@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Sakri Rosenstrom personal website and portfolio" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, angular, developer, freelance, brussels, belgium, devstate, workshops" />
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="date" content="2014-07-07" />
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Sakri Rosenstrom personal website and portfolio</title>
+
+    <!-- GOOGLE ANALYTICS-->
+    <script>
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-393774-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+})();
+
+    </script>
+
+
+        <script src="bower_components/angular/angular.min.js"></script>
+        <script src="bower_components/x2js/xml2json.min.js"></script>
+        <script src="js/portfolioController.js"></script>
+        <script src="js/yearSelectorController.js"></script>
+        <script src="js/sakriDotNet.js"></script>
+
+    <!--<script src="js/release.min.js"></script>-->
+
+        <link rel="stylesheet" href="css/sakri.css" />
+
+    </head>
+    <body data-ng-app="sakriDotNet" data-ng-controller="mainController" data-ng-cloak>
+
+    <div id="mainContainer" main-div="exp" ng-switch on="currentSection" >
+        <header>
+            <h1>Sakri Rosenstrom front end web developer personal home page</h1>
+            <img id="headerImage" src="{{headerImage}}" />
+        </header>
+
+        <nav id="siteNavigation">
+            <h2>Menu</h2>
+            <ul id="menuItemsList">
+                <li><a href="#home" class="navItem" ng-class="{selectedNavItem: currentSection == 'home'}">HOME</a></li>
+                <li><a href="#portfolio" class="navItem" ng-class="{selectedPortfolioNavItem: currentSection == 'portfolio'}">PORTFOLIO</a></li>
+                <li><a href="#cv" class="navItem" ng-class="{selectedNavItem: currentSection == 'cv'}">CV</a></li>
+                <li><a href="#contact" class="navItem" ng-class="{selectedNavItem: currentSection == 'contact'}">CONTACT</a></li>
+                <li><a href="http://www.sakri.net/blog" class="navItem">BLOG</a></li>
+            </ul>
+        </nav>
+
+
+        <!--<sakri-home-section></sakri-home-section>-->
+    <section id="home" class="paddedContent" ng-switch-when="home" >
+        <h2>Home, welcome to sakri.net</h2>
+        <img src="assets/sakri.png" id="profilePic" />
+        <p class="underConstruction">This site is under construction. I put it online so I could share my portfolio with some potential clients, there are still
+        bugs and other incomplete items (responsive stuff), so be gentle.</p>
+        <p class="bold">Hi there, glad you dropped in!</p>
+        <p>This is the personal website of Sakri Rosenstrom. I'm a Brussels based Front End developer and creative coder from Finland. <p>
+        <p>I've been making code driven motion graphics, visual effects, game mechanics and animated user interfaces since the late 90's,
+        and have spent a lot of time working on <a href="http://en.wikipedia.org/wiki/Rich_Internet_application">Rich Internet Applications</a>.<p>
+        <p>I'm currently specializing in the <a href="http://www.w3schools.com/html/html5_canvas.asp" target="_blank">Html5 Canvas</a>,
+        and getting to grips with <a href="https://angularjs.org/" target="_blank">Angular</a> (which is what I've used to build this website).</p>
+        <p>Lately I've been giving Canvas workshops under <a href="http://www.devstate.net/" target="_blank">Devstate</a>
+        but am also looking for work (freelance or full time), using those technologies. Check out my portfolio and CV, if you've got
+        something for me, get in touch.</p>
+        <p>Cheers!</p>
+    </section>
+
+    <section id="portfolio" portfolio-section="exp" ng-switch-when="portfolio">
+
+        <div id="portfolioControls">
+
+            <!--<canvas id="calenderCanvas" calender-canvas="exp" width="80" height="70" ></canvas>-->
+            <img id="calenderImg" data-ng-click="calenderClickHandler()" src="{{calenderSrc}}"
+                 ng-mouseenter="renderOver()"
+                 ng-mouseleave="renderNormal()" />
+
+            <button id="portfolioLeftButton" class="scrollButton"
+                    ng-style="leftButtonStyle"
+                    ng-mouseover="startScroll(1)"
+                    ng-mousedown="scrollButtonDownHandler()"
+                    ng-mouseup="scrollButtonUpHandler()"
+                    ng-mouseleave="stopScroll()" ></button>
+            <div  id="portfolioThumbsScroller" ng-style="thumbsScrollerStyle" >
+                <div id="portfolioThumbnailsListContainer"  ng-style="thumbsListContainerStyle">
+                    <span id="portfolioThumbnailsList" ng-style="thumbsListStyle">
+                        <img ng-src="{{project.path}}thumb.png"
+                             class="portfolioThumbnailsListImg"
+                             ng-class="project.thumbClass"
+                             data-ng-click="projectThumbnailClickHandler(project)"
+                             ng-repeat="project in thumbProjects" />
+                    </span>
+                </div>
+            </div>
+            <button id="portfolioRightButton" class="scrollButton"
+                    ng-style="rightButtonStyle"
+                    ng-mouseover="startScroll(-1)"
+                    ng-mousedown="scrollButtonDownHandler()"
+                    ng-mouseup="scrollButtonUpHandler()"
+                    ng-mouseleave="stopScroll()" ></button>
+        </div>
+
+        <div id="portfolioImageContainer" ng-show="portfolioImageVisible">
+            <img  src="{{currentImagePath}}"  />
+        </div>
+
+        <div id="portfolioFrameContainer" ng-show="flashVisible">
+            <iframe  width="{{project.swfs.swf._width}}" height="{{project.swfs.swf._height}}" src="{{project.swfs.swf.url}}" frameBorder="0" ></iframe>
+        </div>
+
+        <div id="projectInfo" class="paddedContent" ng-style="projectInfoStyle">
+            <h1>{{project.title}}</h1>
+            <div id="projectDescription">
+                <p ng-style="projectInfoP">{{project.description}}</p>
+            </div>
+            <p><a href="{{project.link.__text}}" target="_blank">{{project.link._title}}</a></p>
+            <p><span class="bold">Employer:</span> {{project.employer}}</p>
+            <p><span class="bold">Client:</span> {{project.client}}</p>
+            <p><span class="bold">Technologies:</span> {{project.technologies.technology.toString()}}</p>
+            <p><a class="portfolioNavButton" data-ng-click="previousClick()">Previous</a> - <a class="portfolioNavButton" data-ng-click="nextClick()">next</a></p>
+        </div>
+
+        <canvas id="yearSelector" portfolio-year-selector="exp" ng-show="showYearSelector" ng-style="yearSelectorStyle" ></canvas>
+
+    </section>
+
+    <section id="cv" class="paddedContent" ng-switch-when="cv">
+        <h2>sakri.net CV</h2>
+        <p class="bold">I've been a speaker at conferences including FITC Amsterdam, 360 Flex Milan and Multi-Mania Kortrijk. I Freelance right now, here's a list of jobs I've held in reverse chronological order:<p>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.devstate.net/')"><img src="assets/workLogos/DevStateSakriDotNet.jpg" /></a>
+            <p>Since late 2013, I've been busy with Devstate, a workshops concept revolving around visual coding, focusing on
+                Html5 Canvas, WebGL and General Geometry for creative coding.</p>
+            <a data-ng-click="outboundLinkClick('http://www.devstate.net/')">Visit Devstate</a>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.happymetrix.com/')"><img src="assets/workLogos/happyMetrix.jpg" /></a>
+            <p>In 2013 I worked as a Flex Developer for Happy Metrix, a dashboard application for visualizing online statistics.
+            I built a set of lightweight charting components, connected to numerous social media APIs and worked on the overall
+            architecture and skinning of the app.<p>
+            <a data-ng-click="outboundLinkClick('http://www.happymetrix.com//')">Visit Happy Metrix</a>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.stackandheap.com')"><img src="assets/workLogos/stackAndHeap.jpg" /></a>
+            <p>In 2010 I co-founded Stack & Heap, a Rich Internet Application company.  During this time I worked mostly for
+            Johnson & Johnson pharmaceuticals and Van Hoecke, a local kitchen manufacturer.</p>
+            <a data-ng-click="outboundLinkClick('http://www.stackandheap.com/')">Visit Stack & Heap</a>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.nascom.be/')"><img src="assets/workLogos/nascom.jpg" /></a>
+            <p>2005-2010 was spent as a front end competence/team lead at an upcoming Belgian digital agency. We did tons of work for clients including
+            Sony, Pioneer, Bose, McKinsey & Company, Fortis and Deutche Bank.</p>
+            <a data-ng-click="outboundLinkClick('http://www.nascom.be/')">Visit Nascom</a>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.sony-europe.com/pages/europe/sony_europe.html')"><img src="assets/workLogos/sony.jpg" /></a>
+            <p>I worked as a flash developer at Sony Net Services, an internal digital agency for Sony Europe websites from 2000-2005. I worked on
+            product driven mini-sites, games, show cases, banner campaigns and even some apps</p>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://web.archive.org/web/20000303050426/http://www.mistersuper.com/')"><img src="assets/workLogos/misterSuper.png" /></a>
+            <p>I started out as a freelancer, doing a lot of work for MisterSuper, an online store selling electronics and gadgets.  I started off with a bunch
+            of layouts and animated gif banners, then moved on to flash. I made all kinds of product driven animations featuring Mister Super.</p>
+        </div>
+        <p class="cvSubSection">Before my programming career, I attended these 2 schools:<p>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.leseptantecinq.be/')"><img src="assets/workLogos/75.png" /></a>
+            <p>I received a degree in Graphic Design from this school. It was largely focused on sketching and drawing skills to
+            visualize concepts and ideas for logos, posters, layouts etc. I spent half of my final year on an animation with 3D Studio max,
+            which I unfortunately can't find.  Upon graduating, the first internet bubble was in full swing, and we
+            were advised to look for work as web designers, and that's what I did.</p>
+            <a data-ng-click="outboundLinkClick('http://www.leseptantecinq.be/')">Visit Le Septante Cinq</a>
+        </div>
+        <div>
+            <a data-ng-click="outboundLinkClick('http://www.isb.be/')"><img src="assets/workLogos/isb.png" /></a>
+            <p>The International School Of Brussels was a formative experience in terms of learning and working
+            with people from various cultures and backgrounds.  I received an International Baccalaureate, taking
+            higher Art, History and Biology.</p>
+            <a data-ng-click="outboundLinkClick('http://www.isb.be/')">Visit ISB</a>
+        </div>
+
+
+    </section>
+
+    <section id="contact"  class="paddedContent" ng-switch-when="contact" contact-section="exp" >
+        <form name="contactForm" ng-submit="submitForm()"  >
+            <p class="formTitle" >Your email address:</p>
+            <input 	  type="text"
+                      placeholder="user@domain.com"
+                      id="contactEmailInput"
+                      ng-model = "sender"
+                      required
+                      ng-minlength="6" ng-maxlength="200"
+                    />
+            <p class="formTitle" >Your Message:</p>
+            <textarea id="contactTextArea"
+                      ng-minlength="2" ng-maxlength="700"
+                      ng-model="message"
+                      required></textarea>
+            <input
+                    class="formSubmitButton"
+                    type="submit"
+                    value="Send message!"
+
+                    />
+            <p  class="formTitle" ng-show="mailSent">Mail sent! Thanks! Another one?</p>
+        </form>
+    </section>
+
+    <footer ng-show = "showSocialMediaBar">
+        <nav id="socialMediaBar">
+            <h2>Sakri Rosenstrom on Social Media</h2>
+            <ul>
+                <li><a data-ng-click="outboundLinkClick('http://www.devstate.net')" class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/DevState.png"
+                            title="My current project, Devstate : Finest Html5 Canvas, css3 and WebGL graphical code workshops."
+                            alt="My current project, Devstate : Finest Html5 Canvas, css3 and WebGL graphical code workshops."
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://www.linkedin.com/in/sakri')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/LinkedIn.png"
+                            title="Sakri Rosenstrom Linked In profile. Connect with me, I need projects!"
+                            alt="Sakri Rosenstroms Linked In profile. Connect with me, I need projects!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('https://twitter.com/sakri')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/twitter.png"
+                            title="My ramblings in chunks of 140 characters and less. Don't hesitate to follow, retweet and favorite!"
+                            alt="My ramblings in chunks of 140 characters and less. Don't hesitate to follow, retweet and favorite!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://www.codepen.io/sakri')"   class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/codepen.png"
+                            title="Check out my recent Html5 canvas javascript experiments!"
+                            alt="Check out my recent Html5 canvas javascript experiments!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://instagram.com/54kr1')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/Instagram.png"
+                            title="My award winning photographic achievements with filters. Don't hesitate to follow, like and comment!"
+                            alt="My award winning photographic achievements with filters. Don't hesitate to follow, like and comment!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://www.youtube.com/user/54KR1')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/YouTube.png"
+                            title="My cinematographic skills are often shadowed by my programming prowess, but quality experience awaits you on my youtube channel!"
+                            alt="My cinematographic skills are often shadowed by my programming prowess, but quality experience awaits you on my youtube channel!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://www.reddit.com/user/sakri/')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/Reddit.png"
+                            title="I've been on Reddit since 2006. Go upvote my posts and comments and feed me sweet sweet karma!"
+                            alt="I've been on Reddit since 2006. Go upvote my posts and comments and feed me sweet sweet karma!"
+                            /></a></li>
+                <li><a data-ng-click="outboundLinkClick('http://www.shittytrucklogos.tumblr.com/')"  class="socialMediaImageLink"  >
+                    <img 	src="assets/socialMediaIcons/tumblr.png"
+                            title="My pet creative writing project : A selection of Shitty Truck Logos, found on various highways and truck stops in Belgium. Shitty arrows, maps, globes, wheels, highway graphics, text deformations, eagles etc."
+                            alt="My pet creative writing project : A selection of Shitty Truck Logos, found on various highways and truck stops in Belgium. Shitty arrows, maps, globes, wheels, highway graphics, text deformations, eagles etc."
+                            /></a></li>
+            </ul>
+        </nav>
+        <p>Copyright 2013 Sakri Rosenstrom. All rights reserved.</p>
+    </footer>
+
+</div>
+
+<script id="portfolioXml" type="text/xmldata">
+<portfolio>
+
+    <!-- 1999 -->
+
+    <project>
+        <title>Flirt logo</title>
+        <description>A friend of mine used to run a local Brussels Skateboard company called Flirt. I made this logo for him, he had it printed on t-shirts, sweaters and stickers.
+        Not sure if the logo ever made it to an actual skateboard though...</description>
+        <year>1999</year>
+        <client>Flirt</client>
+        <employer>Independent freelancer</employer>
+        <path>portfolio/1999/flirt/</path>
+        <images width="500" height="400">
+            <image>portfolio/1999/flirt/flirt1.png</image>
+            <image>portfolio/1999/flirt/flirt2.png</image>
+        </images>
+    </project>
+
+    <project>
+        <title>Tinok logo</title>
+        <description>Tinok specializes in all baby related products and is located on Avenue Louise in Brussels. I spent a couple days designing this logo which is still in use, and hasn't been modified since.
+        Considering how many people walk/drive past this shop, I'd say it's probably my most viewed work ever.</description>
+        <year>1999</year>
+        <client>Tinok</client>
+        <employer>Independent freelancer</employer>
+        <path>portfolio/1999/tinok/</path>
+        <images width="540" height="400">
+            <image>portfolio/1999/tinok/logo.png</image>
+            <image>portfolio/1999/tinok/storeWindow.png</image>
+        </images>
+        <link title="Visit Tinok online store">http://www.tinokstore.com/</link>
+    </project>
+
+    <project>
+        <title>Eurorent logo</title>
+        <description>I designed and made this logo in one day, Eurorent still uses the it 15 years down the line! I also worked on their website,
+        which has changed very little since then. The homepage flash must be my oldest flash work still online, including a shape tween and an interactive map of Brussels.</description>
+        <year>1999</year>
+        <client>Eurorent</client>
+        <employer>Independent freelancer</employer>
+        <path>portfolio/1999/euroRent/</path>
+        <images width="540" height="400">
+            <image>portfolio/1999/euroRent/logo.png</image>
+            <image>portfolio/1999/euroRent/screenshot1.png</image>
+            <image>portfolio/1999/euroRent/screenshot2.png</image>
+            <image>portfolio/1999/euroRent/screenshot3.png</image>
+        </images>
+        <link title="Visit Eurorent">http://www.eurorent.com/html/eng/</link>
+    </project>
+
+    <project>
+        <title>MisterSuper.com</title>
+        <description>This was my first real job, a web designer for a consumer electronics online store.
+        I started off with making layouts and designs in photoshop, moved on to animated gifs and quickly flash animations.
+        I made tons of them, mistersuper with cameras, phones, tvs, lavalamps, golf equipment etc. etc.
+        It started with timeline animations in Flash3, then got more complicated with the scripting possibilities of Flash4 which I absolutely loved.
+        This was the starting point of me not designing, and discovering that I enjoyed coding more.
+        These images are from web.archive.org/, as mistersuper.com no longer exists.
+        Mistersuper sold a lot of Sony products, after Sony noticed their success they pouched me.  It was fun while it lasted :)</description>
+        <year>1999</year>
+        <client>MisterSuper</client>
+        <employer>Independent freelancer</employer>
+        <path>portfolio/1999/mistersuper/</path>
+        <images width="715" height="520">
+            <image>portfolio/1999/mistersuper/screenshot1.png</image>
+            <image>portfolio/1999/mistersuper/screenshot2.png</image>
+            <image>portfolio/1999/mistersuper/screenshot3.png</image>
+            <image>portfolio/1999/mistersuper/screenshot4.png</image>
+        </images>
+        <technologies>
+            <technology>html</technology>
+            <technology>css</technology>
+            <technology>flash</technology>
+            <technology>photoshop and imageReady</technology>
+        </technologies>
+    </project>
+
+    <!-- 2000 -->
+    <project>
+        <title>Sony DCS camera 3d renderings</title>
+        <description>I was asked to render a camera as a sample product for a proposed online Sony 3D library. Sadly the project never went through.</description>
+        <year>2000</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2000/DCS3dMax/</path>
+        <images width="640" height="480">
+            <image>portfolio/2000/DCS3dMax/DCSStill1.jpg</image>
+            <image>portfolio/2000/DCS3dMax/DCSStill2.jpg</image>
+            <image>portfolio/2000/DCS3dMax/DCSStill3.jpg</image>
+            <image>portfolio/2000/DCS3dMax/DCSStill4.jpg</image>
+        </images>
+        <technologies>
+            <technology>3D Studio Max</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sakri.net 2000</title>
+        <description>This was my idea of an awesome website for myself in 2000.</description>
+        <year>2000</year>
+        <client>Sakri Rosenstrom</client>
+        <employer>Independent</employer>
+        <path>portfolio/2000/SakriDotNet2000/</path>
+        <images width="720" height="450">
+            <image>portfolio/2000/SakriDotNet2000/screenshot1.png</image>
+            <image>portfolio/2000/SakriDotNet2000/screenshot2.png</image>
+            <image>portfolio/2000/SakriDotNet2000/screenshot3.png</image>
+        </images>
+        <swfs>
+            <swf width="720" height="450">
+                <url>portfolio/2000/SakriDotNet2000/index.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <!-- 2001 -->
+
+    <project>
+        <title>QR10 Showcase</title>
+        <description>I think this was my first "Sony showcase". The project manager just let me do whatever I wanted. Move your mouse slowly from one "vaio" logo to the next, click, rinse and repeat until the showcase repeats itself.</description>
+        <year>2001</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2001/qr10/</path>
+        <images width="700" height="250">
+            <image>portfolio/2001/qr10/screenshot1.png</image>
+            <image>portfolio/2001/qr10/screenshot2.png</image>
+            <image>portfolio/2001/qr10/screenshot3.png</image>
+            <image>portfolio/2001/qr10/screenshot4.png</image>
+            <image>portfolio/2001/qr10/screenshot5.png</image>
+            <image>portfolio/2001/qr10/screenshot6.png</image>
+            <image>portfolio/2001/qr10/screenshot7.png</image>
+        </images>
+        <swfs>
+            <swf width="700" height="250">
+                <url>portfolio/2001/qr10/QR10showcase_en.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sakri.net 2001 Winter Edition</title>
+        <description>This was my idea of an awesome website for myself in winter of 2001.</description>
+        <year>2001</year>
+        <client>Sakri Rosenstrom</client>
+        <employer>Independent</employer>
+        <path>portfolio/2001/SakriDotNet2001Snow/</path>
+        <images width="720" height="450">
+            <image>portfolio/2001/SakriDotNet2001Snow/screenshot1.png</image>
+            <image>portfolio/2001/SakriDotNet2001Snow/screenshot2.png</image>
+            <image>portfolio/2001/SakriDotNet2001Snow/screenshot3.png</image>
+        </images>
+        <swfs>
+            <swf width="720" height="450">
+                <url>portfolio/2001/SakriDotNet2001Snow/snowBounce2.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Camera Comparison</title>
+        <description>An interactive camera comparison tool for Sony Style store. If you have flash, drag and drop cameras and be blown away by 2001 specs! I wrote a script which exported the data from an Excell comma separated file into actionscript arrays, as the comparison chart had to be updated with new models in several languages. </description>
+        <year>2001</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2001/cameraCompare/</path>
+        <images width="544" height="544">
+            <image>portfolio/2001/cameraCompare/screenshot1.png</image>
+            <image>portfolio/2001/cameraCompare/screenshot2.png</image>
+        </images>
+        <swfs>
+            <swf width="544" height="560">
+                <url>portfolio/2001/cameraCompare/camera_comparison_en.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Camera Comparison 2</title>
+        <description>An improved version of the first camera comparison tool.  This one dynamically loads xml and images, making localization and updates possible for non-developers. I believe this is my first custom coded scroller, first of many...</description>
+        <year>2001</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2001/cameraCompare2/</path>
+        <images width="544" height="591">
+            <image>portfolio/2001/cameraCompare2/screenshot1.png</image>
+            <image>portfolio/2001/cameraCompare2/screenshot2.png</image>
+        </images>
+        <swfs>
+            <swf width="544" height="591">
+                <url>portfolio/2001/cameraCompare2/dcam_compare.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Vaio GR Series Showcase</title>
+        <description>This showcase features a bunch of code driven animations from flying lines to text effects. Not bad for 2001 :)</description>
+        <year>2001</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2001/grSeries/</path>
+        <images width="550" height="350">
+            <image>portfolio/2001/grSeries/screenshot1.png</image>
+            <image>portfolio/2001/grSeries/screenshot2.png</image>
+            <image>portfolio/2001/grSeries/screenshot3.png</image>
+            <image>portfolio/2001/grSeries/screenshot4.png</image>
+            <image>portfolio/2001/grSeries/screenshot5.png</image>
+            <image>portfolio/2001/grSeries/screenshot6.png</image>
+            <image>portfolio/2001/grSeries/screenshot7.png</image>
+            <image>portfolio/2001/grSeries/screenshot8.png</image>
+            <image>portfolio/2001/grSeries/screenshot9.png</image>
+            <image>portfolio/2001/grSeries/screenshot10.png</image>
+        </images>
+        <swfs>
+            <swf width="550" height="350">
+                <url>portfolio/2001/grSeries/GRseries.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Mobistar yearly report</title>
+        <description>Sony Net Services also did some external client work. This was a mini-cd containing the 2001 yearly report for Mobistars suit and ties (a Belgian mobile carrier).  At this point in time it was difficult to include images within flowing text with flash. Also I spent a lot of time writing scripts which would take data out of Excell, and display it dynamically in a generated flash table (if you have flash, click on part2 table1 or 2) .  Also, the print feature was a real pain in the ass.</description>
+        <year>2001</year>
+        <client>Mobistar</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2001/mobistar/</path>
+        <images width="788" height="501">
+            <image>portfolio/2001/mobistar/screenshot1.png</image>
+            <image>portfolio/2001/mobistar/screenshot2.png</image>
+        </images>
+        <swfs>
+            <swf width="788" height="501">
+                <url>portfolio/2001/mobistar/demo.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Space Invaders</title>
+        <description>I did this on my free time, press left and right arrows to move, up arrow to shoot.  This is my earliest game that I have found. Not too bad, only the rocket movement is weird and can get out of control if you press too long.</description>
+        <year>2001</year>
+        <client>Sakri Rosenstrom</client>
+        <employer>Independent</employer>
+        <path>portfolio/2001/spaceInvaders/</path>
+        <images width="400" height="300">
+            <image>portfolio/2001/spaceInvaders/screenshot1.png</image>
+            <image>portfolio/2001/spaceInvaders/screenshot2.png</image>
+            <image>portfolio/2001/spaceInvaders/screenshot3.png</image>
+        </images>
+        <swfs>
+            <swf width="400" height="300">
+                <url>portfolio/2001/spaceInvaders/spaceInvaders5.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <!-- 2002 -->
+    <project>
+        <title>Sony Picot</title>
+        <description>This cute DVD player came with an entire flash minisite of it's own.
+        This pac man game has a bunch of levels and connected to a database through Java with weekly top scores winning a PICOT.
+        If you have flash, it still works, the picot character is rather small, but he is there at the bottom.</description>
+        <year>2002</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2002/picot/</path>
+        <images width="781" height="292">
+            <image>portfolio/2002/picot/screenshot1.png</image>
+            <image>portfolio/2002/picot/screenshot2.png</image>
+            <image>portfolio/2002/picot/screenshot3.png</image>
+            <image>portfolio/2002/picot/screenshot4.png</image>
+            <image>portfolio/2002/picot/screenshot5.png</image>
+        </images>
+        <swfs>
+            <swf width="781" height="292">
+                <url>portfolio/2002/picot/game.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>Java</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Aibo Tic Tac Toe</title>
+        <description>A mini-game with the intention of teaching users about Sonys AIBO robotic dogs capabilities. Unfortunately all that remains of this project is this screenshot...</description>
+        <year>2002</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2002/aiboTicTacToe/</path>
+        <images width="650" height="379">
+            <image>portfolio/2002/aiboTicTacToe/screenshot1.png</image>
+            <image>portfolio/2002/aiboTicTacToe/screenshot1.png</image>
+        </images>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+            <technology>Java</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Speaker Locator</title>
+        <description>A drill down approach to finding the right speaker for your car. This project exported a database into xml, then helped users to navigate the different options within a flash interface, resulting in specific speakers and details about them, and a link to the product.</description>
+        <year>2002</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2002/speakerSelector/</path>
+        <images width="400" height="501">
+            <image>portfolio/2002/speakerSelector/screenshot1.png</image>
+            <image>portfolio/2002/speakerSelector/screenshot2.png</image>
+            <image>portfolio/2002/speakerSelector/screenshot3.png</image>
+            <image>portfolio/2002/speakerSelector/screenshot4.png</image>
+            <image>portfolio/2002/speakerSelector/screenshot5.png</image>
+        </images>
+        <swfs>
+            <swf width="440" height="500">
+                <url>portfolio/2002/speakerSelector/selector.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <!-- 2003 -->
+    <project>
+        <title>Aibo Birthday</title>
+        <description>Remember Sonys cute robotic dog?  This flash featured on sony-style in 2003 to celebrate his 3rd birthday.  Some text effects with multi language support, the juggling was a programmatic animation. I was quite proud of it at the time.</description>
+        <year>2003</year>
+        <client>Sony</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/aiboBirthday/</path>
+        <images width="500" height="400">
+            <image>portfolio/2003/aiboBirthday/aiboBirthday1.png</image>
+            <image>portfolio/2003/aiboBirthday/aiboBirthday2.png</image>
+            <image>portfolio/2003/aiboBirthday/aiboBirthday3.png</image>
+        </images>
+        <swfs>
+            <swf width="500" height="400">
+                <url>portfolio/2003/aiboBirthday/aibo_EN.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Aibo Newsletter CMS</title>
+        <description>My first app. A basic CRUD tool for the Aibo marketing departments newsletters.  Apart from saving and deleting, all the logic was frontend javascript.</description>
+        <year>2003</year>
+        <client>Aibo</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/aiboNewsletterCMS/</path>
+        <images width="798" height="482">
+            <image>portfolio/2003/aiboNewsletterCMS/screenshotCrop.png</image>
+            <image>portfolio/2003/aiboNewsletterCMS/screenshotCrop.png</image>
+        </images>
+        <technologies>
+            <technology>Html</technology>
+            <technology>Javascript</technology>
+            <technology>css</technology>
+            <technology>asp</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Aibo News scroller CMS</title>
+        <description>The aibo section of Sony-Style had a banner with rotating news items (which I unfortunately can't run). This was managed by a flash based CMS which connected to a Java backend which saved XML files. Users could enter an image, title, description and a link, in 3 languages.</description>
+        <year>2003</year>
+        <client>Aibo</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/aiboNewsScroller/</path>
+        <images width="550" height="500">
+            <image>portfolio/2003/aiboNewsScroller/aiboNewsScroller.png</image>
+            <image>portfolio/2003/aiboNewsScroller/aiboNewsScroller.png</image>
+        </images>
+        <swfs>
+            <swf width="550" height="500">
+                <url>portfolio/2003/aiboNewsScroller/aibo_update.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Europe Business Units Map</title>
+        <description>An interactive map which received it's data and coordinates from XML, with some filtering capabilities and details about Sonys European operations.</description>
+        <year>2003</year>
+        <client>Sony Europe</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/alfMap/</path>
+        <images width="533" height="398">
+            <image>portfolio/2003/alfMap/screenshot1.png</image>
+            <image>portfolio/2003/alfMap/screenshot2.png</image>
+            <image>portfolio/2003/alfMap/screenshot3.png</image>
+        </images>
+        <swfs>
+            <swf width="533" height="398">
+                <url>portfolio/2003/alfMap/map.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Display Screen Saver</title>
+        <description>Two screens glide around in a fake 3d space with random movements, then come together and display marketing slogans. Made for a CD which was packaged with a line of Sony Monitors</description>
+        <year>2003</year>
+        <client>Sony Europe</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/displayCD/</path>
+        <images width="1024" height="602">
+            <image>portfolio/2003/displayCD/screenshot1.png</image>
+            <image>portfolio/2003/displayCD/screenshot2.png</image>
+        </images>
+        <swfs>
+            <swf width="1024" height="602">
+                <url>portfolio/2003/displayCD/engine4.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Sony Europe Hub Page</title>
+        <description>With it's endless list of urls, Sony wanted a "hub page" which could direct users to their desired content in all available languages and locales. This project included about 50 manually edited XML files for the data :D</description>
+        <year>2003</year>
+        <client>Sony Europe</client>
+        <employer>Sony Net Services</employer>
+        <path>portfolio/2003/hub/</path>
+        <images width="760" height="341">
+            <image>portfolio/2003/hub/screenshot1.png</image>
+            <image>portfolio/2003/hub/screenshot2.png</image>
+            <image>portfolio/2003/hub/screenshot3.png</image>
+        </images>
+        <swfs>
+            <swf width="760" height="341">
+                <url>portfolio/2003/hub/HUB.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+            <technology>xml</technology>
+        </technologies>
+    </project>
+
+    <!-- 2005 -->
+    <project>
+        <title>Good Morning Donna</title>
+        <description>Radio Donna is a national Belgian Radio Station who ran a TV advert with a quirky Disney-ish cartoon.
+        At one moment, the three little pigs release their morning farts.  For the online version, I wrote a script
+        which takes a users name, then the pigs fart that out as green little bubbles which join to form the text.
+        Users could store this and send the link to their friends by email. If you have flash, this still works, but freezes once
+        the fart is complete.</description>
+        <year>2005</year>
+        <client>Donna Radio</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2005/donna/</path>
+        <images width="507" height="286" rotationSpeed="3000">
+            <image>portfolio/2005/donna/fart1.png</image>
+            <image>portfolio/2005/donna/fart2.png</image>
+            <image>portfolio/2005/donna/fart3.png</image>
+            <image>portfolio/2005/donna/fart4.png</image>
+            <image>portfolio/2005/donna/fart5.png</image>
+        </images>
+        <swfs>
+            <swf width="510" height="290">
+                <url>portfolio/2005/donna/fart.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Help Joe</title>
+        <description>Henkel wanted to try a viral approach to promoting their new tooth whitening paste called Express White.
+        Nascom produced a "guitar hero" like game, where videos of a comedian brushing his teeth could be scrubbed with
+        a users mouse.  I was responsible for implementing the game mechanics and
+        video "scrubbing".  This was probably the funnest project I've ever worked on, and won the fwa site of the day award.</description>
+        <year>2005</year>
+        <client>Henkel</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2005/helpJoe/</path>
+        <images width="514" height="400" rotationSpeed="3000">
+            <image>portfolio/2005/helpJoe/screenshot1.png</image>
+            <image>portfolio/2005/helpJoe/screenshot2.png</image>
+            <image>portfolio/2005/helpJoe/screenshot3.png</image>
+            <image>portfolio/2005/helpJoe/screenshot4.png</image>
+            <image>portfolio/2005/helpJoe/screenshot5.png</image>
+            <image>portfolio/2005/helpJoe/screenshot6.png</image>
+            <image>portfolio/2005/helpJoe/screenshot7.png</image>
+            <image>portfolio/2005/helpJoe/screenshot8.png</image>
+        </images>
+        <!--
+        If you have flash, the game still works!  (seems not, there is some kind of a check if local, if server...
+        <swfs>
+            <swf width="600" height="600">
+                <url>portfolio/2005/helpJoe/game.swf</url>
+            </swf>
+        </swfs>
+        -->
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+        <link title="Visit the fwa.com page for Help Joe">http://www.thefwa.com/site/help-joe/</link>
+    </project>
+
+    <!-- 2006 -->
+    <project>
+        <title>VAIO AR-Series showcase</title>
+        <description>The AR-Series appeared as a product placement in the 2006 Movie adaptation of "The Davinci Code". Riding on this glory, Nascom produced a flash showcase highlighting the innovations of this laptop. There's a nifty menu system, for some reason a blue rectangle appears behind some of the text fields, must be some change in the flashplayer. meh.</description>
+        <year>2006</year>
+        <client>Sony VAIO</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2006/arSeries/</path>
+        <images width="963" height="573" rotationSpeed="3000">
+            <image>portfolio/2006/arSeries/screenshot1.png</image>
+            <image>portfolio/2006/arSeries/screenshot2.png</image>
+            <image>portfolio/2006/arSeries/screenshot3.png</image>
+            <image>portfolio/2006/arSeries/screenshot4.png</image>
+            <image>portfolio/2006/arSeries/screenshot5.png</image>
+            <image>portfolio/2006/arSeries/screenshot6.png</image>
+            <image>portfolio/2006/arSeries/screenshot7.png</image>
+        </images>
+        <swfs>
+            <swf width="963" height="573">
+                <url>portfolio/2006/arSeries/ar_series.swf</url>
+            </swf>
+        </swfs>
+        <technologies>
+            <technology>Flash</technology>
+        </technologies>
+    </project>
+
+    <!-- 2007 -->
+    <project>
+        <title>Snowflake app</title>
+        <description>A Christmas card where visitors can cut out their own paper snowflake.  The paper is already folded, so users just have to use a scissor tool to cut out shapes. The paper then unfolds and ends up in an animated snowfall where others can check it out and read the greeting messsages.</description>
+        <year>2007</year>
+        <client>Hercules Trophy</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2007/snowFlakeApp/</path>
+        <images width="500" height="300" rotationSpeed="3000">
+            <image>portfolio/2007/snowFlakeApp/create_flake.jpg</image>
+            <image>portfolio/2007/snowFlakeApp/flake_detail.jpg</image>
+            <image>portfolio/2007/snowFlakeApp/snow_fall.jpg</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Cairngorm</technology>
+            <technology>Papervision</technology>
+            <technology>php</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>BikkembergsFootball.com</title>
+        <description>I was outsourced to thesedays.be to work on the Bikkembergs Flash driven online store. This was a very advanced affair at the time, using FAMES (Flashout, ASDT, MTASC, Eclipse and SwfMill), the first time I produced a project without using Adobes own tools. The project had an extremely fancy intro video. Unfortunately I haven't managed to find any screenshots of the actual online store. This project won a webaward.org.</description>
+        <year>2007</year>
+        <client>Bikkembergs Football</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2007/bikkembergs/</path>
+        <images width="399" height="379" rotationSpeed="3000">
+            <image>portfolio/2007/bikkembergs/screenshot1.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot2.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot3.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot4.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot5.png</image>
+        </images>
+        <technologies>
+            <technology>FAMES</technology>
+            <technology>xml</technology>
+        </technologies>
+        <link title="Visit the webaward.org page for Bikkembergs">http://www.webaward.org/winner.asp?eid=6472#.U8eGmpSSw2E</link>
+    </project>
+
+    <!-- 2008 -->
+
+    <project>
+        <title>Shifty Chess</title>
+        <description>Adobe organized a weekend hackathon in the Ardennes to promote their AIR runtime. I was invited as a speaker to introduce AS3 to a group of 30 developers, and I joined the competition to build an app in 2 days. I teamed up with Jeroen de Vos, we built a desktop chess game, with a toggle to switch the chess pieces to folders and text file icons for that stealth office procrastination. The game allowed clients to connect to each other via Adobes LiveCycle.  We won second place.</description>
+        <year>2008</year>
+        <client>Hercules Trophy</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2008/shiftyChess/</path>
+        <images width="547" height="603" rotationSpeed="3000">
+            <image>portfolio/2008/shiftyChess/shiftychess2.jpg</image>
+            <image>portfolio/2008/shiftyChess/shiftychess3.jpg</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Air</technology>
+            <technology>LiveCycle</technology>
+        </technologies>
+    </project>
+
+    <project>
+        <title>Pioneer Kuro</title>
+        <description>I was outsourced to thesedays.be to work on a flex website promoting Pioneers Kuro TV sets. The site had a 3d cube navigation done with Papervision and a bunch of interactive features. The project won a couple of awards including the webaward.org.</description>
+        <year>2008</year>
+        <client>Pioneer</client>
+        <employer>Nascom</employer>
+        <path>portfolio/2008/kuro/</path>
+        <images width="485" height="433" rotationSpeed="3000">
+            <image>portfolio/2008/kuro/pioneer_kuro1.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro2.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro3.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro4.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro5.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro6.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro7.png</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Papervision</technology>
+        </technologies>
+        <link title="Visit the webaward.org page for Kuro">http://www.webaward.org/winner.asp?eid=12055#.U8fElZSSw2E/</link>
+    </project>
+
+
+
+    <!-- 2011 -->
+    <project>
+        <title>Aviga EHR</title>
+        <description>AVIGA™ is a web-based Flex application by Johnson And Johnson pharmaceuticals.
+            It is an electronic health record designed to address the disease specific needs of
+            clinicians who manage HIV/AIDS. Stack and Heap was commissioned to re-architect and implement it, using Spring Actionscript,
+            and Granite DS for communicating with a Java backend. I spent a year on this project as a part of a 10-15 person
+            development team. I worked on many different CRUD type screens for data input and display.
+            This is the largest application I ever worked on. </description>
+        <year>2011</year>
+        <client>Johnson and Johnson Pharmaceuticals</client>
+        <employer>Stack and Heap</employer>
+        <path>portfolio/2011/avigaEhr/</path>
+        <images width="690" height="406" rotationSpeed="3000">
+            <image>portfolio/2011/avigaEhr/screenshot1small.png</image>
+            <image>portfolio/2011/avigaEhr/screenshot2small.png</image>
+            <image>portfolio/2011/avigaEhr/screenshot3small.png</image>
+            <image>portfolio/2011/avigaEhr/screenshot4small.png</image>
+            <image>portfolio/2011/avigaEhr/screenshot5small.png</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Granite DS</technology>
+            <technology>Spring ActionScript</technology>
+        </technologies>
+        <link title="Visit Aviga EHR website">https://www.avigaehr.com/</link>
+    </project>
+
+    <!-- 2012 -->
+    <project>
+        <title>Van Hoecke VHINTRA</title>
+        <description>Van Hoecke produces high end kitchens in Sint Niklaas.  Stack And Heap collaborated with their inhouse dev-team to produce a Flex/Air intranet application
+        for managing various internal tasks. I worked on a drawer configurator and a "mega data grid".  I extended the "Ultimate Data Grid" from flexicious.com
+        to produce a grid with Excell like custom functionalities.  I also participated in the overall skinning of the product.</description>
+        <year>2012</year>
+        <client>Van Hoecke</client>
+        <employer>Stack And Heap</employer>
+        <path>portfolio/2012/vanHoecke/</path>
+        <images width="798" height="447" rotationSpeed="3000">
+            <image>portfolio/2012/vanHoecke/start_crop.png</image>
+            <image>portfolio/2012/vanHoecke/openpaginas_crop.png</image>
+            <image>portfolio/2012/vanHoecke/product_crop.png</image>
+            <image>portfolio/2012/vanHoecke/taor_config_crop.png</image>
+            <image>portfolio/2012/vanHoecke/vhintra_config_crop.png</image>
+            <image>portfolio/2012/vanHoecke/vhintra_order_crop.png</image>
+            <image>portfolio/2012/vanHoecke/vhintra_pke_crop.png</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Air</technology>
+            <technology>Soap</technology>
+            <technology>Spring ActionScript</technology>
+        </technologies>
+        <link title="Visit Van Hoecke website">http://www.vanhoecke.be</link>
+    </project>
+
+    <!-- 2013 -->
+    <project>
+        <title>Happy Metrix</title>
+        <description>Happy Metrix is a Flex/Air application, which lets you create easy-to-use dashboards, collecting validated data from diverse sources.
+        I started off with a
+        major refactoring session, including re-building most of the charting components from scratch with the intent of making them performant and
+        lightweight enough for the iPad version of the app.  I implemented a number of source APIs, working with the apis of Twitter, Facebook, Tumblr to name a few.
+        I also worked on the export functionality and various other aspects of the app.</description>
+        <year>2013</year>
+        <client>Happy Metrix</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2013/happyMetrix/</path>
+        <images width="690" height="391" rotationSpeed="3000">
+            <image>portfolio/2013/happyMetrix/screenshot0.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot1.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot2.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot3.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot4.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot5.png</image>
+        </images>
+        <technologies>
+            <technology>Flex</technology>
+            <technology>Air</technology>
+            <technology>Pure MVC</technology>
+            <technology>xml</technology>
+            <technology>json</technology>
+        </technologies>
+        <link title="Visit Happy Metrix website">http://www.happymetrix.com</link>
+    </project>
+
+    <project>
+        <title>DevState</title>
+        <description>A concept between 3 veteran graphical coders, after giving trainings, workshops and presentations at conferences, we decided to make it a
+            full time activity.  Devstate currently offers two Canvas workshops, with many more in the planning. </description>
+        <year>2013</year>
+        <client>Self</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2013/devState/</path>
+        <images width="810" height="322" rotationSpeed="3000">
+            <image>portfolio/2013/devState/devState.png</image>
+            <image>portfolio/2013/devState/flappy-bird.png</image>
+            <image>portfolio/2013/devState/techCrush.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>WebGL</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Visit DevState">http://www.devstate.net</link>
+    </project>
+
+    <!-- 2014 -->
+
+    <project>
+        <title>Animated Canvas Charting Components</title>
+        <description>As material for a Devstate workshop titled "Introduction To Html5 Canvas with Charting", I created some
+        lightweight "from scratch" demos which are hosted on codepen.io.  Although there are many great charting component
+        libraries out there, it is a great exercise and a starting point to get into Canvas development.</description>
+        <year>2014</year>
+        <client>Devstate</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2014/charting/</path>
+        <images width="534" height="534" rotationSpeed="3000">
+            <image>portfolio/2014/charting/donutChartSmall.png</image>
+            <image>portfolio/2014/charting/barChartSmall.png</image>
+            <image>portfolio/2014/charting/lineChartSmall.png</image>
+            <image>portfolio/2014/charting/pieChartSmall.png</image>
+            <image>portfolio/2014/charting/isometricSmall.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Check out the animated charting components">http://codepen.io/devstate/</link>
+    </project>
+
+    <project>
+        <title>Canvas Text Effects</title>
+        <description>I gave a talk at FITC Amsterdam in February and another one at Belgiums Multimania in Kortrijk on
+        the topic of "Text Effects With Canvas".  For these talks, and for the exercise of mastering the Html5 Canvas,
+        I created a number of demos on codepen.io using numerous tricks which I've accumulated up my sleeve during the
+        past 15 years of flashing.  Many of the demos allow the user to enter their own text.</description>
+        <year>2014</year>
+        <client>Sakri.net</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2014/codepen/</path>
+        <images width="400" height="400" rotationSpeed="3000">
+            <image>portfolio/2014/codepen/ghost.png</image>
+            <image>portfolio/2014/codepen/ownWords.png</image>
+            <image>portfolio/2014/codepen/isometric.png</image>
+            <image>portfolio/2014/codepen/fire.png</image>
+            <image>portfolio/2014/codepen/particles.png</image>
+            <image>portfolio/2014/codepen/splode.png</image>
+            <image>portfolio/2014/codepen/heman.png</image>
+            <image>portfolio/2014/codepen/clouds.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Click here to for the demos on codePen!">http://codepen.io/sakri/popular</link>
+    </project>
+
+    <project>
+        <title>Flappy Bird 32x32</title>
+        <description>In May 2014, gamejolt.io ran a competition called #lowrezjam where
+        coders were challenged to create a working and playable game at only 32 by 32 pixel resolution.
+        Having built a Flappy Bird clone with Canvas for our Devstate workshop, I thought I'd give it a go, and much to my
+        surprise it was a success. I drew a tiny spritesheet in photoshop, adjusted the code a bit and voila :
+        at the time of writing the game has been played nearly 9000 times!</description>
+        <year>2014</year>
+        <client>Devstate</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2014/flappy32/</path>
+        <images width="400" height="400" rotationSpeed="3000">
+            <image>portfolio/2014/flappy32/tapToFlap.png</image>
+            <image>portfolio/2014/flappy32/game.png</image>
+            <image>portfolio/2014/flappy32/gameOver.png</image>
+            <image>portfolio/2014/flappy32/hiScore.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Click to play Flappy 32x32">http://codepen.io/sakri/full/gGahJ/</link>
+    </project>
+
+    <project>
+        <title>Tech Crush!</title>
+        <description>Cashing in on the incredible popularity of Candy Crush, Devstate wanted to have a Canvas workshop
+        teaching the basics of "Match Three" game mechanics.  In this game instead of candy, you crush logos of
+        Tech companies and make ridiculous amounts of money.</description>
+        <year>2014</year>
+        <client>Devstate</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2014/techCrush/</path>
+        <images width="600" height="468" rotationSpeed="3000">
+            <image>portfolio/2014/techCrush/screenshot1small.png</image>
+            <image>portfolio/2014/techCrush/screenshot2small.png</image>
+            <image>portfolio/2014/techCrush/screenshot3small.png</image>
+            <image>portfolio/2014/techCrush/screenshot4small.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Click here to play Tech Crush!">http://codepen.io/devstate/full/rtiqk</link>
+    </project>
+
+    <project>
+        <title>Knuckle Tattoo Generator</title>
+        <description>I was hired by Brighton based photographer Edward Bishop for a feature to accompany the website
+        for his new book "Knuckles".  Using Html5 Canvas, I created a knuckle tattoo generator, where users can enter
+        their own text and choose a font, which then renders a .png image which can be shared on Facebook and Twitter.</description>
+        <year>2014</year>
+        <client>Edward Bishop Photography</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/2014/knuckles/</path>
+        <images width="700" height="395" rotationSpeed="3000">
+            <image>portfolio/2014/knuckles/screenshot1.png</image>
+            <image>portfolio/2014/knuckles/screenshot2.png</image>
+        </images>
+        <technologies>
+            <technology>Canvas</technology>
+            <technology>Javascript</technology>
+        </technologies>
+        <link title="Create your own Knuckle Tattoo">http://www.knuckletattoos.co.uk/generator/</link>
+    </project>
+
+    <project>
+        <title>Welcome to my Portfolio!</title>
+        <description>Just use the year selector and the thumbs to navigate through my old stuff.  It's recommended to
+        go through this on a computer with flash installed, as there are some funny oldies.  The inventory of projects
+        is nowhere near complete, there are [numProjects] projects at the moment, I'd say a good 30 are missing.
+        I'm currently busy harassing old colleagues for screenshots of some key projects.  Enjoy!</description>
+        <year>2014</year>
+        <client>sakri.net</client>
+        <employer>Independent consulting</employer>
+        <path>portfolio/</path>
+        <images width="580" height="400" rotationSpeed="3000">
+            <image>portfolio/portfolioHome1.png</image>
+            <image>portfolio/portfolioHome2.png</image>
+        </images>
+        <technologies>
+            <technology>Angular</technology>
+            <technology>Canvas</technology>
+            <technology>javascript</technology>
+            <technology>less</technology>
+            <technology>grunt</technology>
+        </technologies>
+    </project>
+
+</portfolio>
+    </script>​
+
+</body>
+</html>

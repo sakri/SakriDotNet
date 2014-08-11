@@ -1,0 +1,470 @@
+
+/* =======:: COLORS ::========== */
+
+/* NOTE : modification to colors must also be updated in sakriDotNet.js colorService() */
+@headerColor: #f25a2b;
+@subHeaderColor: #bcc0d2;
+@bgColor: #edd8aa;
+@white: #FFFFFF;
+
+@siteFont: Tahoma,Helvetica,Arial,Verdana,sans-serif;
+
+/* =======:: GLOBAL ::========== */
+
+html, body{
+    margin : 0px;
+    padding: 0px;
+    width : 100%;
+    height : 100%;
+    background-color:@bgColor;
+    font-family:@siteFont;
+}
+
+#mainContainer{
+    margin:0px;
+    background-color:@bgColor;
+    padding: 0px;
+    overflow: hidden;
+}
+
+canvas{
+    margin: 0px;
+    padding: 0px;
+    /* from http://stackoverflow.com/questions/18508442/remove-whitespace-between-div-element */
+    display:inline-block;
+    margin:0px;
+    outline:none;
+    vertical-align: top;
+}
+
+.bold{
+  font-weight: bold;
+}
+
+.underConstruction{
+  font-weight: bold;
+  color: @headerColor;
+}
+
+#portfolioXml{
+  display: none;
+}
+
+a {
+  outline: 0;
+}
+
+/* =======:: HEADER ::========== */
+
+header{
+    height:105px;
+    background-color:@headerColor;
+    text-align:center;
+}
+
+header h1{
+    display: none;
+}
+
+/* =======:: NAVS  ::========== */
+
+#siteNavigation{
+    height:34px;
+    text-align:center;
+    background-color:@headerColor;
+    padding-top:10px;
+}
+
+nav h2{
+    display:none;
+}
+nav ul{
+    margin:0px;
+    padding:0px;
+}
+nav li{
+    list-style-type:none;
+    display:inline;
+    margin-top:10px;
+}
+
+.navItem{
+    font-size:24px;
+    padding-top:8px;
+    padding-bottom:5px;
+    padding-left:5px;
+    padding-right:5px;
+    text-decoration:none;
+    font-weight:bold;
+    background-color:transparent;
+}
+
+.navItem:link{color:@white;}
+.navItem:visited{color:@white;}
+.navItem:focus{
+    color:@bgColor;
+}
+.navItem:hover{
+    color:@bgColor;
+}
+.navItem:active{
+    color:@bgColor;
+}
+
+.navItem.selectedNavItem{
+    background-color:@bgColor;
+    color:@headerColor;
+    border-radius: 8px 8px 0px 0px;
+}
+
+.navItem.selectedPortfolioNavItem{
+    background-color:@subHeaderColor;
+    border-radius: 8px 8px 0px 0px;
+    color:@white;
+}
+
+
+
+/* =======:: SECTIONS ::========== */
+
+section{
+    background-color:@bgColor;
+    overflow:auto;
+    padding: 5px;
+}
+
+section h2{
+    display: none;
+}
+
+section a{
+    font-weight:bold;
+}
+section a:link{color:@headerColor;}
+section a:visited{color:@headerColor;}
+section a:focus{color:@subHeaderColor;}
+section a:hover{color:@subHeaderColor;}
+section a:active{color:@subHeaderColor;}
+
+.paddedContent{
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+
+#profilePic{
+  float: left;
+  border-style: solid;
+  border-width: 8px;
+  border-color: @white;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 20px;
+}
+
+/* =======:: PORTFOLIO ::========== */
+/* sizes and positioning controlled with javascript */
+
+#portfolio{
+    padding: 0px;
+    margin-bottom: 5px;
+}
+
+#yearSelector{
+    position: absolute;
+    left: 0px;
+    top:150px;
+}
+
+#calenderCanvas{
+    display: inline;
+    cursor: pointer;
+}
+
+/*position: relative; padding-top: 15px;*/
+#portfolioControls{
+    background-color: @subHeaderColor;
+    width: 100%;
+    height: 90px;
+    text-align: center;
+    padding-top: 12px;
+}
+
+
+/* THUMBS SCROLLER position: relative; */
+#portfolioThumbsScroller{
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    height: 76px;
+}
+
+#portfolioThumbnailsListContainer{
+    display: block;
+    position: relative;
+    margin: 0px;
+    left: 0px;
+    top: 0px;
+    padding: 0px;
+    height: 76px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/*position: absolute;*/
+#portfolioThumbnailsList{
+    white-space: nowrap;
+    position: absolute;
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+    left: 0px;
+    top: 0px;
+    height: 76px;
+    overflow: hidden;
+}
+
+.portfolioThumbnailsListImg{
+    margin: 0px;
+    border-width: 3px;
+    border-style: solid;
+    border-color: @white;
+    padding: 0px;
+    margin-left: 3px;
+    margin-right: 3px;
+    cursor:pointer;
+}
+
+.portfolioThumbnailsListImg:hover{
+    border-color: @headerColor;
+}
+
+.portfolioThumbnailsListImg.selectedThumb {
+    border-color: @headerColor;
+}
+
+#calenderImg{
+    cursor: pointer;
+}
+
+/*LEFT & RIGHT buttons*/
+
+#portfolio button:focus {
+    outline-width: 0;
+}
+
+.scrollButton{
+    background-repeat:no-repeat;
+    border-width: 0px;
+    cursor: pointer;
+    margin: 0px;
+    padding: 0px;
+    background-color: transparent;
+}
+
+#portfolioLeftButton{
+    width:15px;
+    height:66px;
+    background-image:url("../assets/PortfolioLeftButtonUp.png");
+}
+#portfolioLeftButton:active{
+    background-image:url("../assets/PortfolioLeftButtonDown.png");
+}
+#portfolioLeftButton:hover{
+    background-image:url("../assets/PortfolioLeftButtonDown.png");
+}
+#portfolioRightButton{
+    width:15px;
+    height:66px;
+    background-image:url("../assets/PortfolioRightButtonUp.png");
+}
+#portfolioRightButton:active{
+    background-image:url("../assets/PortfolioRightButtonDown.png");
+}
+#portfolioRightButton:hover{
+    background-image:url("../assets/PortfolioRightButtonDown.png");
+}
+
+#portfolioImageContainer{
+    text-align: center;
+    margin-top: 10px;
+}
+#portfolioImageContainer img{
+    max-width:100%;
+    height:auto;
+}
+
+
+
+#portfolioFrameContainer{
+    text-align: center;
+    margin-top: 10px;
+}
+
+#projectInfo{
+    text-align: center;
+}
+
+.portfolioNavButton{
+  cursor: pointer;
+}
+
+.portfolioNavButton{
+  font-weight:bold;
+}
+.portfolioNavButton:link{color:@headerColor;}
+.portfolioNavButton:visited{color:@headerColor;}
+.portfolioNavButton:focus{color:@subHeaderColor;}
+.portfolioNavButton:hover{color:@subHeaderColor;}
+.portfolioNavButton:active{color:@subHeaderColor;}
+
+/* =======:: CV ::========== */
+
+
+#cv a{
+  cursor: pointer;
+}
+
+#cv div{
+  clear: both;
+  padding-top: 20px;
+}
+
+#cv img{
+    float: left;
+    margin-top: 15px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+.cvSubSection{
+  font-weight: bold;
+  clear: both;
+  padding-top: 30px;
+}
+
+
+
+/* =======:: CONTACT  ::========== */
+
+.formTitle{
+    margin-top:30px;
+    margin-bottom:10px;
+    font-size:18px;
+    font-weight:bold;
+    color:@headerColor;
+}
+
+.formSubmitButton{
+    margin-top: 22px;
+    border: 2px solid @white;
+    padding: 5px 5px 3px 3px;
+    font-size: 18px;
+    background-color: @headerColor;
+    font-weight: bold;
+    color: @white;
+    cursor: hand;
+    cursor: pointer;
+    height: 45px;
+    width:100%;
+}
+
+.formSubmitButton:active{
+  background-color: @white;
+  border-color: @headerColor;
+  color: @headerColor;
+}
+
+.formSubmitButton:hover{
+  background-color: @white;
+  border-color: @headerColor;
+  color: @headerColor;
+}
+
+#contactTextArea{
+    font-size: 14px;
+    resize: none;
+    width:99%;
+    height:140px;
+}
+
+#contactEmailInput{
+    width:99%;
+    font-size: 14px;
+}
+
+
+
+
+/* =======:: FOOTER ::========== */
+
+footer{
+    width: 100%;
+    text-align:center;
+}
+
+.socialMediaImageLink{
+    text-decoration:none;
+    padding-left:0px;
+    padding-right:0px;
+    margin-left:0px;
+    margin-left:0px;
+}
+
+#socialMediaBar{
+    margin-top: 60px;
+}
+
+#socialMediaBar a{
+    cursor: pointer;
+}
+
+
+/* ---------------------- RESPONSIVE ---------------------- */
+
+@media only screen and (max-width: 1000px) {
+    .paddedContent{
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .paddedContent{
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+
+    #profilePic{
+      width: 40%;
+      height: auto;
+    }
+
+    /* padding-top:10px; */
+    #siteNavigation{
+      height:27px;
+    }
+
+    .navItem{
+      font-size: 18px;
+    }
+
+
+}
+
+@media only screen and (max-width: 400px) {
+
+  .paddedContent{
+    margin-left: 2%;
+    margin-right: 2%;
+  }
+
+  .navItem{
+    font-size: 14px;
+  }
+
+  #siteNavigation{
+    height:23px;
+  }
+}
+
