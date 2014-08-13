@@ -30,10 +30,18 @@ _gaq.push(['_trackPageview']);
 
         <script src="bower_components/angular/angular.min.js"></script>
         <script src="bower_components/x2js/xml2json.min.js"></script>
+        <!-- services -->
+        <script src="js/portfolioService.js"></script>
+        <script src="js/analyticsService.js"></script>
+        <script src="js/canvasTextService.js"></script>
+        <!-- controllers -->
         <script src="js/portfolioController.js"></script>
         <script src="js/yearSelectorController.js"></script>
+        <script src="js/contactController.js"></script>
+        <!-- app -->
         <script src="js/sakriDotNet.js"></script>
 
+    <!-- You can view the non - minified javascript code at https://github.com/sakri/SakriDotNet -->
     <!--<script src="js/release.min.js"></script>-->
 
         <link rel="stylesheet" href="css/sakri.css" />
@@ -193,7 +201,8 @@ _gaq.push(['_trackPageview']);
 
     </section>
 
-    <section id="contact"  class="paddedContent" ng-switch-when="contact" contact-section="exp" >
+    <!--<section id="contact"  class="paddedContent" ng-switch-when="contact" contact-section="exp" >-->
+    <section id="contact"  class="paddedContent" ng-switch-when="contact" ng-controller="contactController" >
         <form name="contactForm" ng-submit="submitForm()"  >
             <p class="formTitle" >Your email address:</p>
             <input 	  type="text"

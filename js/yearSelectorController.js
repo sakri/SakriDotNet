@@ -2,7 +2,7 @@
  * Created by sakri on 7-7-14.
  */
 
-function yearSelectorController($rootScope, $scope, $location, $timeout, colorService, portfolioService, analyticsService){
+function yearSelectorController($rootScope, $scope, $location, $timeout, colorService, portfolioService, analyticsService, canvasTextService){
 
     $scope.yearSelectorStyle = {}
 
@@ -98,7 +98,7 @@ function yearSelectorController($rootScope, $scope, $location, $timeout, colorSe
         cellWidth = $rootScope.containerRect.width * margin / 4;
         cellHeight = cellWidth / 2;//TODO : double check that this works in all sizes?
         gridX = $rootScope.containerRect.width/2 - cellWidth*2;
-        fontSize = getFontSizeForWidth("0000", cellWidth *.8);
+        fontSize = canvasTextService.getFontSizeForWidth(canvas, "0000", cellWidth *.8);
         context.font = "bold "+fontSize+"px sans-serif";
     }
 
@@ -155,39 +155,5 @@ function yearSelectorController($rootScope, $scope, $location, $timeout, colorSe
         }
         return mousePosition;
     }
-
-    //TODO: Move into a service?!
-    //returns the biggest font size that best fits into rect
-    function getFontSizeForWidth(string, width, minFontSize, maxFontSize){
-        minFontSize = minFontSize || 8;
-        maxFontSize = maxFontSize || 500;
-        var fontSize = 80;
-        context.font = "bold "+fontSize+"px sans-serif";
-        var textWidth = context.measureText(string).width;
-
-        //SOME DISAGREEMENT WHETHER THIS SHOOULD BE WITH && or ||
-        if(textWidth < width){
-            while(context.measureText(string).width < width){
-                fontSize++;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize > maxFontSize){
-                    console.log("getFontSizeForWidth() max fontsize reached");
-                    return maxFontSize;
-                }
-            }
-        }else if(textWidth > width){
-            while(context.measureText(string).width > width){
-                fontSize--;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize < minFontSize){
-                    console.log("getFontSizeForWidth() min fontsize reached");
-                    return minFontSize;
-                }
-            }
-        }
-        //console.log("getFontSizeForWidth() 2  : ", copy.fontSize);
-        return fontSize;
-    }
-
 
 }

@@ -22456,7 +22456,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $scope.$evalAsync(function() {
             $scope.thumbProjects = $scope.yearProjects;
         });
-        $scope.renderNormal();
+        $scope.renderCalenderButtonNormal();
     }
 
 
@@ -22587,11 +22587,11 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $rootScope.$broadcast("show-year-selector", $scope.displayYear);
     }
 
-    $scope.renderNormal = function(){
+    $scope.renderCalenderButtonNormal = function(){
         render(colorService.headerColor, colorService.white);
     }
 
-    $scope.renderOver = function(){
+    $scope.renderCalenderButtonOver = function(){
         render(colorService.white, colorService.headerColor);
     }
 

@@ -1,6 +1,5 @@
 //PORTFOLIO
-//['$rootScope', '$scope', '$location' , '$timeout' 'portfolioService', 'analyticsService', portfolioController]);
-function portfolioController($rootScope, $scope, $location, $timeout, portfolioService, analyticsService, colorService) {
+function portfolioController($rootScope, $scope, $location, $timeout, portfolioService, analyticsService, colorService, canvasTextService) {
 
     var canvas = document.createElement("canvas");
     canvas.width = 80;
@@ -170,7 +169,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $scope.$evalAsync(function() {
             $scope.thumbProjects = $scope.yearProjects;
         });
-        $scope.renderNormal();
+        $scope.renderCalenderButtonNormal();
     }
 
 
@@ -327,17 +326,17 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $rootScope.$broadcast("show-year-selector", $scope.displayYear);
     }
 
-    $scope.renderNormal = function(){
-        render(colorService.headerColor, colorService.white);
+    $scope.renderCalenderButtonNormal = function(){
+        renderCalenderButton(colorService.headerColor, colorService.white);
     }
 
-    $scope.renderOver = function(){
-        render(colorService.white, colorService.headerColor);
+    $scope.renderCalenderButtonOver = function(){
+        renderCalenderButton(colorService.white, colorService.headerColor);
     }
 
     var bgRect, handle1Rect, handle2Rect;
 
-    function render(color1, color2){
+    function renderCalenderButton(color1, color2){
         context.clearRect(0, 0, canvas.width, canvas.height);
         var handleHeight = canvas.height *.2;
         handle1Rect = { x:canvas.width *.33 - handleHeight/4, y:0, width: handleHeight/2 , height: handleHeight};
@@ -362,7 +361,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         context.fill();
 
         //TEXT
-        var fontSize = getFontSizeForWidth($scope.displayYear, bgRect.width-handleHeight *.8 );
+        var fontSize = canvasTextService.getFontSizeForWidth(canvas, $scope.displayYear, bgRect.width-handleHeight *.8 );
         context.fillStyle = color2;
         context.fillText($scope.displayYear,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
         $scope.calenderSrc = canvas.toDataURL();
@@ -386,39 +385,6 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         context.arc(rect.x + radius, bottom - radius, radius, halfPi, Math.PI );
         context.lineTo(rect.x, rect.y + radius);
         context.closePath();
-    }
-
-
-    //TODO: Move into a service!! Repeated in yearSelectorController !!!
-    //returns the biggest font size that best fits into rect
-    function getFontSizeForWidth(string, width, minFontSize, maxFontSize){
-        minFontSize = minFontSize || 8;
-        maxFontSize = maxFontSize || 500;
-        var fontSize = 80;
-        context.font = "bold "+fontSize+"px sans-serif";
-        var textWidth = context.measureText(string).width;
-
-        if(textWidth < width){
-            while(context.measureText(string).width < width){
-                fontSize++;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize > maxFontSize){
-                    console.log("getFontSizeForWidth() max fontsize reached");
-                    return maxFontSize;
-                }
-            }
-        }else if(textWidth > width){
-            while(context.measureText(string).width > width){
-                fontSize--;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize < minFontSize){
-                    console.log("getFontSizeForWidth() min fontsize reached");
-                    return minFontSize;
-                }
-            }
-        }
-        //console.log("getFontSizeForWidth() 2  : ", copy.fontSize);
-        return fontSize;
     }
 
 }

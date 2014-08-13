@@ -15,8 +15,11 @@ module.exports = function(grunt) {
 
                     'js/release.js': ["bower_components/angular/angular.js",
                         "bower_components/x2js/xml2json.js",
+                        "js/portfolioService.js",
+                        "js/analyticsService.js",
                         "js/portfolioController.js",
                         "js/yearSelectorController.js",
+                        "js/contactController.js",
                         "js/sakriDotNet.js"]
                 }
             }
