@@ -18,6 +18,7 @@ module.exports = function(grunt) {
                         "js/portfolioService.js",
                         "js/analyticsService.js",
                         "js/portfolioController.js",
+                        "js/calenderButtonController.js",
                         "js/yearSelectorController.js",
                         "js/contactController.js",
                         "js/sakriDotNet.js"]

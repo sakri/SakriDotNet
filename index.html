@@ -37,6 +37,7 @@ _gaq.push(['_trackPageview']);
         <!-- controllers -->
         <script src="js/portfolioController.js"></script>
         <script src="js/yearSelectorController.js"></script>
+        <script src="js/calenderButtonController.js"></script>
         <script src="js/contactController.js"></script>
         <!-- app -->
         <script src="js/sakriDotNet.js"></script>
@@ -89,8 +90,9 @@ _gaq.push(['_trackPageview']);
 
         <div id="portfolioControls">
 
-            <!--<canvas id="calenderCanvas" calender-canvas="exp" width="80" height="70" ></canvas>-->
-            <img id="calenderImg" data-ng-click="calenderClickHandler()" src="{{calenderSrc}}"
+            <img id="calenderImg" data-ng-click="calenderClickHandler()"
+                 portfolio-calender-button="exp"
+                 src="{{calenderSrc}}"
                  ng-mouseenter="renderOver()"
                  ng-mouseleave="renderNormal()" />
 

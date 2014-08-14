@@ -16,9 +16,8 @@ function colorService(){
 //==============::CONTROLLERS::================
 //=============================================
 
-//MAIN
+//MAIN TODO: This is not being used, could this replace "mainDivController" instead?
 function mainController($rootScope, $scope, $location, $timeout, analyticsService) {
-
 
 }
 
@@ -97,7 +96,6 @@ function mainDivController($rootScope, $scope, $location, $timeout, analyticsSer
 
 }
 
-
 //=============================================
 //==============::DIRECTIVES::=================
 //=============================================
@@ -118,6 +116,14 @@ function portfolioDirective(){
         restrict:'A',
         replace:false,
         controller: 'portfolioController'
+    }
+}
+
+function portfolioCalenderButtonDirective(){
+    return {
+        restrict:'A',
+        replace:false,
+        controller: 'calenderButtonController'
     }
 }
 
@@ -169,8 +175,12 @@ app.controller('mainDivController', ['$rootScope', '$scope', '$location', '$time
 app.directive('mainDiv', mainDivDirective);
 
 //PORTFOLIO
-app.controller('portfolioController', ['$rootScope', '$scope', '$location' , '$timeout', 'portfolioService', 'analyticsService', 'colorService', 'canvasTextService', portfolioController]);
+app.controller('portfolioController', ['$rootScope', '$scope', '$location' , '$timeout', 'portfolioService', 'analyticsService', 'colorService', portfolioController]);
 app.directive('portfolioSection', portfolioDirective);
+
+//CALENDER BUTTON
+app.controller('calenderButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', calenderButtonController]);
+app.directive('portfolioCalenderButton', portfolioCalenderButtonDirective);
 
 //YEAR SELECTOR
 app.controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', 'canvasTextService',  yearSelectorController]);
