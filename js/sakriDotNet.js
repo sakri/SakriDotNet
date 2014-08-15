@@ -119,11 +119,22 @@ function portfolioDirective(){
     }
 }
 
+//TODO is it possible to move the controller functionality into this directive? if not, remove these two, not needed
 function portfolioCalenderButtonDirective(){
+    //console.log("portfolioCalenderButtonDirective");
     return {
         restrict:'A',
         replace:false,
         controller: 'calenderButtonController'
+    }
+}
+
+function portfolioProjectsButtonDirective(){
+    //console.log("portfolioProjectsButtonDirective");
+    return {
+        restrict:'A',
+        replace:false,
+        controller: 'projectsButtonController'
     }
 }
 
@@ -181,6 +192,10 @@ app.directive('portfolioSection', portfolioDirective);
 //CALENDER BUTTON
 app.controller('calenderButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', calenderButtonController]);
 app.directive('portfolioCalenderButton', portfolioCalenderButtonDirective);
+
+//PROJECTS BUTTON
+app.controller('projectsButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', projectsButtonController]);
+app.directive('portfolioProjectsButton', portfolioProjectsButtonDirective);
 
 //YEAR SELECTOR
 app.controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', 'canvasTextService',  yearSelectorController]);

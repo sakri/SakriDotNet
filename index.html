@@ -38,11 +38,12 @@ _gaq.push(['_trackPageview']);
         <script src="js/portfolioController.js"></script>
         <script src="js/yearSelectorController.js"></script>
         <script src="js/calenderButtonController.js"></script>
+        <script src="js/projectsButtonController.js"></script>
         <script src="js/contactController.js"></script>
         <!-- app -->
         <script src="js/sakriDotNet.js"></script>
 
-    <!-- You can view the non - minified javascript code at https://github.com/sakri/SakriDotNet -->
+    <!-- You can view the javascript source code at https://github.com/sakri/SakriDotNet -->
     <!--<script src="js/release.min.js"></script>-->
 
         <link rel="stylesheet" href="css/sakri.css" />
@@ -90,35 +91,32 @@ _gaq.push(['_trackPageview']);
 
         <div id="portfolioControls">
 
-            <img id="calenderImg" data-ng-click="calenderClickHandler()"
+            <img class="portfolioOptionButton"
                  portfolio-calender-button="exp"
+                 width="80" height="80"
+                 data-ng-click="calenderClickHandler()"
                  src="{{calenderSrc}}"
-                 ng-mouseenter="renderOver()"
-                 ng-mouseleave="renderNormal()" />
+                 ng-mouseenter="renderCalenderOver()"
+                 ng-mouseleave="renderCalenderNormal()" />
 
-            <button id="portfolioLeftButton" class="scrollButton"
-                    ng-style="leftButtonStyle"
-                    ng-mouseover="startScroll(1)"
-                    ng-mousedown="scrollButtonDownHandler()"
-                    ng-mouseup="scrollButtonUpHandler()"
-                    ng-mouseleave="stopScroll()" ></button>
-            <div  id="portfolioThumbsScroller" ng-style="thumbsScrollerStyle" >
-                <div id="portfolioThumbnailsListContainer"  ng-style="thumbsListContainerStyle">
-                    <span id="portfolioThumbnailsList" ng-style="thumbsListStyle">
-                        <img ng-src="{{project.path}}thumb.png"
-                             class="portfolioThumbnailsListImg"
-                             ng-class="project.thumbClass"
-                             data-ng-click="projectThumbnailClickHandler(project)"
-                             ng-repeat="project in thumbProjects" />
-                    </span>
-                </div>
-            </div>
-            <button id="portfolioRightButton" class="scrollButton"
-                    ng-style="rightButtonStyle"
-                    ng-mouseover="startScroll(-1)"
-                    ng-mousedown="scrollButtonDownHandler()"
-                    ng-mouseup="scrollButtonUpHandler()"
-                    ng-mouseleave="stopScroll()" ></button>
+            <img class="portfolioOptionButton"
+                 portfolio-projects-button="exp"
+                 width="80" height="80"
+                 data-ng-click="projectsClickHandler()"
+                 src="{{projectsSrc}}"
+                 ng-mouseenter="renderProjectsOver()"
+                 ng-mouseleave="renderProjectsNormal()"
+                 ng-show="!showThumbs" />
+
+
+            <span id="portfolioThumbnailsList" ng-style="thumbsListStyle" ng-show="showThumbs">
+                <img ng-src="{{project.path}}thumb.png"
+                     class="portfolioThumbnailsListImg"
+                     ng-class="project.thumbClass"
+                     data-ng-click="projectThumbnailClickHandler(project)"
+                     ng-repeat="project in thumbProjects" />
+            </span>
+
         </div>
 
         <div id="portfolioImageContainer" ng-show="portfolioImageVisible">
@@ -142,6 +140,16 @@ _gaq.push(['_trackPageview']);
         </div>
 
         <canvas id="yearSelector" portfolio-year-selector="exp" ng-show="showYearSelector" ng-style="yearSelectorStyle" ></canvas>
+
+        <div id="projectsList" ng-show="showProjectsList">
+            <ul>
+                <li ng-repeat="project in yearProjects" data-ng-click="projectThumbnailClickHandler(project)">
+                    <span>
+                        <img ng-src="{{project.path}}thumb.png" />{{project.title}}
+                    </span>
+                </li>
+            </ul>
+        </div>
 
     </section>
 

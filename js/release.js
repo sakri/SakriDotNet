@@ -22625,7 +22625,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         var fontSize = getFontSizeForWidth($scope.displayYear, bgRect.width-handleHeight *.8 );
         context.fillStyle = color2;
         context.fillText($scope.displayYear,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
-        $scope.calenderSrc = canvas.toDataURL();
+        $scope.projectsSrc = canvas.toDataURL();
     }
 
 

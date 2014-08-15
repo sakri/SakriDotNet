@@ -1,8 +1,12 @@
 /**
  * Created by sakri on 13-8-14.
+ * Renders the projects button on a Canvas element and sets the source to an image
  */
-function calenderButtonController($rootScope, $scope, colorService, canvasTextService){
-    //console.log("calenderButtonController()");
+function projectsButtonController($rootScope, $scope, colorService, canvasTextService){
+    //TODO: Move to a service
+    //===========================================
+    //==============::CALENDER BUTTON::=================
+    //===========================================
 
     var canvas = document.createElement("canvas");
     canvas.width = 80;
@@ -13,31 +17,30 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
     var year = 0;
 
     $scope.$on("show-project", function(event, project){
-        console.log("calenderButtonController on show-project");
+        //console.log("projectsButtonController on show-project");
         year = project.year;
-        $scope.renderCalenderNormal();
+        $scope.renderProjectsNormal();
     });
 
-    $scope.calenderClickHandler = function(event){
-        $rootScope.$broadcast("show-year-selector", year);
+    $scope.projectsClickHandler = function(event){
+        $rootScope.$broadcast("show-projects-selector", year);
     }
 
-    $scope.renderCalenderNormal = function(){
-        renderCalender(colorService.headerColor, colorService.white);
+    $scope.renderProjectsNormal = function(){
+        renderProjects(colorService.headerColor, colorService.white);
     }
 
-    $scope.renderCalenderOver = function(){
-        renderCalender(colorService.white, colorService.headerColor);
+    $scope.renderProjectsOver = function(){
+        renderProjects(colorService.white, colorService.headerColor);
     }
 
-    var bgRect, handle1Rect, handle2Rect;
+    var bgRect, handleRect;
 
-    function renderCalender(color1, color2){
-        //console.log("calenderButtonController.render()");
+    function renderProjects(color1, color2){
+        //console.log("projectsButtonController.render()");
         context.clearRect(0, 0, canvas.width, canvas.height);
         var handleHeight = canvas.height *.2;
-        handle1Rect = { x:canvas.width *.33 - handleHeight/4, y:0, width: handleHeight/2 , height: handleHeight};
-        handle2Rect = { x:canvas.width *.66 - handleHeight/4, y:0, width: handleHeight/2 , height: handleHeight};
+        handleRect = { x:canvas.width *.15, y:0, width: canvas.width*.35 , height: handleHeight};
         bgRect = {x:0, y:handleHeight/2, width: canvas.width, height:canvas.height-handleHeight/2};
 
         context.fillStyle = color1;
@@ -46,22 +49,16 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
         renderRoundedRect(bgRect, handleHeight/2);
         context.fill();
 
-        //WHITE RECT
-        context.fillStyle = color2;
-        context.fillRect(handleHeight/2, bgRect.y + handleHeight/2, bgRect.width-handleHeight, handleHeight);
-
-        //HANDLES
+        //HANDLE
         context.fillStyle = color1;
-        renderRoundedRect(handle1Rect, handleHeight/5);
-        context.fill();
-        renderRoundedRect(handle2Rect, handleHeight/5);
+        renderRoundedRect(handleRect, handleHeight/5);
         context.fill();
 
         //TEXT
-        var fontSize = canvasTextService.getFontSizeForWidth(canvas, year, bgRect.width-handleHeight *.8 );
+        var fontSize = canvasTextService.getFontSizeForWidth(canvas, "PROJECTS", bgRect.width-handleHeight *.8 );
         context.fillStyle = color2;
-        context.fillText(year,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
-        $scope.calenderSrc = canvas.toDataURL();
+        context.fillText("PROJECTS",  handleHeight * .5, canvas.height - handleHeight * .5 - fontSize);
+        $scope.projectsSrc = canvas.toDataURL();
     }
 
 

@@ -143,6 +143,7 @@ section a:active {
 /* =======:: PORTFOLIO ::========== */
 /* sizes and positioning controlled with javascript */
 #portfolio {
+  width: 100%;
   padding: 0px;
   margin-bottom: 5px;
 }
@@ -151,9 +152,37 @@ section a:active {
   left: 0px;
   top: 150px;
 }
-#calenderCanvas {
-  display: inline;
+#projectsList {
+  position: absolute;
+  left: 0px;
+  top: 150px;
+  width: 100%;
+  background-color: #bcc0d2;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #ffffff;
+  padding-bottom: 50px;
+}
+#projectsList ul {
+  list-style-type: none;
+}
+#projectsList li {
+  padding-top: 10px;
+  clear: both;
   cursor: pointer;
+  min-height: 80px;
+}
+#projectsList li:hover {
+  background-color: #ffffff;
+  color: #f25a2b;
+}
+#projectsList img {
+  float: left;
+  margin-right: 10px;
+  margin-left: 10px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ffffff;
 }
 /*position: relative; padding-top: 15px;*/
 #portfolioControls {
@@ -163,33 +192,15 @@ section a:active {
   text-align: center;
   padding-top: 12px;
 }
-/* THUMBS SCROLLER position: relative; */
-#portfolioThumbsScroller {
-  overflow: hidden;
-  margin: 0px;
-  padding: 0px;
-  height: 76px;
+/* calender button and projects button*/
+.portfolioOptionButton {
+  cursor: pointer;
 }
-#portfolioThumbnailsListContainer {
-  display: block;
-  position: relative;
-  margin: 0px;
-  left: 0px;
-  top: 0px;
-  padding: 0px;
-  height: 76px;
-  overflow: hidden;
-  white-space: nowrap;
-}
-/*position: absolute;*/
 #portfolioThumbnailsList {
   white-space: nowrap;
-  position: absolute;
   display: inline;
   margin: 0px;
   padding: 0px;
-  left: 0px;
-  top: 0px;
   height: 76px;
   overflow: hidden;
 }
@@ -208,43 +219,6 @@ section a:active {
 }
 .portfolioThumbnailsListImg.selectedThumb {
   border-color: #f25a2b;
-}
-#calenderImg {
-  cursor: pointer;
-}
-/*LEFT & RIGHT buttons*/
-#portfolio button:focus {
-  outline-width: 0;
-}
-.scrollButton {
-  background-repeat: no-repeat;
-  border-width: 0px;
-  cursor: pointer;
-  margin: 0px;
-  padding: 0px;
-  background-color: transparent;
-}
-#portfolioLeftButton {
-  width: 15px;
-  height: 66px;
-  background-image: url("../assets/PortfolioLeftButtonUp.png");
-}
-#portfolioLeftButton:active {
-  background-image: url("../assets/PortfolioLeftButtonDown.png");
-}
-#portfolioLeftButton:hover {
-  background-image: url("../assets/PortfolioLeftButtonDown.png");
-}
-#portfolioRightButton {
-  width: 15px;
-  height: 66px;
-  background-image: url("../assets/PortfolioRightButtonUp.png");
-}
-#portfolioRightButton:active {
-  background-image: url("../assets/PortfolioRightButtonDown.png");
-}
-#portfolioRightButton:hover {
-  background-image: url("../assets/PortfolioRightButtonDown.png");
 }
 #portfolioImageContainer {
   text-align: center;

@@ -5,12 +5,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     $scope.project = undefined;
 
     //styles for layout
-    $scope.thumbsScrollerStyle = {};
-    $scope.thumbsListStyle = {"display" : "none"};
-    $scope.leftButtonStyle = {"display" : "none"};
-    $scope.rightButtonStyle = {"display" : "none"};
     $scope.thumbsListStyle = {};
-    $scope.thumbsListContainerStyle = {};
 
     $scope.portfolioImageVisible = false;
     $scope.flashVisible = false;
@@ -18,7 +13,8 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     $scope.yearProjects = [];
     $scope.displayYear = 0;
 
-    var scrollPosition = 0;
+    $scope.showProjectsList = false;
+
     var year;
     var yearProjectIndex = 0;//only used for deep linking
     var yearIndex = 0;
@@ -30,18 +26,16 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     //todo, these are set in the css, should not be set twice...
     var thumbSpacer = 12;//images have a border of 3px and margin of 6px
     var thumbsWidth = 0;
-    var thumbsVisibleWidth = 0;//used for scrolling
+    var thumbsVisibleWidth = 0;
     var infoBoxMaxWidth = "400";
     var infoBoxMaxHeight = "400";
+
+    $scope.showThumbs = true;
 
     function setLoadingStyles(){
         //$scope.portfolioImageVisible = false;
         //$scope.flashVisible = false;
-        $scope.thumbsScrollerStyle["display"] = "none";
-        $scope.leftButtonStyle["display"] = "none";
-        $scope.rightButtonStyle["display"] = "none";
-        $scope.thumbsListStyle["left"] = "0px";
-        scrollPosition = 0;
+        $scope.showProjectsList = false;
     }
 
     setLoadingStyles();
@@ -52,46 +46,33 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         showProjectFromLocation();
     });
 
-    //decides the position of year widget and scroller, width of scroller and whether to show left+right buttons along with layout of infoButton and infoPanel
+    //
     function setLoadedStyles(){
+        $scope.showProjectsList = false;
         if(!$scope.yearProjects ){
             setLoadingStyles();
             return;
         }
-        $scope.thumbsScrollerStyle["display"] = "inline-block";
 
         var containerWidth = $rootScope.containerRect.width;
         if(thumbsWidth + 90 + 22 > containerWidth){
+            //show "projects" button instead of thumbs, clicking projects opens projects selector
             //console.log("show scroller, thumbsWidth : " , thumbsWidth, "containerWidth : ", containerWidth);
-            //take up full space with portfolio controls elements
-            if(isTouchDevice()){
-                $scope.thumbsListContainerStyle["overflow"] = "auto";
-            }else{
-                $scope.leftButtonStyle["display"] = "inline";
-                $scope.rightButtonStyle["display"] = "inline";
-            }
             thumbsVisibleWidth = containerWidth - 130;//calender widget is 80px wide
-            $scope.thumbsScrollerStyle["width"] = thumbsVisibleWidth + "px";
-            $scope.thumbsListContainerStyle["width"] = thumbsWidth +  "px";
-            $scope.thumbsListStyle["width"] = thumbsWidth + "px";
-            console.log("thumbsVisibleWidth" , thumbsVisibleWidth);
+            //console.log("thumbsVisibleWidth" , thumbsVisibleWidth);
+            $scope.showThumbs = false;
         }else{
+            //show thumbnails
             //console.log("no scroller, thumbsWidth : " , thumbsWidth, "containerWidth : ", containerWidth);
-            //center portfolio controls elements
-            $scope.leftButtonStyle["display"] = "none";
-            $scope.rightButtonStyle["display"] = "none";
             thumbsVisibleWidth = thumbsWidth + 10;//plus 10 just in case
-            $scope.thumbsScrollerStyle["width"] = thumbsWidth + "px";
-            $scope.thumbsListContainerStyle["width"] = thumbsWidth +  "px";
-            $scope.thumbsListStyle["width"] = thumbsWidth + "px";
+            $scope.showThumbs = true;
         }
-        $scope.thumbsListStyle["left"] = "0px";//remove scrolling
-        scrollPosition = 0;
     }
 
+    /*
     function isTouchDevice() {
         return !!('ontouchstart' in window);
-    }
+    }*/
 
     $scope.$on("resize-start", function(){
         cancelImageRotation();
@@ -104,6 +85,10 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         if($scope.project){
             showProject();
         }
+    });
+
+    $scope.$on("show-projects-selector", function(event){
+        $scope.showProjectsList = true;
     });
 
 
@@ -127,7 +112,6 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
             }
         }
         targetYear = availableYears[yearIndex];
-
 
         $scope.yearProjects = portfolioService.getProjectsForYear(targetYear);
 
@@ -168,7 +152,8 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
 
 
     function showProject(){
-        if(portfolioService.clientHasFlash && $scope.project.swfs){
+        var size = getProjectDimensions();
+        if(portfolioService.clientHasFlash && $scope.project.swfs && $rootScope.containerRect.width>=size.width){
             $scope.flashVisible = true;
             $scope.portfolioImageVisible = false;
         }else{
@@ -220,7 +205,6 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     }
 
 
-
     function updatePortfolioNavigationButtons(){
 
     }
@@ -242,54 +226,10 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     }
 
     //===========================================
-    //==============::THUMBS SCROLLER::=================
-    //===========================================
-
-    var scrollDirection = 0;
-    var scrollSpeed = 5;
-    var scrollPromise;
-    $scope.startScroll = function(direction){
-        scrollDirection = direction;
-        scrollThumbs();
-    }
-
-    $scope.scrollButtonDownHandler = function(){
-        scrollSpeed = 12;
-    }
-
-    $scope.scrollButtonUpHandler = function(){
-        scrollSpeed = 5;
-    }
-
-    function scrollThumbs(){
-        scrollPosition += scrollDirection * scrollSpeed;
-        if(scrollDirection==1 && scrollPosition>=0){
-            scrollPosition = 0;
-            updateScroll();
-            return;
-        }
-        if(scrollDirection==-1 && scrollPosition <= thumbsVisibleWidth-thumbsWidth-15){
-            scrollPosition = thumbsVisibleWidth-thumbsWidth-15;
-            updateScroll();
-            return;
-        }
-        updateScroll();
-        scrollPromise = $timeout(scrollThumbs, 50);
-    }
-
-    function updateScroll(){
-        $scope.thumbsListStyle["left"] = scrollPosition + "px";
-    }
-
-    $scope.stopScroll = function(direction){
-        if (scrollPromise) {
-            $timeout.cancel(scrollPromise);
-        }
-    }
-
-    //===========================================
     //==============::IMAGE ROTATOR::=================
     //===========================================
+
+    //TODO : Move to own controller (or directive?)
 
     function showNextProjectImage(){
         cancelImageRotation();

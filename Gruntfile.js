@@ -1,13 +1,11 @@
 /**
- * Created by sakri on 16-12-13.
+ * Created by sakri on 3-7-14.
  */
 
 module.exports = function(grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
-        //BCHW HOME
 
         concat: {
             dist: {
@@ -19,6 +17,7 @@ module.exports = function(grunt) {
                         "js/analyticsService.js",
                         "js/portfolioController.js",
                         "js/calenderButtonController.js",
+                        "js/projectsButtonController.js",
                         "js/yearSelectorController.js",
                         "js/contactController.js",
                         "js/sakriDotNet.js"]
