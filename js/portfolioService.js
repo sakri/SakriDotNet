@@ -4,6 +4,8 @@
 
 function portfolioService($http) {
 
+    this.currentProject = 0;//TODO: move elsewhere, create a service or constant or variable or whatever
+
     this.clientHasFlash  = false;
 
     //http://stackoverflow.com/questions/998245/how-can-i-detect-if-flash-is-installed-and-if-not-display-a-hidden-div-that-inf

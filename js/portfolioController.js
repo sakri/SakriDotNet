@@ -162,7 +162,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
             $scope.flashVisible = false;
             showNextProjectImage();
         }
-        //console.log("show-project portfolio controller");
+        portfolioService.currentProject = $scope.project;
         $rootScope.$broadcast("show-project", $scope.project);
         analyticsService.logPortfolioProject($scope.project.title);
         setLoadedStyles();

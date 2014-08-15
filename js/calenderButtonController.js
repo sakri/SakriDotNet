@@ -1,7 +1,7 @@
 /**
  * Created by sakri on 13-8-14.
  */
-function calenderButtonController($rootScope, $scope, colorService, canvasTextService){
+function calenderButtonController($rootScope, $scope, portfolioService, colorService, canvasTextService){
     //console.log("calenderButtonController()");
 
     var canvas = document.createElement("canvas");
@@ -10,11 +10,10 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
     var context = canvas.getContext("2d");
     context.font = "bold 24px sans-serif";
     context.textBaseline = "top";
-    var year = 0;
+    var year = portfolioService.currentProject.year;
 
     $scope.$on("show-project", function(event, project){
-        console.log("calenderButtonController on show-project");
-        year = project.year;
+        year = portfolioService.currentProject.year;
         $scope.renderCalenderNormal();
     });
 
@@ -33,7 +32,7 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
     var bgRect, handle1Rect, handle2Rect;
 
     function renderCalender(color1, color2){
-        //console.log("calenderButtonController.render()");
+        console.log("calenderButtonController.renderCalender()");
         context.clearRect(0, 0, canvas.width, canvas.height);
         var handleHeight = canvas.height *.2;
         handle1Rect = { x:canvas.width *.33 - handleHeight/4, y:0, width: handleHeight/2 , height: handleHeight};
@@ -59,6 +58,7 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
 
         //TEXT
         var fontSize = canvasTextService.getFontSizeForWidth(canvas, year, bgRect.width-handleHeight *.8 );
+        //console.log("calenderButtonController.render() ", year,  bgRect.width-handleHeight *.8, fontSize);
         context.fillStyle = color2;
         context.fillText(year,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
         $scope.calenderSrc = canvas.toDataURL();
@@ -83,4 +83,6 @@ function calenderButtonController($rootScope, $scope, colorService, canvasTextSe
         context.lineTo(rect.x, rect.y + radius);
         context.closePath();
     }
+
+    $scope.renderCalenderNormal();
 }

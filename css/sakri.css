@@ -270,6 +270,10 @@ section a:active {
   margin-right: 10px;
   margin-bottom: 5px;
 }
+#cv hr {
+  clear: both;
+  margin-top: 50px;
+}
 .cvSubSection {
   font-weight: bold;
   clear: both;

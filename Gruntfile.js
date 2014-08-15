@@ -15,6 +15,7 @@ module.exports = function(grunt) {
                         "bower_components/x2js/xml2json.js",
                         "js/portfolioService.js",
                         "js/analyticsService.js",
+                        "js/canvasTextService.js",
                         "js/portfolioController.js",
                         "js/calenderButtonController.js",
                         "js/projectsButtonController.js",

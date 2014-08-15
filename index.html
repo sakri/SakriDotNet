@@ -28,63 +28,65 @@ _gaq.push(['_trackPageview']);
     </script>
 
 
-        <script src="bower_components/angular/angular.min.js"></script>
-        <script src="bower_components/x2js/xml2json.min.js"></script>
-        <!-- services -->
-        <script src="js/portfolioService.js"></script>
-        <script src="js/analyticsService.js"></script>
-        <script src="js/canvasTextService.js"></script>
-        <!-- controllers -->
-        <script src="js/portfolioController.js"></script>
-        <script src="js/yearSelectorController.js"></script>
-        <script src="js/calenderButtonController.js"></script>
-        <script src="js/projectsButtonController.js"></script>
-        <script src="js/contactController.js"></script>
-        <!-- app -->
-        <script src="js/sakriDotNet.js"></script>
+    <!--
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/x2js/xml2json.min.js"></script>
+
+    <script src="js/portfolioService.js"></script>
+    <script src="js/analyticsService.js"></script>
+    <script src="js/canvasTextService.js"></script>
+
+    <script src="js/portfolioController.js"></script>
+    <script src="js/yearSelectorController.js"></script>
+    <script src="js/calenderButtonController.js"></script>
+    <script src="js/projectsButtonController.js"></script>
+    <script src="js/contactController.js"></script>
+
+    <script src="js/sakriDotNet.js"></script>-->
+
 
     <!-- You can view the javascript source code at https://github.com/sakri/SakriDotNet -->
-    <!--<script src="js/release.min.js"></script>-->
+    <script src="js/release.min.js"></script>
 
-        <link rel="stylesheet" href="css/sakri.css" />
+    <link rel="stylesheet" href="css/sakri.css" />
 
-    </head>
-    <body data-ng-app="sakriDotNet" data-ng-controller="mainController" data-ng-cloak>
+</head>
+<body data-ng-app="sakriDotNet" data-ng-controller="mainController" data-ng-cloak>
 
-    <div id="mainContainer" main-div="exp" ng-switch on="currentSection" >
-        <header>
-            <h1>Sakri Rosenstrom front end web developer personal home page</h1>
-            <img id="headerImage" src="{{headerImage}}" />
-        </header>
+<div id="mainContainer" main-div="exp" ng-switch on="currentSection" >
+    <header>
+        <h1>Sakri Rosenstrom front end web developer personal home page</h1>
+        <img id="headerImage" src="{{headerImage}}" />
+    </header>
 
-        <nav id="siteNavigation">
-            <h2>Menu</h2>
-            <ul id="menuItemsList">
-                <li><a href="#home" class="navItem" ng-class="{selectedNavItem: currentSection == 'home'}">HOME</a></li>
-                <li><a href="#portfolio" class="navItem" ng-class="{selectedPortfolioNavItem: currentSection == 'portfolio'}">PORTFOLIO</a></li>
-                <li><a href="#cv" class="navItem" ng-class="{selectedNavItem: currentSection == 'cv'}">CV</a></li>
-                <li><a href="#contact" class="navItem" ng-class="{selectedNavItem: currentSection == 'contact'}">CONTACT</a></li>
-                <li><a href="http://www.sakri.net/blog" class="navItem">BLOG</a></li>
-            </ul>
-        </nav>
+    <nav id="siteNavigation">
+        <h2>Menu</h2>
+        <ul id="menuItemsList">
+            <li><a href="#home" class="navItem" ng-class="{selectedNavItem: currentSection == 'home'}">HOME</a></li>
+            <li><a href="#portfolio" class="navItem" ng-class="{selectedPortfolioNavItem: currentSection == 'portfolio'}">PORTFOLIO</a></li>
+            <li><a href="#cv" class="navItem" ng-class="{selectedNavItem: currentSection == 'cv'}">CV</a></li>
+            <li><a href="#contact" class="navItem" ng-class="{selectedNavItem: currentSection == 'contact'}">CONTACT</a></li>
+            <li><a href="http://www.sakri.net/blog" class="navItem">BLOG</a></li>
+        </ul>
+    </nav>
 
 
-        <!--<sakri-home-section></sakri-home-section>-->
+    <!--<sakri-home-section></sakri-home-section>-->
     <section id="home" class="paddedContent" ng-switch-when="home" >
         <h2>Home, welcome to sakri.net</h2>
         <img src="assets/sakri.png" id="profilePic" />
-        <p class="underConstruction">This site is under construction. I put it online so I could share my portfolio with some potential clients, there are still
-        bugs and other incomplete items (responsive stuff), so be gentle.</p>
+        <p class="underConstruction">This site is under construction, I've put it online so I could share my portfolio with some potential clients. The design is
+        crap, there's no animation and bugs still exist, so be gentle.</p>
         <p class="bold">Hi there, glad you dropped in!</p>
         <p>This is the personal website of Sakri Rosenstrom. I'm a Brussels based Front End developer and creative coder from Finland. <p>
         <p>I've been making code driven motion graphics, visual effects, game mechanics and animated user interfaces since the late 90's,
         and have spent a lot of time working on <a href="http://en.wikipedia.org/wiki/Rich_Internet_application">Rich Internet Applications</a>.<p>
         <p>I'm currently specializing in the <a href="http://www.w3schools.com/html/html5_canvas.asp" target="_blank">Html5 Canvas</a>,
-        and getting to grips with <a href="https://angularjs.org/" target="_blank">Angular</a> (which is what I've used to build this website).</p>
+        and getting to grips with <a href="https://angularjs.org/" target="_blank">Angular</a> (which is what I've used to build this website, you can view the
+        sources on <a href="https://github.com/sakri/SakriDotNet" target="_blank">GitHub</a> ).</p>
         <p>Lately I've been giving Canvas workshops under <a href="http://www.devstate.net/" target="_blank">Devstate</a>
         but am also looking for work (freelance or full time), using those technologies. Check out my portfolio and CV, if you've got
-        something for me, get in touch.</p>
-        <p>Cheers!</p>
+        something for me, get in touch!</p>
     </section>
 
     <section id="portfolio" portfolio-section="exp" ng-switch-when="portfolio">
@@ -191,6 +193,7 @@ _gaq.push(['_trackPageview']);
             <p>I started out as a freelancer, doing a lot of work for MisterSuper, an online store selling electronics and gadgets.  I started off with a bunch
             of layouts and animated gif banners, then moved on to flash. I made all kinds of product driven animations featuring Mister Super.</p>
         </div>
+        <hr />
         <p class="cvSubSection">Before my programming career, I attended these 2 schools:<p>
         <div>
             <a data-ng-click="outboundLinkClick('http://www.leseptantecinq.be/')"><img src="assets/workLogos/75.png" /></a>

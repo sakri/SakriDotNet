@@ -22284,27 +22284,225 @@ function X2JS(config) {
 	
 }
 
-//PORTFOLIO
-//['$rootScope', '$scope', '$location' , '$timeout' 'portfolioService', 'analyticsService', portfolioController]);
-function portfolioController($rootScope, $scope, $location, $timeout, portfolioService, analyticsService, colorService) {
+/**
+ * Created by sakri on 12-8-14.
+ */
 
-    var canvas = document.createElement("canvas");
-    canvas.width = 80;
-    canvas.height = 80;
-    var context = canvas.getContext("2d");
-    context.font = "bold 24px sans-serif";
-    context.textBaseline = "top";
+function portfolioService($http) {
+
+    this.currentProject = 0;//TODO: move elsewhere, create a service or constant or variable or whatever
+
+    this.clientHasFlash  = false;
+
+    //http://stackoverflow.com/questions/998245/how-can-i-detect-if-flash-is-installed-and-if-not-display-a-hidden-div-that-inf
+    try {
+        var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+        if (fo) {
+            this.clientHasFlash = true;
+        }
+    } catch (e) {
+        if (navigator.mimeTypes
+            && navigator.mimeTypes['application/x-shockwave-flash'] != undefined
+            && navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin) {
+            this.clientHasFlash = true;
+        }
+    }
+
+    var json = createPortfolioJson();
+    //console.log("temp : ", json);
+    var availableYears = getAvailableYears();
+
+    function createPortfolioJson(){
+        var xmlNode = document.getElementById("portfolioXml");
+        var xml = xmlNode.innerHTML;
+        xmlNode.innerHTML = "";
+        var x2js = new X2JS();
+        var json = x2js.xml_str2json( xml );
+        var last = json.portfolio.project[json.portfolio.project.length-1];
+        last.description = last.description.split("[numProjects]").join(""+json.portfolio.project.length);
+        return json;
+    }
+
+    function getAvailableYears(){
+        var unique = {};
+        var projects = json.portfolio.project;
+        var years = [];
+        for(var i=0; i<projects.length; i++){
+            if(!unique[projects[i].year]){
+                years.push(projects[i].year);
+                unique[projects[i].year] = true;
+            }
+        }
+        //console.log(years);//TODO : sort
+        return years;
+    }
+
+    this.yearHasProjects = function(year){
+        return availableYears.indexOf(String(year)) > -1;
+    }
+
+    this.getAvailableYears = function(){
+        return availableYears;//should make a copy instead of returning original
+    }
+
+    this.getJson = function(){
+        return json;
+    }
+
+    this.getProjectsForYear = function(year){
+        var allProjects = json.portfolio.project;
+        var projects = [];
+        for(var i=0; i<allProjects.length; i++){
+            if(allProjects[i].year == year){
+                projects.push(allProjects[i]);
+            }
+        }
+        return projects;
+    }
+
+    this.getProjectIndex = function(project){
+        return json.portfolio.project.indexOf(project);
+    }
+
+    this.isFirstProject = function(project){
+        return this.getProjectIndex(project) == 0;
+    }
+
+    this.isLastProject = function(project){
+        return this.getProjectIndex(project) == json.portfolio.project.length-1;
+    }
+
+    this.getPreviousProject = function(project){
+        if(this.isFirstProject(project)){
+            return undefined;
+        }
+        return json.portfolio.project[this.getProjectIndex(project) - 1];
+    }
+
+    this.getNextProject = function(project){
+        if(this.isLastProject(project)){
+            return undefined;
+        }
+        return json.portfolio.project[this.getProjectIndex(project) + 1];
+    }
+
+}
+
+/**
+ * Created by sakri on 13-8-14.
+ */
+
+//GOOGLE ANALYTICS SERVICE
+function analyticsService() {
+
+    var isLive = window.location.host.indexOf("sakri.net") > -1;
+    //console.log("analyticsService", isLive, _gaq);
+
+    this.logOutBoundClick = function(link){
+        var name=String(link).replace(/.*?:\/\//g, "");//from http://stackoverflow.com/questions/8206269/javascript-how-to-remove-http-from-url
+        if(name.indexOf("www.")==0){
+            name=name.split("www.")[1];
+        }
+        name=name.split(".")[0];
+        if(isLive){
+            _gaq.push(["_trackEvent", "outBoundClicks", name]);
+        }
+
+        window.open(link,'_blank');
+
+    }
+
+    this.logSectionVisit = function(sectionName){
+        if(isLive){
+            //console.log("logSectionVisit()", _gaq,  sectionName);
+            _gaq.push(["_trackEvent", "Home", sectionName]);
+        }
+    }
+
+    this.logPortfolioProject = function(projectName){
+        if(isLive){
+            //console.log("logPortfolioProject()", projectName);
+            _gaq.push(["_trackEvent", "Portfolio", projectName]);
+        }
+    }
+
+    this.logPortfolioYear = function(year){
+        if(isLive){
+            //console.log("logPortfolioYear()", year);
+            _gaq.push(["_trackEvent", "Portfolio", year]);
+        }
+    }
+
+    this.logContactMessage = function(){
+        if(isLive){
+            //console.log("logPortfolioYear()", year);
+            _gaq.push(["_trackEvent", "ContactMailSent"]);
+        }
+    }
+
+    this.logPreviousProjectClick = function(){
+        if(isLive){
+            _gaq.push(["_trackEvent", "previousProject"]);
+        }
+    }
+
+    this.logNextProjectClick = function(){
+        if(isLive){
+            _gaq.push(["_trackEvent", "nextProject"]);
+        }
+    }
+
+}
+
+/**
+ * Created by sakri on 12-8-14.
+ */
+function canvasTextService(){
+
+    //TODO: Move into a service?!
+    //returns the biggest font size that best fits into rect
+    this.getFontSizeForWidth = function(canvas, string, width, minFontSize, maxFontSize){
+        var context = canvas.getContext("2d");
+        minFontSize = minFontSize || 8;
+        maxFontSize = maxFontSize || 500;
+        var fontSize = 80;
+        context.font = "bold "+fontSize+"px sans-serif";
+        var textWidth = context.measureText(string).width;
+
+        if(textWidth < width){
+            while(context.measureText(string).width < width){
+                if(fontSize >= maxFontSize){
+                    console.log("getFontSizeForWidth() max fontsize reached");
+                    fontSize = maxFontSize;
+                    break;
+                }
+                fontSize++;
+                context.font = "bold "+fontSize+"px sans-serif";
+            }
+        }else if(textWidth > width){
+            while(context.measureText(string).width > width){
+                if(fontSize <= minFontSize){
+                    fontSize = minFontSize;
+                    console.log("getFontSizeForWidth() min fontsize reached");
+                    break;
+                }
+                fontSize--;
+                context.font = "bold "+fontSize+"px sans-serif";
+            }
+        }
+        //console.log("canvasTextService.getFontSizeForWidth()  : ", fontSize);
+        return fontSize;
+    }
+
+}
+//PORTFOLIO
+function portfolioController($rootScope, $scope, $location, $timeout, portfolioService, analyticsService, colorService, canvasTextService) {
 
     $scope.currentImagePath = "";
     $scope.project = undefined;
 
     //styles for layout
-    $scope.thumbsScrollerStyle = {};
-    $scope.thumbsListStyle = {"display" : "none"};
-    $scope.leftButtonStyle = {"display" : "none"};
-    $scope.rightButtonStyle = {"display" : "none"};
     $scope.thumbsListStyle = {};
-    $scope.thumbsListContainerStyle = {};
 
     $scope.portfolioImageVisible = false;
     $scope.flashVisible = false;
@@ -22312,7 +22510,8 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     $scope.yearProjects = [];
     $scope.displayYear = 0;
 
-    var scrollPosition = 0;
+    $scope.showProjectsList = false;
+
     var year;
     var yearProjectIndex = 0;//only used for deep linking
     var yearIndex = 0;
@@ -22324,18 +22523,16 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     //todo, these are set in the css, should not be set twice...
     var thumbSpacer = 12;//images have a border of 3px and margin of 6px
     var thumbsWidth = 0;
-    var thumbsVisibleWidth = 0;//used for scrolling
+    var thumbsVisibleWidth = 0;
     var infoBoxMaxWidth = "400";
     var infoBoxMaxHeight = "400";
+
+    $scope.showThumbs = true;
 
     function setLoadingStyles(){
         //$scope.portfolioImageVisible = false;
         //$scope.flashVisible = false;
-        $scope.thumbsScrollerStyle["display"] = "none";
-        $scope.leftButtonStyle["display"] = "none";
-        $scope.rightButtonStyle["display"] = "none";
-        $scope.thumbsListStyle["left"] = "0px";
-        scrollPosition = 0;
+        $scope.showProjectsList = false;
     }
 
     setLoadingStyles();
@@ -22346,46 +22543,33 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         showProjectFromLocation();
     });
 
-    //decides the position of year widget and scroller, width of scroller and whether to show left+right buttons along with layout of infoButton and infoPanel
+    //
     function setLoadedStyles(){
+        $scope.showProjectsList = false;
         if(!$scope.yearProjects ){
             setLoadingStyles();
             return;
         }
-        $scope.thumbsScrollerStyle["display"] = "inline-block";
 
         var containerWidth = $rootScope.containerRect.width;
         if(thumbsWidth + 90 + 22 > containerWidth){
+            //show "projects" button instead of thumbs, clicking projects opens projects selector
             //console.log("show scroller, thumbsWidth : " , thumbsWidth, "containerWidth : ", containerWidth);
-            //take up full space with portfolio controls elements
-            if(isTouchDevice()){
-                $scope.thumbsListContainerStyle["overflow"] = "auto";
-            }else{
-                $scope.leftButtonStyle["display"] = "inline";
-                $scope.rightButtonStyle["display"] = "inline";
-            }
             thumbsVisibleWidth = containerWidth - 130;//calender widget is 80px wide
-            $scope.thumbsScrollerStyle["width"] = thumbsVisibleWidth + "px";
-            $scope.thumbsListContainerStyle["width"] = thumbsWidth +  "px";
-            $scope.thumbsListStyle["width"] = thumbsWidth + "px";
-            console.log("thumbsVisibleWidth" , thumbsVisibleWidth);
+            //console.log("thumbsVisibleWidth" , thumbsVisibleWidth);
+            $scope.showThumbs = false;
         }else{
+            //show thumbnails
             //console.log("no scroller, thumbsWidth : " , thumbsWidth, "containerWidth : ", containerWidth);
-            //center portfolio controls elements
-            $scope.leftButtonStyle["display"] = "none";
-            $scope.rightButtonStyle["display"] = "none";
             thumbsVisibleWidth = thumbsWidth + 10;//plus 10 just in case
-            $scope.thumbsScrollerStyle["width"] = thumbsWidth + "px";
-            $scope.thumbsListContainerStyle["width"] = thumbsWidth +  "px";
-            $scope.thumbsListStyle["width"] = thumbsWidth + "px";
+            $scope.showThumbs = true;
         }
-        $scope.thumbsListStyle["left"] = "0px";//remove scrolling
-        scrollPosition = 0;
     }
 
+    /*
     function isTouchDevice() {
         return !!('ontouchstart' in window);
-    }
+    }*/
 
     $scope.$on("resize-start", function(){
         cancelImageRotation();
@@ -22398,6 +22582,10 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         if($scope.project){
             showProject();
         }
+    });
+
+    $scope.$on("show-projects-selector", function(event){
+        $scope.showProjectsList = true;
     });
 
 
@@ -22421,7 +22609,6 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
             }
         }
         targetYear = availableYears[yearIndex];
-
 
         $scope.yearProjects = portfolioService.getProjectsForYear(targetYear);
 
@@ -22456,12 +22643,14 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $scope.$evalAsync(function() {
             $scope.thumbProjects = $scope.yearProjects;
         });
-        $scope.renderNormal();
+        //$scope.renderNormal();
+        //$rootScope.$broadcast("");
     }
 
 
     function showProject(){
-        if(portfolioService.clientHasFlash && $scope.project.swfs){
+        var size = getProjectDimensions();
+        if(portfolioService.clientHasFlash && $scope.project.swfs && $rootScope.containerRect.width>=size.width){
             $scope.flashVisible = true;
             $scope.portfolioImageVisible = false;
         }else{
@@ -22470,7 +22659,7 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
             $scope.flashVisible = false;
             showNextProjectImage();
         }
-        //console.log("show-project portfolio controller");
+        portfolioService.currentProject = $scope.project;
         $rootScope.$broadcast("show-project", $scope.project);
         analyticsService.logPortfolioProject($scope.project.title);
         setLoadedStyles();
@@ -22498,6 +22687,10 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
     }
 
     $scope.projectThumbnailClickHandler = function(project){
+        navigateToProject(project);
+    }
+
+    function navigateToProject(project){
         setLoadingStyles();
         $scope.$evalAsync(function() {
             $location.path("portfolio/"+project.year+"/"+project.title.split(" ").join("_"));
@@ -22508,55 +22701,32 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         $rootScope.$broadcast("show-year-selector", $scope.displayYear);
     }
 
-    //===========================================
-    //==============::THUMBS SCROLLER::=================
-    //===========================================
 
-    var scrollDirection = 0;
-    var scrollSpeed = 5;
-    var scrollPromise;
-    $scope.startScroll = function(direction){
-        scrollDirection = direction;
-        scrollThumbs();
+    function updatePortfolioNavigationButtons(){
+
     }
 
-    $scope.scrollButtonDownHandler = function(){
-        scrollSpeed = 12;
-    }
-
-    $scope.scrollButtonUpHandler = function(){
-        scrollSpeed = 5;
-    }
-
-    function scrollThumbs(){
-        scrollPosition += scrollDirection * scrollSpeed;
-        if(scrollDirection==1 && scrollPosition>=0){
-            scrollPosition = 0;
-            updateScroll();
-            return;
+    $scope.previousClick = function(){
+        var previousProject = portfolioService.getPreviousProject($scope.project);
+        if(previousProject){
+            navigateToProject(previousProject);
         }
-        if(scrollDirection==-1 && scrollPosition <= thumbsVisibleWidth-thumbsWidth-15){
-            scrollPosition = thumbsVisibleWidth-thumbsWidth-15;
-            updateScroll();
-            return;
-        }
-        updateScroll();
-        scrollPromise = $timeout(scrollThumbs, 50);
+        analyticsService.logPreviousProjectClick();
     }
 
-    function updateScroll(){
-        $scope.thumbsListStyle["left"] = scrollPosition + "px";
-    }
-
-    $scope.stopScroll = function(direction){
-        if (scrollPromise) {
-            $timeout.cancel(scrollPromise);
+    $scope.nextClick = function(){
+        var nextProject = portfolioService.getNextProject($scope.project);
+        if(nextProject){
+            navigateToProject(nextProject);
         }
+        analyticsService.logNextProjectClick();
     }
 
     //===========================================
     //==============::IMAGE ROTATOR::=================
     //===========================================
+
+    //TODO : Move to own controller (or directive?)
 
     function showNextProjectImage(){
         cancelImageRotation();
@@ -22577,27 +22747,43 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         }
     }
 
+}
 
+/**
+ * Created by sakri on 13-8-14.
+ */
+function calenderButtonController($rootScope, $scope, portfolioService, colorService, canvasTextService){
+    //console.log("calenderButtonController()");
 
-    //TODO: Move to a service
-    //===========================================
-    //==============::CALENDER BUTTON::=================
-    //===========================================
+    var canvas = document.createElement("canvas");
+    canvas.width = 80;
+    canvas.height = 80;
+    var context = canvas.getContext("2d");
+    context.font = "bold 24px sans-serif";
+    context.textBaseline = "top";
+    var year = portfolioService.currentProject.year;
+
+    $scope.$on("show-project", function(event, project){
+        year = portfolioService.currentProject.year;
+        $scope.renderCalenderNormal();
+    });
+
     $scope.calenderClickHandler = function(event){
-        $rootScope.$broadcast("show-year-selector", $scope.displayYear);
+        $rootScope.$broadcast("show-year-selector", year);
     }
 
-    $scope.renderNormal = function(){
-        render(colorService.headerColor, colorService.white);
+    $scope.renderCalenderNormal = function(){
+        renderCalender(colorService.headerColor, colorService.white);
     }
 
-    $scope.renderOver = function(){
-        render(colorService.white, colorService.headerColor);
+    $scope.renderCalenderOver = function(){
+        renderCalender(colorService.white, colorService.headerColor);
     }
 
     var bgRect, handle1Rect, handle2Rect;
 
-    function render(color1, color2){
+    function renderCalender(color1, color2){
+        console.log("calenderButtonController.renderCalender()");
         context.clearRect(0, 0, canvas.width, canvas.height);
         var handleHeight = canvas.height *.2;
         handle1Rect = { x:canvas.width *.33 - handleHeight/4, y:0, width: handleHeight/2 , height: handleHeight};
@@ -22622,9 +22808,84 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         context.fill();
 
         //TEXT
-        var fontSize = getFontSizeForWidth($scope.displayYear, bgRect.width-handleHeight *.8 );
+        var fontSize = canvasTextService.getFontSizeForWidth(canvas, year, bgRect.width-handleHeight *.8 );
+        //console.log("calenderButtonController.render() ", year,  bgRect.width-handleHeight *.8, fontSize);
         context.fillStyle = color2;
-        context.fillText($scope.displayYear,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
+        context.fillText(year,  handleHeight * .5, bgRect.y + handleHeight * 1.7);
+        $scope.calenderSrc = canvas.toDataURL();
+    }
+
+
+    var halfPi = Math.PI/2;
+    var pi2 = Math.PI*2;
+
+    function renderRoundedRect (rect, radius){
+        var right = rect.x + rect.width;
+        var bottom = rect.y + rect.height;
+        context.beginPath();
+        context.moveTo(rect.x, rect.y + radius);
+        context.arc(rect.x + radius, rect.y + radius, radius, Math.PI, Math.PI + halfPi);
+        context.lineTo(right - radius, rect.y);
+        context.arc(right - radius, rect.y + radius, radius, Math.PI + halfPi, pi2 );
+        context.lineTo(right, bottom - radius);
+        context.arc(right - radius, bottom - radius, radius, 0, halfPi );
+        context.lineTo(rect.x + radius, bottom);
+        context.arc(rect.x + radius, bottom - radius, radius, halfPi, Math.PI );
+        context.lineTo(rect.x, rect.y + radius);
+        context.closePath();
+    }
+
+    $scope.renderCalenderNormal();
+}
+/**
+ * Created by sakri on 13-8-14.
+ * Renders the projects button on a Canvas element and sets the source to an image
+ */
+function projectsButtonController($rootScope, $scope, colorService, canvasTextService){
+
+    var canvas = document.createElement("canvas");
+    canvas.width = 80;
+    canvas.height = 80;
+    var context = canvas.getContext("2d");
+    context.font = "bold 24px sans-serif";
+    context.textBaseline = "top";
+
+    $scope.projectsClickHandler = function(event){
+        $rootScope.$broadcast("show-projects-selector");
+    }
+
+    $scope.renderProjectsNormal = function(){
+        renderProjects(colorService.headerColor, colorService.white);
+    }
+
+    $scope.renderProjectsOver = function(){
+        renderProjects(colorService.white, colorService.headerColor);
+    }
+
+    var bgRect, handleRect;
+
+    function renderProjects(color1, color2){
+        //console.log("projectsButtonController.render()");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        var handleHeight = canvas.height *.2;
+        handleRect = { x:canvas.width *.15, y:0, width: canvas.width*.35 , height: handleHeight};
+        bgRect = {x:0, y:handleHeight/2, width: canvas.width, height:canvas.height-handleHeight/2};
+
+        context.fillStyle = color1;
+
+        //BG
+        renderRoundedRect(bgRect, handleHeight/2);
+        context.fill();
+
+        //HANDLE
+        context.fillStyle = color1;
+        renderRoundedRect(handleRect, handleHeight/5);
+        context.fill();
+
+        //TEXT
+        var fontSize = canvasTextService.getFontSizeForWidth(canvas, "PROJECTS", bgRect.width-handleHeight *.8 );
+        context.fillStyle = color2;
+        context.fillText("PROJECTS",  handleHeight * .5, canvas.height - handleHeight * .5 - fontSize);
         $scope.projectsSrc = canvas.toDataURL();
     }
 
@@ -22648,46 +22909,13 @@ function portfolioController($rootScope, $scope, $location, $timeout, portfolioS
         context.closePath();
     }
 
-
-    //TODO: Move into a service!! Repeated in yearSelectorController !!!
-    //returns the biggest font size that best fits into rect
-    function getFontSizeForWidth(string, width, minFontSize, maxFontSize){
-        minFontSize = minFontSize || 8;
-        maxFontSize = maxFontSize || 500;
-        var fontSize = 80;
-        context.font = "bold "+fontSize+"px sans-serif";
-        var textWidth = context.measureText(string).width;
-
-        if(textWidth < width){
-            while(context.measureText(string).width < width){
-                fontSize++;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize > maxFontSize){
-                    console.log("getFontSizeForWidth() max fontsize reached");
-                    return maxFontSize;
-                }
-            }
-        }else if(textWidth > width){
-            while(context.measureText(string).width > width){
-                fontSize--;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize < minFontSize){
-                    console.log("getFontSizeForWidth() min fontsize reached");
-                    return minFontSize;
-                }
-            }
-        }
-        //console.log("getFontSizeForWidth() 2  : ", copy.fontSize);
-        return fontSize;
-    }
-
+    $scope.renderProjectsNormal();
 }
-
 /**
  * Created by sakri on 7-7-14.
  */
 
-function yearSelectorController($rootScope, $scope, $location, $timeout, colorService, portfolioService, analyticsService){
+function yearSelectorController($rootScope, $scope, $location, $timeout, colorService, portfolioService, analyticsService, canvasTextService){
 
     $scope.yearSelectorStyle = {}
 
@@ -22783,7 +23011,7 @@ function yearSelectorController($rootScope, $scope, $location, $timeout, colorSe
         cellWidth = $rootScope.containerRect.width * margin / 4;
         cellHeight = cellWidth / 2;//TODO : double check that this works in all sizes?
         gridX = $rootScope.containerRect.width/2 - cellWidth*2;
-        fontSize = getFontSizeForWidth("0000", cellWidth *.8);
+        fontSize = canvasTextService.getFontSizeForWidth(canvas, "0000", cellWidth *.8);
         context.font = "bold "+fontSize+"px sans-serif";
     }
 
@@ -22841,172 +23069,62 @@ function yearSelectorController($rootScope, $scope, $location, $timeout, colorSe
         return mousePosition;
     }
 
-    //TODO: Move into a service?!
-    //returns the biggest font size that best fits into rect
-    function getFontSizeForWidth(string, width, minFontSize, maxFontSize){
-        minFontSize = minFontSize || 8;
-        maxFontSize = maxFontSize || 500;
-        var fontSize = 80;
-        context.font = "bold "+fontSize+"px sans-serif";
-        var textWidth = context.measureText(string).width;
+}
 
-        //SOME DISAGREEMENT WHETHER THIS SHOOULD BE WITH && or ||
-        if(textWidth < width){
-            while(context.measureText(string).width < width){
-                fontSize++;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize > maxFontSize){
-                    console.log("getFontSizeForWidth() max fontsize reached");
-                    return maxFontSize;
-                }
-            }
-        }else if(textWidth > width){
-            while(context.measureText(string).width > width){
-                fontSize--;
-                context.font = "bold "+fontSize+"px sans-serif";
-                if(fontSize < minFontSize){
-                    console.log("getFontSizeForWidth() min fontsize reached");
-                    return minFontSize;
-                }
-            }
-        }
-        //console.log("getFontSizeForWidth() 2  : ", copy.fontSize);
-        return fontSize;
+/**
+ * Created by sakri on 12-8-14.
+ */
+
+function contactController($scope, $http, analyticsService) {
+
+    $scope.mailSent = false;
+    $scope.sender = "";
+    $scope.message = "Hi Sakri,";
+
+    function validateEmail(email) {
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
     }
 
+    function showEmailErrorMessage(message){
+        alert(message);//yes yes, not the most creative solution
+    }
+
+    $scope.submitForm = function() {
+        //console.log("posting data....", JSON.stringify($scope.data));
+        if(!validateEmail($scope.sender)){
+            showEmailErrorMessage("Your email doesn't seem to be valid, double check?");
+            return;
+        }
+        if($scope.message=="Hi Sakri," || $scope.message==""){
+            showEmailErrorMessage("Would be nice if you actually left a message...");
+            return;
+        }
+        var sender =  encodeURIComponent($scope.sender);
+        var message = encodeURIComponent($scope.message);
+        var params = "sender="+sender+"&message="+message;
+        $http.defaults.headers.post = { 'Content-Type' : "application/x-www-form-urlencoded" };
+        $http.post('http://www.sakri.net/sendMail.php', params).success(successHandler).error(errorHandler);
+        analyticsService.logContactMessage();
+    };
+
+    function successHandler(data, status){
+        //console.log("email success!");
+        $scope.message = "Hi Sakri,";
+        $scope.mailSent = true;
+    }
+
+    function errorHandler(data, status){
+        console.log("not sure why, but I always get an error!");
+        $scope.message = "Hi Sakri,";
+        $scope.mailSent = true;
+    }
 
 }
 
 //=============================================
 //================::SERVICES::=================
 //=============================================
-
-//GOOGLE ANALYTICS SERVICE
-function analyticsService() {
-
-    var isLive = window.location.host.indexOf("sakri.net") > -1;
-    //console.log("analyticsService", isLive, _gaq);
-
-    this.logOutBoundClick = function(link){
-        var name=String(link).replace(/.*?:\/\//g, "");//from http://stackoverflow.com/questions/8206269/javascript-how-to-remove-http-from-url
-        if(name.indexOf("www.")==0){
-            name=name.split("www.")[1];
-        }
-        name=name.split(".")[0];
-        if(isLive){
-            _gaq.push(["_trackEvent", "outBoundClicks", name]);
-        }
-
-        window.open(link,'_blank');
-
-    }
-
-    this.logSectionVisit = function(sectionName){
-        if(isLive){
-            //console.log("logSectionVisit()", _gaq,  sectionName);
-            _gaq.push(["_trackEvent", "Home", sectionName]);
-        }
-    }
-
-    this.logPortfolioProject = function(projectName){
-        if(isLive){
-            //console.log("logPortfolioProject()", projectName);
-            _gaq.push(["_trackEvent", "Portfolio", projectName]);
-        }
-    }
-
-    this.logPortfolioYear = function(year){
-        if(isLive){
-            //console.log("logPortfolioYear()", year);
-            _gaq.push(["_trackEvent", "Portfolio", year]);
-        }
-    }
-
-    this.logContactMessage = function(){
-        if(isLive){
-            //console.log("logPortfolioYear()", year);
-            _gaq.push(["_trackEvent", "ContactMailSent"]);
-        }
-    }
-
-}
-
-
-
-//TODO rename to xml service or so?
-//from http://rabidgadfly.com/2013/02/angular-and-xml-no-problem/
-function portfolioService($http) {
-
-    this.clientHasFlash  = false;
-
-    //http://stackoverflow.com/questions/998245/how-can-i-detect-if-flash-is-installed-and-if-not-display-a-hidden-div-that-inf
-    try {
-        var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
-        if (fo) {
-            this.clientHasFlash = true;
-        }
-    } catch (e) {
-        if (navigator.mimeTypes
-            && navigator.mimeTypes['application/x-shockwave-flash'] != undefined
-            && navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin) {
-            this.clientHasFlash = true;
-        }
-    }
-
-    var json = createPortfolioJson();
-    //console.log("temp : ", json);
-    var availableYears = getAvailableYears();
-
-    function createPortfolioJson(){
-        var xmlNode = document.getElementById("portfolioXml");
-        var xml = xmlNode.innerHTML;
-        xmlNode.innerHTML = "";
-        var x2js = new X2JS();
-        var json = x2js.xml_str2json( xml );
-        var last = json.portfolio.project[json.portfolio.project.length-1];
-        last.description = last.description.split("[numProjects]").join(""+json.portfolio.project.length);
-        return json;
-    }
-
-    function getAvailableYears(){
-        var unique = {};
-        var projects = json.portfolio.project;
-        var years = [];
-        for(var i=0; i<projects.length; i++){
-            if(!unique[projects[i].year]){
-                years.push(projects[i].year);
-                unique[projects[i].year] = true;
-            }
-        }
-        //console.log(years);//TODO : sort
-        return years;
-    }
-
-    this.yearHasProjects = function(year){
-        return availableYears.indexOf(String(year)) > -1;
-    }
-
-    this.getAvailableYears = function(){
-        return availableYears;//should make a copy instead of returning original
-    }
-
-    this.getJson = function(){
-        return json;
-    }
-
-    this.getProjectsForYear = function(year){
-        var allProjects = json.portfolio.project;
-        var projects = [];
-        for(var i=0; i<allProjects.length; i++){
-            if(allProjects[i].year == year){
-                projects.push(allProjects[i]);
-            }
-        }
-        return projects;
-    }
-
-}
-
 
 //a bit pointless for now, is foreseen to provide more of a service
 function colorService(){
@@ -23022,9 +23140,8 @@ function colorService(){
 //==============::CONTROLLERS::================
 //=============================================
 
-//MAIN
+//MAIN TODO: This is not being used, could this replace "mainDivController" instead?
 function mainController($rootScope, $scope, $location, $timeout, analyticsService) {
-
 
 }
 
@@ -23103,56 +23220,6 @@ function mainDivController($rootScope, $scope, $location, $timeout, analyticsSer
 
 }
 
-
-//CONTACT
-function contactController($rootScope, $scope, $http, analyticsService) {
-
-    $scope.mailSent = false;
-    $scope.sender = "";
-    $scope.message = "Hi Sakri,";
-
-    function validateEmail(email) {
-        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
-    }
-
-    function showEmailErrorMessage(message){
-        alert(message);//yes yes, not the most creative solution
-    }
-
-    $scope.submitForm = function() {
-        //console.log("posting data....", JSON.stringify($scope.data));
-        if(!validateEmail($scope.sender)){
-            showEmailErrorMessage("Your email doesn't seem to be valid, double check?");
-            return;
-        }
-        if($scope.message=="Hi Sakri," || $scope.message==""){
-            showEmailErrorMessage("Would be nice if you actually left a message...");
-            return;
-        }
-        var sender =  encodeURIComponent($scope.sender);
-        var message = encodeURIComponent($scope.message);
-        var params = "sender="+sender+"&message="+message;
-        $http.defaults.headers.post = { 'Content-Type' : "application/x-www-form-urlencoded" };
-        $http.post('http://www.sakri.net/sendMail.php', params).success(successHandler).error(errorHandler);
-        analyticsService.logContactMessage();
-    };
-
-    function successHandler(data, status){
-        //console.log("email success!");
-        $scope.message = "Hi Sakri,";
-        $scope.mailSent = true;
-    }
-
-    function errorHandler(data, status){
-        console.log("not sure why, but I always get an error!");
-        $scope.message = "Hi Sakri,";
-        $scope.mailSent = true;
-    }
-
-}
-
-
 //=============================================
 //==============::DIRECTIVES::=================
 //=============================================
@@ -23176,11 +23243,22 @@ function portfolioDirective(){
     }
 }
 
-function contactDirective(){
+//TODO is it possible to move the controller functionality into this directive? if not, remove these two, not needed
+function portfolioCalenderButtonDirective(){
+    //console.log("portfolioCalenderButtonDirective");
     return {
         restrict:'A',
         replace:false,
-        controller: 'contactController'
+        controller: 'calenderButtonController'
+    }
+}
+
+function portfolioProjectsButtonDirective(){
+    //console.log("portfolioProjectsButtonDirective");
+    return {
+        restrict:'A',
+        replace:false,
+        controller: 'projectsButtonController'
     }
 }
 
@@ -23200,7 +23278,6 @@ function yearSelectorDirective(){
 //===========
 var app = angular.module('sakriDotNet', []);
 
-
 //===========
 //SERVICES
 //===========
@@ -23213,6 +23290,9 @@ app.service('portfolioService', ['$http', portfolioService]);
 
 //GOOGLE ANALYTICS SERVICE
 app.service('analyticsService', [analyticsService]);
+
+//CANVAS TEXT SERVICE
+app.service('canvasTextService', [canvasTextService]);
 
 //COLOR SERVICE
 app.service('colorService', [colorService]);
@@ -23233,10 +23313,17 @@ app.directive('mainDiv', mainDivDirective);
 app.controller('portfolioController', ['$rootScope', '$scope', '$location' , '$timeout', 'portfolioService', 'analyticsService', 'colorService', portfolioController]);
 app.directive('portfolioSection', portfolioDirective);
 
+//CALENDER BUTTON
+app.controller('calenderButtonController', ['$rootScope', '$scope', 'portfolioService', 'colorService', 'canvasTextService', calenderButtonController]);
+app.directive('portfolioCalenderButton', portfolioCalenderButtonDirective);
+
+//PROJECTS BUTTON
+app.controller('projectsButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', projectsButtonController]);
+app.directive('portfolioProjectsButton', portfolioProjectsButtonDirective);
+
 //YEAR SELECTOR
-app.controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', yearSelectorController]);
+app.controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', 'canvasTextService',  yearSelectorController]);
 app.directive('portfolioYearSelector', yearSelectorDirective);
 
 //Contact
-app.controller('contactController', ['$rootScope', '$scope', '$http', 'analyticsService', contactController]);
-app.directive('contactSection', contactDirective);
+app.controller('contactController', ['$scope', '$http', 'analyticsService', contactController]);

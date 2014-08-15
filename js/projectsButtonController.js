@@ -3,10 +3,6 @@
  * Renders the projects button on a Canvas element and sets the source to an image
  */
 function projectsButtonController($rootScope, $scope, colorService, canvasTextService){
-    //TODO: Move to a service
-    //===========================================
-    //==============::CALENDER BUTTON::=================
-    //===========================================
 
     var canvas = document.createElement("canvas");
     canvas.width = 80;
@@ -14,16 +10,9 @@ function projectsButtonController($rootScope, $scope, colorService, canvasTextSe
     var context = canvas.getContext("2d");
     context.font = "bold 24px sans-serif";
     context.textBaseline = "top";
-    var year = 0;
-
-    $scope.$on("show-project", function(event, project){
-        //console.log("projectsButtonController on show-project");
-        year = project.year;
-        $scope.renderProjectsNormal();
-    });
 
     $scope.projectsClickHandler = function(event){
-        $rootScope.$broadcast("show-projects-selector", year);
+        $rootScope.$broadcast("show-projects-selector");
     }
 
     $scope.renderProjectsNormal = function(){
@@ -80,4 +69,6 @@ function projectsButtonController($rootScope, $scope, colorService, canvasTextSe
         context.lineTo(rect.x, rect.y + radius);
         context.closePath();
     }
+
+    $scope.renderProjectsNormal();
 }

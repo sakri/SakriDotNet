@@ -190,7 +190,7 @@ app.controller('portfolioController', ['$rootScope', '$scope', '$location' , '$t
 app.directive('portfolioSection', portfolioDirective);
 
 //CALENDER BUTTON
-app.controller('calenderButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', calenderButtonController]);
+app.controller('calenderButtonController', ['$rootScope', '$scope', 'portfolioService', 'colorService', 'canvasTextService', calenderButtonController]);
 app.directive('portfolioCalenderButton', portfolioCalenderButtonDirective);
 
 //PROJECTS BUTTON
