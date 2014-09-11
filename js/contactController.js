@@ -17,6 +17,12 @@ function contactController($scope, $http, analyticsService) {
         alert(message);//yes yes, not the most creative solution
     }
 
+    //It seems search engines find the sendMail.php script whilst scraping the contents
+    //Resulting in emtpy emails being sent.  This is an attempt at stopping that phenomena.
+    function getMailScriptAddress(){
+        return 'http'+'://'+'www.'+'sakri'+'.net/'+'sendMail'+'.php';
+    }
+
     $scope.submitForm = function() {
         //console.log("posting data....", JSON.stringify($scope.data));
         if(!validateEmail($scope.sender)){
@@ -31,7 +37,7 @@ function contactController($scope, $http, analyticsService) {
         var message = encodeURIComponent($scope.message);
         var params = "sender="+sender+"&message="+message;
         $http.defaults.headers.post = { 'Content-Type' : "application/x-www-form-urlencoded" };
-        $http.post('http://www.sakri.net/sendMail.php', params).success(successHandler).error(errorHandler);
+        $http.post(getMailScriptAddress(), params).success(successHandler).error(errorHandler);
         analyticsService.logContactMessage();
     };
 

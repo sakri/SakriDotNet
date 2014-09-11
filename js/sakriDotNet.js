@@ -1,98 +1,9 @@
 //=============================================
-//================::SERVICES::=================
-//=============================================
-
-//a bit pointless for now, is foreseen to provide more of a service
-function colorService(){
-    this.headerColor = "#f25a2b";
-    this.subHeaderColor = "#bcc0d2";
-    this.bgColor = "#edd8aa";
-    this.white = "#FFFFFF";
-    this.gray = "#888888";
-}
-
-
-//=============================================
 //==============::CONTROLLERS::================
 //=============================================
 
 //MAIN TODO: This is not being used, could this replace "mainDivController" instead?
 function mainController($rootScope, $scope, $location, $timeout, analyticsService) {
-
-}
-
-//MAIN DIV
-function mainDivController($rootScope, $scope, $location, $timeout, analyticsService){
-
-    var container, resizeTimeoutPromise;
-
-    var headerImages = {"home":"home", "portfolio":"work", "cv":"about", "contact":"contact"};
-
-    $scope.currentSection = "home";
-    $scope.showSocialMediaBar = true;
-
-    function setHeaderImage(){
-        $scope.headerImage = "assets/headers/"+headerImages[$scope.currentSection]+".gif"
-    }
-
-    function init(){
-        $scope.currentSection = isValidSection() ? getSection() : "home";
-        $rootScope.$broadcast("navigate", $scope.currentSection);
-        showFooter();
-        $rootScope.$on('$locationChangeSuccess', function () {
-            $scope.currentSection = getSection();
-            analyticsService.logSectionVisit($scope.currentSection);
-            showFooter();
-            setHeaderImage();
-        });
-        setHeaderImage();
-    }
-
-    function showFooter(){
-        $scope.showSocialMediaBar = $scope.currentSection != "portfolio";
-    }
-
-    function isValidSection(){
-        return headerImages[getSection()] != undefined;
-    }
-
-    function getSection(){
-        return $location.path().split("/")[1];
-    }
-
-    //avoid running resize scripts repeatedly if a browser window is being resized by dragging
-    function resizeHandler(){
-        if (resizeTimeoutPromise) {
-            $timeout.cancel(resizeTimeoutPromise);
-        }else{
-            $rootScope.$broadcast("resize-start");
-        }
-        resizeTimeoutPromise = $timeout(commitResize, 300 );
-    }
-
-    function commitResize(){
-        resizeTimeoutPromise = undefined;
-        updateContainerRect();
-        $rootScope.$broadcast("commit-resize",  $rootScope.containerRect);
-    }
-
-    function updateContainerRect(){
-        $rootScope.containerRect = container.getBoundingClientRect();
-        $rootScope.containerRect.width -= 6;//-6 for 3px border, TODO make dynamic, take into account different box models?
-    }
-
-    this.initialize = function(element) {
-        container = element[0];
-        window.addEventListener('resize', resizeHandler);
-        updateContainerRect();
-        $timeout(init, 200);
-    }
-
-    $scope.outboundLinkClick = function(url){
-        analyticsService.logOutBoundClick(url);
-    }
-
-    resizeHandler();
 
 }
 
@@ -152,54 +63,38 @@ function yearSelectorDirective(){
 //===========
 //APP
 //===========
-var app = angular.module('sakriDotNet', []);
+angular
+    .module('sakriDotNet', [])
 
-//===========
-//SERVICES
-//===========
+    //===========
+    //SERVICES
+    //===========
 
-//PORTFOLIO SERVICE
-app.service('portfolioService', ['$http', portfolioService]);
+    .service('portfolioService', ['$http', portfolioService])
+    //.service('imageService', [imageService])
+    .service('analyticsService', [analyticsService])
+    .service('canvasTextService', [canvasTextService])
+    .service('colorService', [colorService])
 
-//IMAGE SERVICE
-//app.service('imageService', [imageService]);
+    //==========================
+    //CONTROLLERS AND DIRECTIVES
+    //==========================
 
-//GOOGLE ANALYTICS SERVICE
-app.service('analyticsService', [analyticsService]);
+    .controller('mainController', ['$rootScope', '$scope', '$location', '$timeout', 'analyticsService', mainController])
 
-//CANVAS TEXT SERVICE
-app.service('canvasTextService', [canvasTextService]);
+    .controller('mainDivController', ['$rootScope', '$scope', '$location', '$timeout', 'analyticsService', mainDivController])
+    .directive('mainDiv', mainDivDirective)
 
-//COLOR SERVICE
-app.service('colorService', [colorService]);
+    .controller('portfolioController', ['$rootScope', '$scope', '$location' , '$timeout', 'portfolioService', 'analyticsService', 'colorService', portfolioController])
+    .directive('portfolioSection', portfolioDirective)
 
+    .controller('calenderButtonController', ['$rootScope', '$scope', 'portfolioService', 'colorService', 'canvasTextService', calenderButtonController])
+    .directive('portfolioCalenderButton', portfolioCalenderButtonDirective)
 
-//===========
-//CONTROLLERS
-//===========
+    .controller('projectsButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', projectsButtonController])
+    .directive('portfolioProjectsButton', portfolioProjectsButtonDirective)
 
-//MAIN CONTROLLER
-app.controller('mainController', ['$rootScope', '$scope', '$location', '$timeout', 'analyticsService', mainController]);
+    .controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', 'canvasTextService',  yearSelectorController])
+    .directive('portfolioYearSelector', yearSelectorDirective)
 
-//MAIN DIV CONTROLLER
-app.controller('mainDivController', ['$rootScope', '$scope', '$location', '$timeout', 'analyticsService', mainDivController]);
-app.directive('mainDiv', mainDivDirective);
-
-//PORTFOLIO
-app.controller('portfolioController', ['$rootScope', '$scope', '$location' , '$timeout', 'portfolioService', 'analyticsService', 'colorService', portfolioController]);
-app.directive('portfolioSection', portfolioDirective);
-
-//CALENDER BUTTON
-app.controller('calenderButtonController', ['$rootScope', '$scope', 'portfolioService', 'colorService', 'canvasTextService', calenderButtonController]);
-app.directive('portfolioCalenderButton', portfolioCalenderButtonDirective);
-
-//PROJECTS BUTTON
-app.controller('projectsButtonController', ['$rootScope', '$scope', 'colorService', 'canvasTextService', projectsButtonController]);
-app.directive('portfolioProjectsButton', portfolioProjectsButtonDirective);
-
-//YEAR SELECTOR
-app.controller('yearSelectorController', ['$rootScope', '$scope', '$location' , '$timeout', 'colorService', 'portfolioService', 'analyticsService', 'canvasTextService',  yearSelectorController]);
-app.directive('portfolioYearSelector', yearSelectorDirective);
-
-//Contact
-app.controller('contactController', ['$scope', '$http', 'analyticsService', contactController]);
+    .controller('contactController', ['$scope', '$http', 'analyticsService', contactController]);

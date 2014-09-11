@@ -16,6 +16,7 @@ module.exports = function(grunt) {
                         "js/portfolioService.js",
                         "js/analyticsService.js",
                         "js/canvasTextService.js",
+                        "js/colorService.js",
                         "js/portfolioController.js",
                         "js/calenderButtonController.js",
                         "js/projectsButtonController.js",
