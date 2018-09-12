@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!--
+
+    Hello, glad to see you here!
+
+    ...but you're better off reading the comment at the top of index.html, the javascript and css is identical
+
+    -->
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-393774-1"></script>
+    <script>
+        var _scriptStart = new Date().getTime();
+        if(location.href.indexOf("localhost") == -1){
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-393774-1');
+        };
+    </script>
+
+    <!-- site metadata -->
+    <meta charset="UTF-8" />
+    <meta name="Resource-type" content="Document"/>
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, angular, polymer, front end, frontend, developer, freelance, creative, creative coder, coder, programmer,  brussels, belgium, workshops" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+    <title>Portfolio : Sakri Rosenstrom Front End Developer and Creative Coder, Brussels Belgium</title>
+
+    <!-- Open Graph data -->
+    <meta property="og:site_name" content="Sakri Rosenstrom - Frontend Developer and Creative Coder, Brussels"/>
+    <meta property="og:title" content="Sakri Rosenstrom - Frontend Developer Brussels" />
+    <meta property="og:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games"/>
+    <meta property="og:image" content="http://www.sakri.net/assets/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.sakri.net" />
+
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakri Rosenstrom - Frontend Developer Brussels">
+    <meta name="twitter:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games">
+    <meta name="twitter:url" content="http://www.sakri.net">
+    <meta name="twitter:image" content="http://www.sakri.net/assets/thumbnail.png">
+
+    <!-- Icons -->
+    <link href="http://www.sakri.net/assets/thumbnail.png" type="image/png" rel="image_src">
+    <link href="http://www.sakri.net" rel="canonical">
+
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone.png" type="image/png">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad.png" type="image/png" sizes="76x76">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone-retina.png" type="image/png" sizes="120x120">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad-retina.png" type="image/png" sizes="152x152">
+
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-96x96.png" type="image/png" sizes="96x96">
+
+    <!-- for grunt script to work, CSS, Javascript and init declarations/comments must remain in this order -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/sakriDotNet.css" />
+
+    <!-- javascript sources -->
+    <script src="js/home_version_00_23/utils.js"></script>
+    <script src="js/home_version_00_23/layout.js"></script>
+    <script src="js/home_version_00_23/data.js"></script>
+    <script src="js/home_version_00_23/sprites.js"></script>
+    <script src="js/home_version_00_23/SakriDotNetLoader.js"></script>
+    <script src="js/home_version_00_23/CanvasInteractionManager.js"></script>
+    <script src="js/home_version_00_23/DragManager.js"></script>
+    <script src="js/home_version_00_23/CardCanvasRenderer.js"></script>
+    <script src="js/home_version_00_23/CardHtmlRenderer.js"></script>
+    <script src="js/home_version_00_23/CardsMenu.js"></script>
+    <script src="js/home_version_00_23/Card.js"></script>
+    <script src="js/home_version_00_23/EffectsLayer.js"></script>
+    <script src="js/home_version_00_23/SakriDotNetHomeApp.js"></script>
+
+    <!-- init -->
+    <script>
+
+        function waitForIt(){
+            if(document.body){
+                if(appConfig.checkNoJs()){
+                    return;
+                }
+                document.body.style.overflow = "hidden";
+                return new SakriDotNetHomeApp("folio", "index.html").init();
+            }
+            requestAnimationFrame(waitForIt);
+        };
+
+        waitForIt();
+
+    </script>
+
+</head>
+<body>
+
+    <h1>Portfolio</h1>
+    <nav>
+        <a href="./index.html">Home</a>
+        <a href="#sakriDotNet">Sakri.net</a> |
+        <a href="#centomedia">centomedia</a> |
+        <a href="#lotje">lotje</a> |
+        <a href="#knuckleTattoos">knuckleTattoos</a>
+        <a href="#canvasTextEffects">canvasTextEffects</a>
+        <a href="#happyMetrix">happyMetrix</a>
+        <a href="#kuro">kuro</a>
+        <a href="#bikkembergs">bikkembergs</a>
+        <a href="#helpJoe">helpJoe</a>
+        <a href="#aiboNewsletter">aiboNewsletter</a>
+    </nav>
+
+    <section id="sakriDotNet">
+        <div class="sectionContent">
+            <h1>Sakri.net</h1>
+            <img src="./portfolio/2018/sakriRosenstrom/sakriRosenstrom.png" alt="sakri.net website icon" />
+            <p>In the year 2000, sakri.com was already taken, so I bought sakri.net .  This is probably version 7.
+                The goal was to create a new online "business card" to promote my focus on more visual, interaction and
+                animation oriented work.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>The concept is simple :</p>
+                <ul>
+                    <li>Show the world what I'm good at by coding something I enjoy coding.</li>
+                    <li>Use <a href="http://vanilla-js.com/">Vanilla.js</a> to showcase building performant
+                        js/html5/css features from scratch, while not relying on other peoples code, libs, frameworks.</li>
+                    <li>Follow minimal principles in design and code (still working on it).</li>
+                </ul>
+            <p>The site is in progress still. I wanted to take a "start up approach" : Complete an MVP (minimum viable product),
+            release (August 17, 2018). Then continue improving the site while promoting it, and looking for new
+            customers.</p>
+            <p>I've been using the "pixel guy" as my sites identity/icon since the start, also recycling it for avatars,
+                profile pics etc. </p>
+            <p>I spent time studying Googles Material Design documents while designing/building the prototype. Their
+                way of thinking works great for me : Often wearing designer/developer hats simultaneously only serves to
+                distract and slows down the process. Following material principles reduced the amount of design decisions
+                and allowed me to focus on the code.</p>
+            <a href="https://material.io/design/components/cards.html">Google Material Design Card doc</a>
+            <p>Some feature highlights:</p>
+            <H4>Loader</H4>
+            <p>I wanted this to be as lightweight as possible. Normally this would be "embedded" in the html page (rather
+            than an external js load). Instead of a sprite sheet, I created a photoshop file with all the animated
+            pixels in separate layers. Using "Export layers to files", a custom app then loads the assets and exports
+            points. These are then used by the script to generate the spritesheets for the canvas animation.  I plan to use
+            this technique in upcoming features of the website.  The loader then uses a query selector to discover a list of
+            images to load and observes them.</p>
+            </p>
+            <H4>Cards Menu</H4>
+            <p>I hadn't seen this done yet (probably has) so I decided to replicate the mobile OS "recent apps" menu.
+            The app reads the "section" tags from the mark up, then makes "screenshots" of them, and passes these
+            to the menu for scrolling. The original html content is then discarded. When a card is opened, it zooms in
+            and is rendered in html (to enable scrolling and selection of text/images).</p>
+            <H4>Responsive design</H4>
+            <p>The menu supports slightly different layouts for horizontal and vertical orientation. It's designed
+            to render, function correctly, and look good in *every* screen dimension. If the screen is resized, the
+            layout calculations are repeated, and the app updates itself accordingly.</p>
+            <h4>Stats Module</h4>
+            This is a showcase for a minimal app, with some data visualization and animation. Users are asked to complete
+            a set of tasks on the website, and are rewarded with a Pixel Confetti Animation. A standalone version of the
+            Stats Module can be tested here : <a href="statsModule.html">stats module</a>
+            <H4>No Javascript version</H4>
+            <p>I wanted the html markup to be as clean as possible, and to look good for browsers with javascript
+                turned off. The markup is clean, but the "no js" version is still at the MVP stage ;)  You can
+            see it by turning off javascript in your browser, or by opening the page with a noJs=true param. For no
+                particular reason, here's my <a href="https://cssstats.com/stats?url=http%3A%2F%2Fsakri.net&ua=Browser%20Default" target="blank">css stats</a></p>
+            <H4>Navigation options</H4>
+            <p>The cards can be scrolled with touch, mousewheel and keyboard (up, down, enter)</p>
+            <a href="http://www.sakri.net?noJs=true">http://www.sakri.net?noJs=true</a>
+            <h2>Year : 2000 - 2018</h2>
+            <span>Client : <a href="http://www.sakri.net">Sakri Rosenstrom</a></span>
+            <span>Technologies : Javascript, Html5, Canvas, css, Grunt, photoshop</span>
+            <span>Client : <a href="https://www.pinterest.com/54kr1/sakrinet-inspiration/">pinterest moodboard</a></span>
+        </div>
+    </section>
+
+    <section id="centomedia">
+        <div class="sectionContent">
+            <h1>Centomedia Digital Signage</h1>
+            <img src="./portfolio/2018/centomedia/kbc.jpg" alt="Screenshot of centomedia" />
+            <p>Centomedia is a Belgian Digital signage company with clients ranging from Airports (Brussels Airport, Dubai Airport),
+                Multinationals (Nike, Engie, 3M), Universities (UAntwerpen, KULeuven) to local companies like KBC, BASE, Telenet,
+                Spar and local municipalities). Their main product: Centoview “Screen communication made easy”, is a cloud hosted CMS
+                system for custom designed Digital Signage slide shows.
+                I was hired to assist with their transition from their Flash based Digital Signage approach to modern HTML5
+                solutions.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <h2>Year : 2014 - 2018</h2>
+            <span>Client : <a href="https://centomedia.be">Centomedia</a></span>
+            <span>Technologies : Javascript, Polymer, Adobe Flash</span>
+        </div>
+    </section>
+
+    <section id="lotje">
+        <div class="sectionContent">
+            <h1>Lotje childrens games</h1>
+            <img src="./portfolio/2017/lotjeGames/lotjeHome.jpg" alt="Screenshot of Lotje website homepage" />
+            <p>Lotje is a well known series of Belgian childrens books by Lieve Baetensen. In the past, the site
+                hosted a number of popular games built with Adobe Flash, which mobile users could no longer access.
+                I was asked to create 3 new Html5 games which would work across all browsers and devices, aimed at kids
+                between 3-7 years old.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>I participated and gave technical consulting from start to finish.
+                The games are customizable by a wordpress set up which allows the site admin to create new "versions" of
+                the games by simply uploading new sets of images. To appease impatient kids, I created a lightweight micro
+                game framework, mostly handling user interactions and game state.<p>
+            <p>
+               I had fun with particles, as seen in the loaders and game interactions.
+                Lotje illustrations heavily emphasize on "light" and "atmosphere", the particles are meant to emulate
+                such a magical environment.</p>
+            <h2>Year : 2017</h2>
+            <span>Client : <a href="https://https://lotje.net">Lotje</a></span>
+            <span>In collaboration with : <a href="http://www.monokroom.com/">Monokroom</a></span>
+            <span>Technologies : Html5 Canvas, Javascript</span>
+            <span>Play Games : <a href="http://www.lotje.net/spelletjes/">Lotje Games</a></span>
+
+        </div>
+    </section>
+
+    <section id="knuckleTattoos">
+        <div class="sectionContent">
+            <h1>Knuckle Tattoo Generator</h1>
+            <img src="./portfolio/2014/knuckles/screenshot1.png" alt="Screenshot of knuckle tattoo generator app" />
+            <p>I was hired by Brighton based photographer Edward Bishop for a feature to accompany the website
+                for his new book "Knuckles".  Using Html5 Canvas, I created a knuckle tattoo generator, where users can enter
+                their own text and choose a font in an html form, which is then rendered as a .png image, which can be shared on Facebook and Twitter.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+            <images width="700" height="395" rotationSpeed="3000">
+                <image>portfolio/2014/knuckles/screenshot1.png</image>
+                <image>portfolio/2014/knuckles/screenshot2.png</image>
+            </images>
+             -->
+            <h2>Year : 2014</h2>
+            <span>Client : <a href="https://edwardbishop.me/">Edward Bishop Photography</a></span>
+            <span>Technologies : Html5 Canvas, Javascript</span>
+            <span>In collaboration with : <a href="https://www.stirtingale.com/">Tom Hole</a></span>
+            <span>Visit site : <a href="http://www.knuckletattoos.co.uk/generator/">Knuckle Tattoo Generator</a></span>
+            <span><a href="https://www.instagram.com/knuckletattooproject/">Projects instagram</a></span>
+        </div>
+    </section>
+
+    <section id="canvasTextEffects">
+        <div class="sectionContent">
+            <h1>Canvas Text Effects</h1>
+            <img src="./portfolio/2014/codepen/ghost.png" alt="Screenshot of Canvas Text Effect" />
+            <p>I gave a talk at FITC Amsterdam in February 2014 and another one at Belgiums Multimania in Kortrijk on
+                the topic of "Text Effects With Canvas".  For these talks, and for research into the Html5 Canvas,
+                I wrote a number of demos on codepen.io using tricks which I've accumulated up my sleeve over the years.
+                The idea was to focus on performance and effects requiring pixel level manipulation, which cannot be done with css.
+                Many of the demos allow the user to enter their own text.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="400" height="400" rotationSpeed="3000">
+            <image>portfolio/2014/codepen/ghost.png</image>
+            <image>portfolio/2014/codepen/ownWords.png</image>
+            <image>portfolio/2014/codepen/isometric.png</image>
+            <image>portfolio/2014/codepen/fire.png</image>
+            <image>portfolio/2014/codepen/particles.png</image>
+            <image>portfolio/2014/codepen/splode.png</image>
+            <image>portfolio/2014/codepen/heman.png</image>
+            <image>portfolio/2014/codepen/clouds.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2014</h2>
+            <span>Technologies : Html5 Canvas, Javascript</span>
+            <a href="http://codepen.io/sakri/popular">View demos at CodePen</a>
+        </div>
+    </section>
+
+    <section id="happyMetrix">
+        <div class="sectionContent">
+            <h1>Happy Metrix</h1>
+            <img src="./portfolio/2013/happyMetrix/screenshot0.png" alt="Screenshot of Happy Metrix" />
+            <p>Happy Metrix was a revisit back into start up world. The app lets you create easy-to-use dashboards,
+                collecting validated data from diverse data sources. I built a custom set of charting components from scratch
+                with the intent of making them easy to use, performant and lightweight enough for the iPad version of the app.
+                I implemented a number of "data sources", working with the APIs of Twitter, Facebook, Instagram, Google Analytics,
+                various URL shorteners/trackers and Tumblr (to name a few).
+                On top of working on the app, I also took part in the promotion: speaking/visiting conferences and
+                events, even spending days on a stand promoting the app at a trade show.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="690" height="391" rotationSpeed="3000">
+            <image>portfolio/2013/happyMetrix/screenshot0.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot1.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot2.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot3.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot4.png</image>
+            <image>portfolio/2013/happyMetrix/screenshot5.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2013</h2>
+            <span>Technologies : Flash, Flex, Html5, Javascript, OAuth, various social media APIs</span>
+            <span>Visit site : <a href="http://www.happymetrix.com">Happy Metrix</a></span>
+        </div>
+    </section>
+
+    <section id="kuro">
+        <div class="sectionContent">
+            <h1>Pioneer Kuro</h1>
+            <img src="./portfolio/2008/kuro/pioneer_kuro.jpg" alt="Screenshot of Pioneer Kuro Flatscreen TV showcase" />
+            <p>I collaborated with thesedays.be and Patrick Pietens on a flash based "Experience website" promoting Pioneers Kuro TV sets,
+                one of the higher end flat screen tv's of 2008.
+                In retrospect this occurred at an interesting moment in time: On one hand flash was
+                maturing to the point of having solid architectural frameworks and 3D was the HOT topic (thanks
+                to libraries like as Papervision3d and Away3d). On the other hand, the iPhone had just been released, and was
+                soon to kill off Flash, with no mercy or remorse.
+                The site had a distinctive 3d cube navigation, and was using some (at the moment) advanced management
+                of video and interactive content.
+                The project won several awards including the webaward.org.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="485" height="433" rotationSpeed="3000">
+            <image>portfolio/2008/kuro/pioneer_kuro1.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro2.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro3.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro4.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro5.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro6.png</image>
+            <image>portfolio/2008/kuro/pioneer_kuro7.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2008</h2>
+            <span>Client : <a href="http://www.pioneer.eu/">Pioneer</a></span>
+            <span>Technologies : Flash, Flex, Papervision3d</span>
+            <span>webaward.org page for :<a href="http://www.webaward.org/winner.asp?eid=12055#.U8fElZSSw2E">Kuro</a></span>
+
+            <span>Agency : <a href="https://www.thesedays.com/">Thesedays Antwerp</a></span>
+            <span>Design : <a href="https://www.valentijndestoop.com/">Valentijn Destoop</a></span>
+            <span>In Collab with : <a href="http://patrickpietens.com/">Patrick Pietens</a></span>
+        </div>
+    </section>
+
+    <section id="bikkembergs">
+        <div class="sectionContent">
+            <h1>Bikkembergs Football</h1>
+            <img src="./portfolio/2007/bikkembergs/screenshot1.png" alt="Screenshot of Bikkembergs Football experience site and online store" />
+            <p>Bikkembergs Flash driven online store. The frontend connected to an Ogone backend for transactions.
+                The project was a very fancy affair at the time,
+                using FAMES (Flashout, ASDT, MTASC, Eclipse and SwfMill), or in other words an attempt at "open source flash".
+                This set up allowed developers to code AS3 (programming language of Flash) with an editor superior to
+                Flashbuilder or the Flash IDE, and export .swf movies from the command line.
+                The project also featured a 3D video intro by Joost Korngold.
+                This project won a webaward.org.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="399" height="379" rotationSpeed="3000">
+            <image>portfolio/2007/bikkembergs/screenshot1.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot2.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot3.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot4.png</image>
+            <image>portfolio/2007/bikkembergs/screenshot5.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2007</h2>
+            <span>Client : <a href="https://www.bikkembergs.com/">Bikkembergs</a></span>
+            <span>Technologies : AS3, Fames, Ogone</span>
+            <span><a href="http://www.webaward.org/winner.asp?eid=6472#.W0IhhdIzbD5">webaward.org page</a></span>
+
+            <span>Agency : <a href="https://www.thesedays.com/">Thesedays Antwerp</a></span>
+            <span>Design : <a href="https://www.valentijndestoop.com/">Valentijn Destoop</a></span>
+            <span>In Collab with : <a href="https://be.linkedin.com/in/nlierman">Nicolas Lierman</a></span>
+            <span>3d video by : <a href="http://www.renascent.nl/">renascent.nl</a></span>
+        </div>
+    </section>
+
+    <section id="helpJoe">
+        <div class="sectionContent">
+            <h1>Help Joe</h1>
+            <img src="./portfolio/2005/helpJoe/screenshot1.png" alt="Screenshot of Henkel Help Joe tooth whitening paste viral campaign" />
+            <p>Henkel wanted to try a viral approach to promoting their new tooth whitening paste called Express White.
+                Nascom produced a "guitar hero" like game, where videos of a comedian brushing his teeth could be scrubbed with
+                a users mouse.  I was responsible for implementing the game mechanics and
+                video "scrubbing". One the funnest projects I've worked on, and winner the FWA site of the day award.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="514" height="400" rotationSpeed="3000">
+            <image>portfolio/2005/helpJoe/screenshot1.png</image>
+            <image>portfolio/2005/helpJoe/screenshot2.png</image>
+            <image>portfolio/2005/helpJoe/screenshot3.png</image>
+            <image>portfolio/2005/helpJoe/screenshot4.png</image>
+            <image>portfolio/2005/helpJoe/screenshot5.png</image>
+            <image>portfolio/2005/helpJoe/screenshot6.png</image>
+            <image>portfolio/2005/helpJoe/screenshot7.png</image>
+            <image>portfolio/2005/helpJoe/screenshot8.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2005</h2>
+            <span>Client : <a href="https://www.henkel.com/">Henkel</a></span>
+            <span>Technologies : AS3, Flash, php, mysql</span>
+            <span>fwa.com page for <a href="http://www.thefwa.com/site/help-joe/">Help Joe</a></span>
+
+            <span>Agency : <a href="https://www.nascom.be/">Nasom</a></span>
+        </div>
+    </section>
+
+    <section id="aiboNewsletter">
+        <div class="sectionContent">
+            <h1>Aibo Newsletter CMS</h1>
+            <img src="./portfolio/2003/aiboNewsletterCMS/screenshotCrop.png" alt="Screenshot of Sony Europes AIBO robotic dog newsletter cms tool" />
+            <p>My first web app! A basic CRUD tool for the Aibo marketing departments newsletters released in 2003.
+                Using Object Oriented techniques learned from Actionscript, I built the front end using css
+                and javascript, connecting to an ASP backend. Users could create new newsletters, save and edit
+                them, then publish files ready to use for their monthly newsletter for the European Market.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <!--
+
+        <images width="798" height="482">
+            <image>portfolio/2003/aiboNewsletterCMS/screenshotCrop.png</image>
+            <image>portfolio/2003/aiboNewsletterCMS/screenshotCrop.png</image>
+        </images>
+
+             -->
+            <h2>Year : 2003</h2>
+            <span>Client : <a href="https://www.sony.eu/">Sony AIBO</a></span>
+            <span>Technologies : Html, css, javascript, asp</span>
+
+         </div>
+    </section>
+
+</body>
+</html>

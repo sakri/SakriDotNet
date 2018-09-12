@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!--
+
+    Hello, glad to see you here!
+    Please find the sources at : https://github.com/sakri/SakriDotNet
+    You can also browse them in developer tools at http://www.sakri.net/indexWithSource.html
+    For a technical write up, check out the "sakri.net" entry in my portfolio section.
+    If you like what you see, don't hesitate to introduce me to your "guys who pay for freelancers" people ;)
+    Cheers, Sakri
+
+    The site is built with Vanilla.js. I don't have a fetish for "re-inventing the wheel",
+    For client projects, I'll use whatever tools/libs/frameworks deemed "fit for the job".
+    The point here is to show I'm capable of building custom features for custom
+    requirements from scratch, or built on top of existing code.
+
+    -->
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-393774-1"></script>
+    <script>
+        var _scriptStart = new Date().getTime();
+        if(location.href.indexOf("localhost") == -1){
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-393774-1');
+        };
+    </script>
+
+    <!-- site metadata -->
+    <meta charset="UTF-8" />
+    <meta name="Resource-type" content="Document"/>
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, angular, polymer, front end, frontend, developer, freelance, creative, creative coder, coder, programmer,  brussels, belgium, workshops" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+    <title>Sakri Rosenstrom Front End Developer and Creative Coder, Brussels Belgium</title>
+
+    <!-- Open Graph data -->
+    <meta property="og:site_name" content="Sakri Rosenstrom - Frontend Developer and Creative Coder, Brussels"/>
+    <meta property="og:title" content="Sakri Rosenstrom - Frontend Developer Brussels" />
+    <meta property="og:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games"/>
+    <meta property="og:image" content="http://www.sakri.net/assets/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.sakri.net" />
+
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakri Rosenstrom - Frontend Developer Brussels">
+    <meta name="twitter:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games">
+    <meta name="twitter:url" content="http://www.sakri.net">
+    <meta name="twitter:image" content="http://www.sakri.net/assets/thumbnail.png">
+
+    <!-- Icons -->
+    <link href="http://www.sakri.net/assets/thumbnail.png" type="image/png" rel="image_src">
+    <link href="http://www.sakri.net" rel="canonical">
+
+    <!-- Social -->
+    <meta name="p:domain_verify" content="0748e1babd732d1cd5cf7b2a03ad766b"/><!-- Pinterest -->
+
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone.png" type="image/png">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad.png" type="image/png" sizes="76x76">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone-retina.png" type="image/png" sizes="120x120">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad-retina.png" type="image/png" sizes="152x152">
+
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-96x96.png" type="image/png" sizes="96x96">
+
+    <!-- for grunt script to work, CSS, Javascript and init declarations/comments must remain in this order -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/sakriDotNet.css" />
+
+    <!-- javascript sources -->
+    <script src="js/utils.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/sprites.js"></script>
+    <script src="js/SakriDotNetLoader.js"></script>
+    <script src="js/CanvasInteractionManager.js"></script>
+    <script src="js/DragManager.js"></script>
+    <script src="js/CardCanvasRenderer.js"></script>
+    <script src="js/CardHtmlRenderer.js"></script>
+    <script src="js/CardsMenu.js"></script>
+    <script src="js/Card.js"></script>
+    <script src="js/EffectsLayer.js"></script>
+    <script src="js/SakriDotNetHomeApp.js"></script>
+
+    <!-- init -->
+    <script>
+
+        function waitForIt(){
+            if(document.body){
+                if(appConfig.checkNoJs()){
+                    return;
+                }
+                document.body.style.overflow = "hidden";
+                return new SakriDotNetHomeApp("home").init();
+             }
+            requestAnimationFrame(waitForIt);
+        };
+
+        waitForIt();
+
+    </script>
+
+</head>
+<body>
+
+    <nav>
+        <a href="#about">about</a> |
+        <a href="#services">services</a> |
+        <a href="#portfolio">portfolio</a> |
+        <a href="#contact">contact</a>
+        <a href="#faq">Frequently Asked Questions</a>
+        <a href="#workshops">Workshops</a>
+    </nav>
+
+    <section id="about">
+        <div class="sectionContent">
+            <h1>Sakri Rosenström</h1>
+            <img src="assets/sectionImages/profile.jpg" alt="Sakri Rosenstrom Profile picture" />
+            <p>Hi, I'm a freelance front end developer and creative coder based in Brussels.
+                Browse through my cards, if you like what you see, get in touch through the contact section :)
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>Graduating Art college in 1999, I started out as a Web Designer and quickly discovered a preference for programming.
+                This combination has made me a “visual thinker”, often providing “out of the box” coding solutions and ideas.</p>
+            <p>Over the years I have participated in successes and failures, in a range of roles, within teams large and small, various backgrounds,
+                cultures and project management processes, making banner ads to large scale web apps, for all types of screens.</p>
+            <p>These experiences have molded me into a pragmatist with a mature understanding of the project development life-cycle,
+                balancing the requirements of business, designers and developers alike.
+                I have been coached and mentored by incredible professionals,
+                and have enjoyed sharing that knowledge with others.</p>
+            <p>I enjoy brainstorming and problem solving. I'm experienced in project promotion (social media, speaking at events).
+                I've pitched projects, give workshops and can communicate technical matters in plain English to non-programmers.
+            </p>
+            <p>Please take a look at my portfolio for past work, or read my interview style Q&A in the F.A.Q. Section. Thanks for visiting!</p>
+            <p>Sakri</p>
+        </div>
+    </section>
+
+    <section id="services">
+        <div class="sectionContent">
+            <h1>services</h1>
+            <img src="assets/sectionImages/services.png" />
+            <p>Specializing in Visuals, animation and interaction using HTML5 technologies, I enjoy building components,
+                data visualizations, uis, games, menus, loaders, mini-sites and other dynamic custom features.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>Coding solo on small projects, participating with teams on larger ones and anything in between works for me.
+                I've used too many frameworks and libraries to list, whatever your set up, I can get up to speed and
+                productive quickly.</p>
+            <p>For smaller projects I'm happy to code Vanilla Javascript (no libs/frameworks). I like Vue.js for mid size,
+                I've had good experiences with Angular/Polymer/Typescript as complexity increases.</p>
+
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <div class="sectionContent">
+            <h1>portfolio</h1>
+            <img src="assets/sectionImages/portfolio.png" alt="Sakri Rosenstrom Frontend Developer Portfolio" />
+            <p>It's been a pleasure to work on a wide range of projects with equally varied roles and talented colleagues.
+                I've worked solo, been employed by a megacorp, toiled for agencies, start-ups, even founded and
+                co-owned an agency. Click the button below to browse a selection of my projects.
+            </p>
+            <a href="portfolio.html">open portfolio!</a>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="sectionContent">
+            <h1>contact</h1>
+            <img src="assets/sectionImages/contact.png" alt="Sakri Rosenstrom Frontend Developer Contact Section" />
+            <p>Looks like my skill set and personality match your business?
+                Email me with your contact details and I'll be happy to arrange a call, or provide
+                info on pricing / availability / remote / travel options.
+            </p>
+         </div>
+        <div class="sectionExtendedContent">
+            <span>Email : <a href="mailto:sakri.rosenstrom@gmail.com" target="_blank">sakri.rosenstrom@gmail.com</a></span>
+            <span>Discuss on Reddit : <a href="https://www.reddit.com/r/sakri/" target="_blank">reddit.com/r/sakri/</a></span>
+            <span>LinkedIn : <a href="https://www.linkedin.com/in/sakri/" target="_blank">linkedin.com/in/sakri/</a></span>
+            <span>Twitter : <a href="https://www.twitter.com/sakri/" target="_blank">twitter.com/sakri/</a></span>
+            <span>Instagram : <a href="https://www.instagram.com/54kr1/" target="_blank">instagram.com/54kr1/</a></span>
+        </div>
+    </section>
+
+    <section id="faq">
+        <div class="sectionContent">
+            <h1>Frequently Asked Questions</h1>
+            <p>Having been on both sides of the table, I've tried to answer some common interview questions.
+               Topics range from various aspects of my professional life, work flow, technology, hobbies and life in general.</p>
+            <a href="faq.html">Open the FAQ</a>
+        </div>
+    </section>
+
+    <section id="workshops">
+        <div class="sectionContent">
+            <h1>Html5 Canvas Workshops</C></h1>
+            <p>I give workshops on graphics and animation using the Html5 Canvas at conferences, companies and
+                co-working spaces.
+                My workshops are hands on, informative and peppered with dry developer humor where
+                attendees can expect to absorb information in a relaxed environment. The workshops are basic to medium advanced,
+                requiring a working understanding of Javascript.
+                The goal of the workshops is a sufficient understanding of the Canvas element, it's
+                strengths and weaknesses, for real life application using best practices and insider tricks and tips.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            Current offerings are:
+            <ul>
+                <li>General Introduction to Html5 Canvas, graphics, animation and bitmap manipulation</li>
+                <li>Introduction to Data visualization with Html5 Canvas</li>
+                <li>Introduction to casual game development with Html5 Canvas</li>
+            </ul>
+            Please contact me for a quote on custom content.
+            All Workshops last 6 hours and cost €1,000 (excluding VAT) with a maximum of 15 attendees.
+            Attendees need their own laptop, own code editor of choice and a modern browser.
+            Exercises and Examples use no external libraries, no time is wasted on installation.
+            For workshops outside Belgium you will have to cover my travel and lodging, I will arrive the night before a scheduled workshop.
+            <p>Interested? Please get in touch via the contact section.</p>
+        </div>
+    </section>
+
+</body>
+
+</html>

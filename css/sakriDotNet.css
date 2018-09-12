@@ -1,0 +1,149 @@
+html, body{
+    margin: 0px;
+    padding: 0px;
+    font-family: Helvetica,Arial,sans-serif;
+    background-color: #ededed;
+}
+
+/* NO JS */
+
+section{
+    width : 80%;
+    padding: 10%;
+    font-size: 1.5em;
+}
+
+.sectionContent img{
+    width : 100%;
+}
+
+.sectionExtendedContent span{
+    display:block;
+    padding-top: 1.5em;
+}
+
+.sectionExtendedContent a{
+    font-weight:bold;
+}
+
+.sectionExtendedContent a:link {
+    color: #049CD8;/* unvisited link */
+}
+
+.sectionExtendedContent a:visited {
+    color: #E52521;/* visited link */
+}
+
+.sectionExtendedContent a:hover {
+    color: #43B047;/* mouse over link */
+}
+
+.sectionExtendedContent a:active {
+    color: #FBD000;/* selected link */
+}
+
+/* CARDS MENU */
+
+.canvasContainer{
+    position:absolute;
+    overflow: hidden;
+    padding:0px;
+    margin:0px;
+    left:0px;
+    top:0px;
+    width:100%;
+    height:100%;
+    background-color: #ededed;
+}
+/*
+    background-image: url("../assets/pine.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+ */
+
+.cardElement{
+    position:absolute;
+    padding:0px;
+    margin:0px;
+}
+
+.card{
+    left:0px;
+    top:0px;
+    width:100%;
+    height:100%;
+    overflow: hidden;
+}
+
+.card a{
+    display:block;
+    font-weight: bold;
+    margin-bottom: 5%;
+}
+
+.cardImage{
+
+}
+
+.cardStory{
+    /*overflow: hidden;*/
+    overflow-y: auto;
+}
+
+.cardStory span{
+    display:block;
+    padding-top: 1.5em;
+}
+
+.cardStory a{
+    font-weight:bold;
+}
+
+.cardStory a:link {
+    color: #049CD8;/* unvisited link */
+}
+
+.cardStory a:visited {
+    color: #E52521;/* visited link */
+}
+
+.cardStory a:hover {
+    color: #43B047;/* mouse over link */
+}
+
+.cardStory a:active {
+    color: #FBD000;/* selected link */
+}
+
+.cardStoryFirstParagraph{
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.cardActionLink{
+    background-color: #00acee;
+    color:#FFFFFF;
+    border: none;
+    font-weight: bold;
+}
+
+.cardActionLink:hover{
+    background-color: #007cae;
+}
+
+/*WARNING : Duplicated in statsModule.css!!!*/
+.cardCloseButton{
+    position : absolute;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    color: #444444;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.cardCloseButton:hover {
+    color:#FFFFFF;
+    background-color: #00acee;
+}

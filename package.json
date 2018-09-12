@@ -1,0 +1,13 @@
+{
+  "name": "Sakri",
+  "version": "0.1.2",
+  "description": "Portfolio website of Sakri Rosenstrom, Freelance Frontend Developer.",
+  "license": "NOTSureYet",
+  "devDependencies": {
+    "grunt": "^1.0.3",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-uglify": "^3.4.0"
+  }
+}

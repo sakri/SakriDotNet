@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!--
+
+    Hello, glad to see you here!
+
+    ...but you're better off reading the comment at the top of index.html, the javascript and css is identical
+
+    -->
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-393774-1"></script>
+    <script>
+        var _scriptStart = new Date().getTime();
+        if(location.href.indexOf("localhost") == -1){
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-393774-1');
+        };
+    </script>
+
+    <!-- site metadata -->
+    <meta charset="UTF-8" />
+    <meta name="Resource-type" content="Document"/>
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, angular, polymer, front end, frontend, developer, freelance, creative, creative coder, coder, programmer,  brussels, belgium, workshops" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+    <title>FAQ : Frequently Asked Questions, Sakri Rosenstrom Front End Developer and Creative Coder, Brussels Belgium</title>
+
+    <!-- Open Graph data -->
+    <meta property="og:site_name" content="Sakri Rosenstrom - Frontend Developer and Creative Coder, Brussels"/>
+    <meta property="og:title" content="Sakri Rosenstrom - Frontend Developer Brussels" />
+    <meta property="og:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games"/>
+    <meta property="og:image" content="http://www.sakri.net/assets/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.sakri.net" />
+
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakri Rosenstrom - Frontend Developer Brussels">
+    <meta name="twitter:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games">
+    <meta name="twitter:url" content="http://www.sakri.net">
+    <meta name="twitter:image" content="http://www.sakri.net/assets/thumbnail.png">
+
+    <!-- Icons -->
+    <link href="http://www.sakri.net/assets/thumbnail.png" type="image/png" rel="image_src">
+    <link href="http://www.sakri.net" rel="canonical">
+
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone.png" type="image/png">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad.png" type="image/png" sizes="76x76">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone-retina.png" type="image/png" sizes="120x120">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad-retina.png" type="image/png" sizes="152x152">
+
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-96x96.png" type="image/png" sizes="96x96">
+
+    <!-- for grunt script to work, CSS, Javascript and init declarations/comments must remain in this order -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/sakriDotNet.css" />
+
+    <!-- javascript sources -->
+    <script src="js/home_version_00_23/utils.js"></script>
+    <script src="js/home_version_00_23/layout.js"></script>
+    <script src="js/home_version_00_23/data.js"></script>
+    <script src="js/home_version_00_23/sprites.js"></script>
+    <script src="js/home_version_00_23/SakriDotNetLoader.js"></script>
+    <script src="js/home_version_00_23/CanvasInteractionManager.js"></script>
+    <script src="js/home_version_00_23/DragManager.js"></script>
+    <script src="js/home_version_00_23/CardCanvasRenderer.js"></script>
+    <script src="js/home_version_00_23/CardHtmlRenderer.js"></script>
+    <script src="js/home_version_00_23/CardsMenu.js"></script>
+    <script src="js/home_version_00_23/Card.js"></script>
+    <script src="js/home_version_00_23/EffectsLayer.js"></script>
+    <script src="js/home_version_00_23/SakriDotNetHomeApp.js"></script>
+
+    <!-- init -->
+    <script>
+
+        function waitForIt(){
+            if(document.body){
+                if(appConfig.checkNoJs()){
+                    return;
+                }
+                document.body.style.overflow = "hidden";
+                return new SakriDotNetHomeApp("faq", "index.html").init();
+            }
+            requestAnimationFrame(waitForIt);
+        };
+
+        waitForIt();
+
+    </script>
+
+</head>
+<body>
+
+    <h1>Frequently Asked Questions</h1>
+
+    <nav>
+        <a href="./index.html">Home</a>
+        <a href="#myStory">My Story</a> |
+        <a href="#professionalStory">My Professional Story</a> |
+        <a href="#hobbies">What I do outside programming</a> |
+        <a href="#dreamJob">what's my dream job?</a>
+        <a href="#sakriDotNet">about this website</a>
+        <a href="#workFlow">preferred workflow</a>
+    </nav>
+
+    <section id="myStory">
+        <div class="sectionContent">
+            <h1>What's Your Story?</h1>
+            <p>I was born in 1975 in Porvoo Finland. I attended the world renown Näsin Ala-aste until 4th Grade, when
+                my father took up a job offer in Saudi Arabia, where I spent 2 wonderful years at Jubail Academy.
+                I was introduced to kids from all over the world, with mostly American teachers, apple II computers and skateboarding.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>In 1988 our family moved to Brussels, where I remain to this day. I had the fortune of going to the International
+                School Of Brussels (ISB), getting fully immersed in the international bubble. Like a proper teenager, I played guitar
+                in bands and spent most of my free time skateboarding with locals.
+                I wrestled and played American Football against US military base high schools scattered around Europe.
+                Our team won the European Football championships in 1993.</p>
+            <p>At ISB I made a core group of friends who I still speak to regularly, but more importantly I met Melissa Beltgens
+                to whom 25 years later I'm happily married to with 2 kids.</p>
+            <p>To retain my Finnish passport, I went back to Finland for a 9 month military service. This, was a highly
+            decorated affair.  After rising through the ranks, working high responsibility positions including Dentists Assistant
+            and night receptionist at a hospital, I returned to Brussels, a mean lean killing machine :D</p>
+            <p>At this point I was far more interested in nightlife than real life, and nightlife in Belgium was good. Venues like
+            Fuse, Vaudeville, Fool Moon, Whos Whos Land etc. etc. hosted big name DJs nearly every weekend. But I needed to study
+            something, and found Le 75 through a recommendation. </p>
+            <p>Le 75 is a French speaking art school in Brussels, where I studied Graphic Design.
+            In the mid 90's the school had 6 macs, students had to sign up and reserve "photoshop" time on them.
+            Needless to say the practical courses were heavily geared toward
+            manual design techniques : sketching, painting, ink techniques, technical drawing etc.
+            Focus was on concepts, style, illustration, logo design, spacial design and ability to dissect, discuss and defend
+            your own work.</p>
+            <p>At this point my "professional story" continues in the card "What's your professional story".</p>
+            <p>My wife also studied design in Brussels, following a course of Interior Design at St. Lucas.  Being a good
+            boyfriend, I was quite involved (and learned a lot) from her studies, helping her with building accurate miniature
+                architectural models, hand drawing architectural blue prints and learning the basics of CAD software.</p>
+            <p>After our studies we both got jobs and moved in together, got married and had 2 children. Needless to say
+            our focus has since shifted from nightlife to parenting. I think I've learned more about management and organization
+            through this particular job than any IT book, video or training.</p>
+        </div>
+    </section>
+
+    <section id="professionalStory">
+        <div class="sectionContent">
+            <h1>What's Your Professional Story?</h1>
+            <p>The first internet bubble was in full swing as I graduated with a degree in Graphic Design from
+                "Le 75" in Brussels in 1999.  I solicited every web related company/agency I could find on altavista
+                and the yellow pages.  This landed me a job as a webdesigner for the now defunct online store : mistersuper.com .
+                It was a cool job, we had a copy of Macromedia Flash 3, and I quickly learned the ropes through US flash forums.
+                Before long Flash 4 was released and I found myself spending less time designing, fixated on actionscript
+                and it's seemingly endless animation possibilities.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+
+            <p>I was approached by Sony Europe in 2000, where I joined SonyNetServices, their internal web agency based in
+            Saltzburg with a branch at the Brussels offices. Within a year of joining I was a full time actionscript
+            developer, collaborating with designers. At Sony I worked on product comparison apps, product showcases,
+            games, banners, a nasty XSLT based content management system, wap and iMode mobile phone content etc.</p>
+
+            <p>Sony restructured in 2004, firing 16,0000 personnel globally.  Sony Net Services Brussels was shut down,
+            but I stayed on for a year working on an internal project, something along the lines of "elf yourself" or an
+            early snapchat.  This project was eventually axed, and I decided it was time to leave mega corp.</p>
+
+            <p>With SonyNetServices out of the picture, a local agency called Nascom had found a foot in the door at Sony.
+            I met the team, liked what I saw and joined.  This was a great company, 15 guys all hands on, a startup mentality,
+            everyone motivated and producing high quality results. At this moment in time, flash dominated the web
+            and Nascom was one of the players in Belgium.  We produced viral games, experience sites, video was starting
+            to kick in and things were looking up!</p>
+
+            <p>Adobe bought the Macromedia Flash platform, and released Flex2 in 2006.  With ActionScript3, companies
+            and developers were able to build maintainable, large scale front end applications. Frameworks like Cairngorm,
+            Fames, PureMVC, SpringActionScript, Swiz and Robotlegs were popping up left right and center. 3D content
+            was also gaining momentum with frameworks like Papervision3D and Away3D. Live messaging, pixel level manipulation,
+            programming with sound etc. etc. gave a vast toolbox to create with. These were the glory days of Flash,
+            I attended and spoke frequently at enthusiastic conferences around Europe. It seemed like nothing would
+            stop the train. Although "Flash Killlers" had been touted since day 1, in 2007 Apple released
+            the iPhone, which eventually turned out to do the job, but that's another story.</p>
+
+            <p>Unfortunately Nascom didn't last very long. Business saw money in the group, and in a space of 2 years the
+            company grew from 20 to 75 employees, quickly killing off the vibe by separating key players and adding layers of
+            management between them. Although I was leading a team of 6 flash developers, by 2010 it was time for something new.</p>
+
+            <p>...to be continued</p>
+
+            <!--
+            <p>I got together with Christophe Herreman and Roland Zwaga to start Stack&Heap bvba. The focus was "Rich Internet
+            Applications", using all the sparkly goodies from two paragraphs ago. </p>
+
+            <p>Happy Metrix</p>
+
+            <p>DevState</p>
+
+            <p>Centomedia</p>
+
+
+            <a href="http://www.leseptantecinq.be/fr/">Le75</a>
+            -->
+        </div>
+    </section>
+
+    <section id="hobbies">
+        <div class="sectionContent">
+            <h1>Outside Programming, What Are You Into?</h1>
+            <p>Above all else I value spending time with family and friends.  I love the outdoors, I love Grilling,
+                new experiences, travelling. Here's a few other things I'm into : </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <img src="assets/BrusselsBlackAngelsLogo.png" alt="Brussels Black Angles American Football logo" />
+            <h3>BBA : Brussels Black Angels</h3>
+            <p>I coach the Offensive Line of Brussels Black Angels American Football Club, undefeated in the 2018
+                BAFL Division 1 league and winners of the Belgian Bowl. In the final BBA beat the Limburg Shotguns 50-0.</p>
+            <a href="https://www.facebook.com/brusselsblackangels/">BBA facebook</a>
+            <a href="https://www.instagram.com/brusselsblackangels/">BBA Instagram</a>
+            <span>
+                <img src="assets/odin_chihuahua1_200x200.png" alt="odin the chihuahua" />
+                <img src="assets/odin_chihuahua2_200x200.png" alt="odin the chihuahua" />
+                <img src="assets/odin_chihuahua3_200x200.png" alt="odin the chihuahua" />
+            </span>
+            <h3>Little Odin</h3>
+            <p>Against better judgment, my wife strong armed me into buying a Chihuahua.
+                Turns out he's an awesome little friend, and great fun to photograph (he's big in Japan!).
+                I've always enjoyed photography, most photos taken with my Samsung Galaxy.</p>
+            <a href="https://www.instagram.com/little_odin_/">Odins Instagram</a>
+        </div>
+
+    </section>
+
+    <section id="dreamJob">
+        <div class="sectionContent">
+            <h1>What's Your Dream Job?</h1>
+            <p>I'm happiest and most productive when focusing on an encapsulated task or a problem which requires a
+                creative solution, preferably visual in nature.  A custom menu, a text effect, a particle system, a game mechanic.
+                Here's a short list of what I imagine would be dream jobs for me:</p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>Coming soon...</p>
+            <img src="./assets/icons/touch-icon-ipad-retina.png">
+            <!--
+            <ul>
+                <li>King, Rovio</li>
+                <li>Google Doodle guy : Marking a special day with an interactive piece that lives for one day only? Sign me up!</li>
+                <li>Facebook interactive anniversary/event feature guy : Instead of pre-rendered videos, small interactive
+                    casual game like features instead.</li>
+                <li>Daily Casual Game : Using news revolving around a particular topic, produce a game/experience that people following the topic can get a laugh from.</li>
+                <li>Texts effects for live video overlay : A news channel needs eye catching dynamic graphics over their video feed, like
+                    opening titles to a movie or live statistics updates with data visualization. </li>
+                <li>More to come...</li>
+            </ul>
+            -->
+        </div>
+    </section>
+
+    <section id="sakriDotNet">
+        <div class="sectionContent">
+            <h1>Tell Me About This Website?</h1>
+            <p>I would love to, but there is already a lengthy write up in the portfolio section. Ok, this is a
+            filler, I'll compose a fascinating Question & Answer when I'm further down my todo list for this site.</p>
+        </div>
+    </section>
+
+    <section id="workFlow">
+        <div class="sectionContent">
+            <h1>What's Your Preferred Work Flow?</h1>
+            <p>I like to focus on the code. The code which creates, controls and manipulates all visual elements on
+            a screen.  I prefer to leave design to a designer and the backend to a backend developer.  I know enough
+            about both to appreciate the specialists, I've spent a lot of time with both profiles, and am good
+            at establishing workflows that accommodate everyone.</p>
+            <p>...aaand this is also incomplete, rest coming soon.</p>
+
+        </div>
+    </section>
+
+</body>
+</html>

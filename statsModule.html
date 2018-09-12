@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- site metadata -->
+    <meta charset="UTF-8" />
+    <meta name="Resource-type" content="Document"/>
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, angular, polymer, front end, frontend, developer, freelance, creative, creative coder, coder, programmer,  brussels, belgium, workshops" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+    <title>Sakri Rosenstrom Front End Developer and Creative Coder, Brussels Belgium</title>
+
+    <!-- Open Graph data -->
+    <meta property="og:site_name" content="Sakri Rosenstrom - Frontend Developer and Creative Coder, Brussels"/>
+    <meta property="og:title" content="Sakri Rosenstrom - Frontend Developer Brussels" />
+    <meta property="og:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games"/>
+    <meta property="og:image" content="http://www.sakri.net/assets/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.sakri.net" />
+
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakri Rosenstrom - Frontend Developer Brussels">
+    <meta name="twitter:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games">
+    <meta name="twitter:url" content="http://www.sakri.net">
+    <meta name="twitter:image" content="http://www.sakri.net/assets/thumbnail.png">
+
+    <!-- Icons -->
+    <link href="http://www.sakri.net/assets/thumbnail.png" type="image/png" rel="image_src">
+    <link href="http://www.sakri.net" rel="canonical">
+
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone.png" type="image/png">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad.png" type="image/png" sizes="76x76">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-iphone-retina.png" type="image/png" sizes="120x120">
+    <link rel="apple-touch-icon" href="http://www.sakri.net/assets/icons/touch-icon-ipad-retina.png" type="image/png" sizes="152x152">
+
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="http://www.sakri.net/assets/icons/favicon-96x96.png" type="image/png" sizes="96x96">
+
+    <!-- for grunt script to work, CSS, Javascript and init declarations/comments must remain in this order -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/statsModule.css" />
+
+    <!-- javascript sources -->
+    <script src="js/utils.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/sprites.js"></script>
+    <script src="js/StatsModuleSpaghetti.js"></script>
+
+    <!-- init -->
+    <script></script>
+
+</head>
+<body onload="init()" onresize="windowResizeHandler()" onclick="bodyClickHandler()">
+    <div id="appContainer">
+        <div id="interactionsContainer" class="statsContainer">
+            <h2>Clicks history:</h2>
+            <canvas id="lineChartCanvas"></canvas>
+            <!-- like button -->
+        </div>
+        <div id="pieContainer" class="statsContainer">
+            <h2>Cards overview</h2>
+            <div id="pieLegendContainer">
+                <div>
+                    <div id="cardNotVisitedLegend" class="pieChartLabelLegend" ></div>
+                    <p>Not visited <span id="cardNotVisitedStatLabel"></span></p>
+                </div>
+                <div>
+                    <div id="cardVisitedLegend" class="pieChartLabelLegend" ></div>
+                    <p>Visited <span id="cardVisitedStatLabel"></span></p>
+                </div>
+                <div>
+                    <div id="cardEndOfArticleLegend" class="pieChartLabelLegend" ></div>
+                    <p>Completed card <span id="cardEndOfArticleStatLabel"></span></p>
+                </div>
+            </div>
+            <div id="pieChartContainer">
+                <canvas id="pieChartCanvas"></canvas>
+            </div>
+        </div>
+        <div id="badgesContainer" class="statsContainer">
+            <span>
+                <canvas id="avatarCanvas"></canvas>
+                <h2 id="achievementsTitle"></h2>
+            </span>
+            <div id="badgesList"></div>
+        </div>
+        <div id="shareContainer" class="statsContainer">
+            <button onclick="shareClickHandler()">share!</button>
+        </div>
+    </div>
+
+    <div id="sharePanel" class="statsContainer">
+        <div id="shareContent">
+            <H1>How kind of you!</H1>
+            <div id="sharePanelExamples">
+                <p>Here's an example : </p>
+                <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">You simply haven&#39;t LIVED until you&#39;ve completed my new <a href="https://t.co/TM7ZsY1HZo">https://t.co/TM7ZsY1HZo</a> stats module :D<a href="https://twitter.com/hashtag/html5?src=hash&amp;ref_src=twsrc%5Etfw">#html5</a> <a href="https://twitter.com/hashtag/javascript?src=hash&amp;ref_src=twsrc%5Etfw">#javascript</a> <a href="https://twitter.com/hashtag/canvas?src=hash&amp;ref_src=twsrc%5Etfw">#canvas</a> <a href="https://twitter.com/hashtag/pixelart?src=hash&amp;ref_src=twsrc%5Etfw">#pixelart</a> <a href="https://twitter.com/hashtag/portfolio?src=hash&amp;ref_src=twsrc%5Etfw">#portfolio</a> <a href="https://twitter.com/hashtag/challenge?src=hash&amp;ref_src=twsrc%5Etfw">#challenge</a> <a href="https://twitter.com/hashtag/frontend?src=hash&amp;ref_src=twsrc%5Etfw">#frontend</a></p>&mdash; sakri (@sakri) <a href="https://twitter.com/sakri/status/1039542547650097152?ref_src=twsrc%5Etfw">September 11, 2018</a></blockquote>
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                <p>Don't hold back, Karma will repay you! Cut & Paste for the lazy:</p>
+                <ul>
+                    <li>You haven't LIVED until you've completed the www.sakri.net stats module!</li>
+                    <li>Once you go Sakri, you never go backri! http://www.sakri.net</li>
+                    <li>My life had no meaning, then I discovered http://www.sakri.net which filled my spiritual void!</li>
+                    <li>There are #frontend #developer #portfolios, and there is http://www.sakri.net . Hire this guy!</li>
+                </ul>
+            </div>
+            <button id="closeShareButton" onclick="sharePanelCloseHandler()">close</button>
+        </div>
+    </div>
+
+    <div id="testControllers">
+        <span>
+            <button onclick="addOpenCard()">add visit</button>
+            <button onclick="addReachedEndOfArticle()">add end of article</button>
+            <button onclick="addToVisitDurationMS(10)">add 10 secs to visit</button>
+            <button onclick="addActions(10)">add 10 actions</button>
+            <button onclick="celebrateVictory()">celebrate!</button>
+        </span>
+    </div>
+
+</body>
+
+</html>
