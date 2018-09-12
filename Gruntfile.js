@@ -2,10 +2,6 @@ module.exports = function(grunt) {
 
     grunt.log.write(' --BUILDING : sakri.net');
 
-    //minify css
-    //try to set up ftp from grunt
-    //metadata can be in one file? Injected by grunt
-
     var minifyJsFiles = {
         './release/js/SakriDotNet.min.js' : './release/js/SakriDotNetConcat.js',
         './release/js/StatsModule.min.js' : './release/js/StatsModuleConcat.js'
@@ -36,8 +32,8 @@ module.exports = function(grunt) {
     };
 
     var minifyCssFiles = {
-        './release/css/SakriDotNet.min.css' : './css/SakriDotNet.css',
-        './release/css/StatsModule.min.css' : './css/StatsModuleConcat.js'
+        './release/css/sakriDotNet.min.css' : './css/sakriDotNet.css',
+        './release/css/statsModule.min.css' : './css/statsModule.css'
     };
 
     grunt.initConfig({
@@ -71,7 +67,32 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-copy');
 
+    /*
+npm install -g grunt-cli
+npm install grunt-contrib-copy --save-dev
+npm install grunt-contrib-concat --save-dev
+npm install grunt-contrib-cssmin --save-dev
+npm install grunt-contrib-uglify --save-dev
+     */
+
     //================ SITE SPECIFIC CUSTOM TASKS ==========================
+
+    var prepareRelease = function(){
+        if(grunt.file.exists("./release")){
+            grunt.file.delete("./release");
+        }
+        grunt.file.mkdir("./release");
+        grunt.file.copy("./css/", "./release/css/");
+        grunt.file.copy("./js/", "./release/js/");
+    };
+    grunt.registerTask('prepareRelease', 'deletes/creates release folder', prepareRelease);
+
+    var copyToRelease = function(sourceHtmlFile, releaseHtmlFile){
+        var sourceContents = grunt.file.read(sourceHtmlFile);
+        grunt.file.write(releaseHtmlFile, sourceContents);
+    };
+
+    grunt.registerTask('copyToRelease', 'copies index.html as is so source code can be viewed in browsers dev tools', copyToRelease);
 
     var embedMinifiedScript = function(sourceHtmlFile, minifiedJSFile, releaseHtmlFile){
 
@@ -115,18 +136,10 @@ module.exports = function(grunt) {
     grunt.registerTask('embedMinifiedCss', 'Inserts or replaces minified css in a file', embedMinifiedCss);
 
 
-
-    var copyToRelease = function(sourceHtmlFile, releaseHtmlFile){
-        var sourceContents = grunt.file.read(sourceHtmlFile);
-        grunt.file.write(releaseHtmlFile, sourceContents);
-    };
-
-    grunt.registerTask('copyToRelease', 'copies index.html as is so source code can be viewed in browsers dev tools', copyToRelease);
-
-
     //================ SET DEFAULT TASK ==========================
 
     grunt.registerTask('default', [
+        'prepareRelease',
         'concat',
         'uglify',
         'cssmin',
@@ -134,10 +147,10 @@ module.exports = function(grunt) {
         'embedMinifiedScript:./faq.html:./release/js/SakriDotNet.min.js:./release/faq.html',
         'embedMinifiedScript:./portfolio.html:./release/js/SakriDotNet.min.js:./release/portfolio.html',
         'embedMinifiedScript:./statsModule.html:./release/js/StatsModule.min.js:./release/statsModule.html',
-        'embedMinifiedCss:./release/index.html:./release/css/SakriDotNet.min.css',
-        'embedMinifiedCss:./release/faq.html:./release/css/SakriDotNet.min.css',
-        'embedMinifiedCss:./release/portfolio.html:./release/css/SakriDotNet.min.css',
-        'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css:',
+        'embedMinifiedCss:./release/index.html:./release/css/sakriDotNet.min.css',
+        'embedMinifiedCss:./release/faq.html:./release/css/sakriDotNet.min.css',
+        'embedMinifiedCss:./release/portfolio.html:./release/css/sakriDotNet.min.css',
+        'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css',
         'copyToRelease:./index.html:./release/indexWithSource.html',
         'copyToRelease:./css/SakriDotNet.css:./release/css/SakriDotNet.css',
         'copyToRelease:./css/StatsModule.css:./release/css/StatsModule.css'
