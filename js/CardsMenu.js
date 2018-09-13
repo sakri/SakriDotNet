@@ -280,8 +280,11 @@
                 card.animateToBounds.updateToRect(card.bounds);
                 card.animateFromBounds.updateToRect(card.bounds);
                 card.animateFromBounds.y = -card.bounds.height * 1.2;
+                card.animateFromBounds.width = Math.round(card.bounds.width * .5);
+                card.animateFromBounds.height = Math.round(card.bounds.height * .5);
+                card.animateFromBounds.x = card.animateToBounds.centerX() - Math.round(card.bounds.width * .25);
             }
-            _unitAnimator.start(1500, renderIntroNextStep, introComplete);
+            _unitAnimator.start(2500, renderIntroNextStep, introComplete);
         };
 
         var renderIntroNextStep = function(normal){
@@ -290,9 +293,10 @@
             var startSpacer = 1 / (_cards.length + 1), endSpacer = 1 / (_cards.length), y;
             for(i=0; i<_cards.length; i++){
                 introNormal = MathUtil.smoothstep(normal, startSpacer * i, endSpacer * (i+1));
-                introNormal = i == _cards.length - 1 ? UnitEasing.easeOutBack(introNormal) : introNormal;
+               // introNormal = i == _cards.length - 1 ? UnitEasing.easeOutBack(introNormal) : introNormal;
                 card = _cards[i];
-                card.bounds.y = MathUtil.interpolate(introNormal, card.animateFromBounds.y, card.animateToBounds.y);
+                card.interpolateToAnimationBounds(UnitEasing.easeOutSine(introNormal));
+                card.bounds.y = MathUtil.interpolate(UnitEasing.easeOutBack(introNormal), card.animateFromBounds.y, card.animateToBounds.y);
                 card.render(_context, _data[_dataIndex + i], true);
             }
         };

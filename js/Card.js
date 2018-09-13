@@ -84,27 +84,33 @@
 
         var renderCardBG = function(context, data, bounds, tabBounds ){
 
+            //these two variables are a quick fix, layout is not being updated during intro/zoom animations
+            //resulting in protruding tabs, this is a temporary fix
+            var tabWidth = Math.min(tabBounds.width , bounds.width);
+            var tabX = MathUtil.clamp(tabBounds.x , bounds.x, bounds.right() - tabWidth);
+
+
             context.lineWidth = 1;//try .5
             context.strokeStyle = "rgba(50, 50, 50, .2)";//MathUtil.getRandomRGBColorString();//
             context.fillStyle = "#FFFFFF";//data.themeColor; //MathUtil.getRandomRGBAColorString(.2);
             //context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
             var tabCornderRadius = tabBounds.bottom();
-            var tabCenterWidth = tabBounds.width - tabCornderRadius;
+            var tabCenterWidth = tabWidth - tabCornderRadius;
 
             //Top Left Corner to tab
             context.beginPath();
             context.moveTo(bounds.x, bounds.y + tabCornderRadius);
-            context.lineTo(tabBounds.x, bounds.y + tabCornderRadius);
+            context.lineTo(tabX, bounds.y + tabCornderRadius);
 
             //Left side of tab Semi sphere
-            context.arc(tabBounds.x + tabCornderRadius, bounds.y + tabCornderRadius , tabCornderRadius, Math.PI, Math.PI * 1.5);
+            context.arc(tabX + tabCornderRadius, bounds.y + tabCornderRadius , tabCornderRadius, Math.PI, Math.PI * 1.5);
 
             //tab top
-            context.lineTo(tabBounds.x + tabCenterWidth, bounds.y);
+            context.lineTo(tabX + tabCenterWidth, bounds.y);
 
             //Right side of tab Semi sphere
-            context.arc(tabBounds.x + tabCenterWidth, bounds.y + tabCornderRadius, tabCornderRadius, Math.PI * 1.5, MathUtil.PI2);
+            context.arc(tabX + tabCenterWidth, bounds.y + tabCornderRadius, tabCornderRadius, Math.PI * 1.5, MathUtil.PI2);
 
             //rest of card
             context.lineTo(bounds.right(), bounds.y + tabCornderRadius);//top right
@@ -125,13 +131,13 @@
             context.restore();
 
             //Theme color graphic
-            var circleX = tabBounds.x + tabCornderRadius * .8;
+            var circleX = tabX + tabCornderRadius * .8;
             var circleY = bounds.y + tabCornderRadius * .6;
             var circleRadius = tabCornderRadius * .2;
 
             context.fillStyle = data.themeColor;
             context.beginPath();
-            //context.moveTo(tabBounds.x + tabCornderRadius * .65, tabBounds.y + tabCornderRadius * .5);
+            //context.moveTo(tabX + tabCornderRadius * .65, tabBounds.y + tabCornderRadius * .5);
             context.arc(circleX, circleY, circleRadius * .75, 0, Math.PI * 2);
             context.fill();
             context.closePath();

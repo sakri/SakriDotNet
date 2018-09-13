@@ -9,7 +9,9 @@ module.exports = function(grunt) {
     var concatJSFiles = {
         'release/js/SakriDotNetConcat.js': [
             "./js/utils.js",
-            "./js/layout.js",
+            "./js/layout/AppLayout.js",
+            "./js/layout/CardMenuLayout.js",
+            "./js/layout/CardContentLayout.js",
             "./js/data.js",
             "./js/sprites.js",
             "./js/SakriDotNetLoader.js",
@@ -24,8 +26,10 @@ module.exports = function(grunt) {
         ],
         'release/js/StatsModuleConcat.js': [
             "./js/utils.js",
-            "./js/layout.js",
+            "./js/layout/AppLayout.js",
             "./js/data.js",
+            "./js/statsModule/LineChart.js",
+            "./js/statsModule/PieChart.js",
             "./js/sprites.js",
             "./js/StatsModuleSpaghetti.js"
         ]
