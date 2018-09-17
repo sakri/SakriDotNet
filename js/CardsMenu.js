@@ -6,7 +6,7 @@
 
 (function() {
 
-    window.CardsMenu = function(canvas, cardClickCallback){
+    window.CardsMenu = function(canvas, scrollCallback, cardClickCallback){
 
         var _canvas,
             _context,
@@ -201,6 +201,9 @@
                 }
             }else{
                 _scrollNormal = nextScrollNormal;
+            }
+            if(scrollCallback){
+                scrollCallback();
             }
         };
 

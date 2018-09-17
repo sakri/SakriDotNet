@@ -2,7 +2,7 @@
     window.SakriDotNetSpriteSheet = {};
 
     var _sourceImage = new Image();
-    _sourceImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATIAAACQCAYAAACLZeeUAAARO0lEQVR4Xu2dYZqkrA5Gu3bVK5v+tlCzsl7V1H30KbxIBZIAKuqZPzNTQggn8BoU9fH19fX6+vp6fLX/6WWn3RMsQAACtyLweL1er8fjIQnZJEzpn5LgIWS3Gjp0FgLjEHj8/Py8ns9nLFCzgP38/Hx4+Xw+w2854euR2Y1DB08gAIFTEHj8/v6+vr+/gwC9JAFLezIJ2u/v71dUbypCRnaKkOMkBK5HYJWJWUQsIBDEDCG73vigRxA4BQGE7BRhwkkIQKBEwLWkVJaYZGSMNQhA4BACCNkh2GkUAhDoSQAh60kTWxCAwCEEELJDsNMoBCDQkwBC1pMmtiAAgUMIcNfyEOw0CgEI9CSAkPWkiS0IQOAQAukjRezsPyQMNAoBCLQQyD4sXnrWUng8afKBfWQtkaAuBCBQTUB7m8XK8CRg05/kGctQBiGrDgMVIQCBFgLFt1VMD5THxjMChpC1RIC6EIBAM4Ger90hI2sOBwYgAIEaApOQSS9QrLE1Yp2eQj1i//AJAhBwvuLak3GdrSyDAQIQODGBXMYSsrT0zbHWDKeHkKWZYsget/DhxCHEdQhAwCoKE6mcOB0lelK7cUQ9YspIgAAETkzg41397+XmVuLksRtnZMszoZnlsMfuicOF6xCAgESgdmkZC0eriITMKRWu6QNPs8/RV548WZanLKMDAhA4MYFsRjaJSPKZuOzSUilbK3qakNXaPXG4cB0CENAyspUweMSpk+hJS8nU51hMPf4SfQhA4MIEVhmZIEi5i+dztpT5sG96Y8B6UV7KwIpC5vDhwiGkaxCAwC5CZhQchIzxCAEIVBHosf1CathzoX2EslXwqAQBCIxBgEeUxogDXkAAAg0ErpyRNWChKgQgcCYCmpCldwm195dpG1f3XIaeKQ74CgEINBDQhCmY1p5z/NjM6nggfatrZA1YqAoBCJyJQHZn//tO49QXLcsKWzFMZd9w9ngY/UxxwFcIQKCBgPjO/kjENHGSRGyqI2VZ8fYKzW6uS57srQELVSEAgTMR+PiKUhAxQ0aWEzFJyBYRW9aqj7lpacmavr6nVvTOFAd8hQAEGghIG2K/DBlZScRaMjIt49KON6CgKgQgcFYC8fUvqQ/StSzvM5Gx3dKbMiwiZSlz1ljgNwQgUEnAc9G9diuG5ppHnDxltXY5DgEIXISAto8szaas5T2Cs1XZi4SIbkAAAhqBqz+ipPXfctwq3hZblIEABDYg0GuSerKqUjeuameD0GESAhAIBHJviPUSuqoA9eqXlyflIQABB4GVkP38/Hw9n8+pujdT6zXhr2rHERKKQgACXgIfG2IrxSz3CmqvPwiZlxjlIQABMfN6VYhZEKC57vTnndl5sztJEL02pvKjCSJDDQIQ2JBA9qFxg5gFwUsfM5o3vToETbKzCGIiiiVRK/ojMNT6rr3xY8OwYBoCEPAQKL7GpyBmadYmPiQuCJq2lBUzsiCKkahZ7awEMQaTuRZo6ZeHL2UhAIEdCGgX9aVlpvhb4QbBkqEl4uGxszwWJYirZkd6CH3OGBv82SE0NAEBCFgJaEI2X2+KJr0kANZrUle1Y2VNOQhAYCMCFiFbxKy0tDNu2UhvBnwsEU9qZ6PwYBYCELAQsApZyLqmv8WXMRoF6Mp2LLwpAwEIbEDAI2Sl5kfb7jCaPxuEDpMQgEAgwEPj+ljoJfZ6S5SAAASqCGwxSXtlQ3GHzmKzKghUggAE2ghcQsh+fn5ez+fT25ctxLEtGtSGAASqCHgnv6WRLQRCs6kdl/yuqWPpP2UgAIGdCSBkOwOnOQhAoD+BIGQ9s5OcrZY2tLracTKy/mMHixAYhsAiZO/d+z0yNIRsmPDiCATuQUB6sWKrmGWFrEEstYxLO05Gdo/xTC9vSiD3FokWMSuJSo3gTKHR6sWv8LGGUrNptUM5CEDgYALi40YNmZMmOjWCo9kMCL3C5C1/cKhoHgIQyBGwvFzQS08TCO147TLQa9db3suB8hCAwE4ELC9W9C4zNYGoyco0m9asLcZqsblTGGgGAhBoIaCJ1JlExytM3vItnKkLAQhsSEATsjnTiV81nfMlekTIIhBnsbkhekxDAAK9CKhC9n6O0dqe6YMdZ7Fp7TTlIACBYwmoQlbhniUj85o9i01vvygPAQh0IMD7yDpALJjY4kSxrcdYh8AJCRwx0bbIrjT0d2lT48BxCFySQE8hs4qFtZwFuNWWtdyobVr8ogwEbkugl5BJ35aMoU5CMv0x3QwwRuMubRpxUAwC9yWwh5Bt9fXukpBdqc37jk56DgEjga2FTPsKuNFNsVhOyK7WZgsj6kLgFgR6CdkEa/Ul8emH6Avlq9cFOb6BqQXhLm1qHDgOgVsT6CFk8/WvIFrp34Jo9bjwfpc2bz046TwErARahWz1qNHz+fwQtA2E7C5tWmNIOQjcnkCrkM1LypCRpTQnYdtAyO7U5u0HKAAgYCHQQ8hCOx+ZUuZaWI+l5d3atMSSMhC4LYGskD0ej7D3a4Hzer0s7y8L5bMvbcxd7D+izYrIpzcY3P2saJMqEIBAgcDHJAxi8ufPn49qf//+nX8TBE3bnBrb+sjIjmgzdsghoE39ZCRCAALbEFgJ2TShJQFLm54ELRIzz+QO17eWdo9oc0kZ31mnUbSb+rlN+LAKAQhMBNyCErC9xSy3V6xEd8nIrCLWs81YxByi3dRPhhoEILAtgQ8hC8vHeJKH3yZXwu/Tb9O/M3cmNxOy1jZn9TZmnnEnWvq5bQixDgEIzEKWm9hBrHKYkiWmleackaVtegRUuekg+bG6LucVspZ+WqFQDgIQqCcgCllJVNJMrVZUSmJSEtBWUfGKWLKs9WxX6bnNpD7C1ITADQhkhezfv39f//3334JgEhDpt55CZhHQ3kK2YSaIkN1gAtHFMQgUl5aaixXXjSaT4tJyOpATy1hAW9rUro91zgQRMm0AcRwCnQgMJWSWPm0hZJZMsKJdhMwSUMpAoAOB4vaL9+Rdmom/b1kxsYOd6u0XR7QZnK5oGyHrMEAxAQELgayQhTdZxEbi3yomtlnIcgLao01teSlBq2wXIbOMQMpAoAOBqp39lRP7Q8gkUckJ6Luy565hjKdp+0VlfxGyDgMUExCwEHA9axllSrWCMvnketZyyzbTnf1SJlgpYmI/LQGhDAQg4CdQfJuFYK5FwMSMLGnj440bnV6LLWZH8cPqaSbYQUDJyPzjkRoQqCLQQ5i8DR8xwbU2txBQrU0vN8pDAAIZAgjZdkMDIduOLZYhsCIwCZmUjYAJAhCAwGkIHJGRSXBGyV7wYx0deMCjJGbDjI9UyOLsbAuRy9kfBkinmwutZzJ4ICCnEJBR5kssVtaPh9RO0pJ9Ji4Tl4lrn1nMl2S+BCFbiUwo07CHKg2JZp/AIGQIGUJmJ3ASIWOJG72GvDa6HepxguEEc4oTTDEjm3rQISsTs7HEdjxhWOIKTz90EKUaEwgZQnZ+IesgYgGCdWmplauZjHEdzX46cckMyQxX42eUi9v4sZKC1Qd3R8iENKHZU8hG4NHa39b6ZGRkZKfKyJbMafrH9N4xLRtzfNR2lZVlnmEME8ayDF2BdfhhsV30o8TE4cfkvybY1QLi9EMTOvzoJGTEZQ2yN4/cXrHsx2g3+iq4W0Ba/EhnbyRQbkGt8MMjqKsTzPs/Yswq/EiXTOH/qy053iVMox85YXULKn7IwmH8GLV2govHpWu/6VZxKb79Is3MrF8gqvgSuetif6Uf4vW6JMtyCWqDH9aMbL5GJ7yZd/rZ/XFl4cMtmn2XgDTw0CYOfjRkhneIi6amS2b2eDyWj/Nqo2467vwSefYie62YBh8LoqplIMVrZNbBkfHjY3npEdSpcijf4EdNZpgNfYMfluFkFjL8+MzEpCwsB935lbJh4qIJ2TLhtI/1pmCcXyIvAVktcxsGana5HPk+mqBqmZv7q+mSsBuW2vM4EAa/OyssCXvB/jATxrrUbhinCPv/EyGLPs1j01QwDUq4YC8teeLfHOquDdRFhLQ2c75ZbmBIb6+NRS6ysVruWUZelEVZbqaYltreyVLKUsMxT2ZYmxUKfmiCrY2P2WQnHqVw4kfFEnePuFQJmXXidhSyj6WY1YfMBM1V1wZqdjnm8Ue7IywI6pINxWI6tRkLu9WH+JXeqb0k41iuGca2Q5upHWv7SUzm/0o23+XCq6aWzdulzK2Bh8m+MSOrGieGcRG6ro3TpVwHHs3CnrtLr40XD48zCdkoZ9xXer3QmaHOyYMSRHWpLdW3+hHXVQZLMTPMTZJaPwqfG7TchFkJojZJBAbZ+sJdbW1yt55gWsZH7NttBFUDNkPJpYbaGdmjqIbJPbwf2uTpyGPO0Lw3YKRMSOGevWYY97WTHyk+aRuIa2LWCGrhBGHJDEUB8/oRz6vEnzhr1ObuByuPH8axasoMa5eWRh8mRHXXyLQJm0wYDfjsSIuQaf54gODHiuaIcZFuOoQTruvOekbYpeGUCkjxjm+rsCuZrllQvTfoYh7CJYfVuev9H8v42EVQLSJTzMpyIuIQD7OQlbLDEfwoZah78sCPP9q5bTleGRft5oT7Mkh6k0USM2GJq26h8WZDcRu9BHWy6RX3OHu0ZKgI2XrIW84wCLsgEw0TxiI6TXHZSNjd21GcfpTsW64ZznNbiovDD02wi35M7QdhbBgfqlibl5ZhpFmdcZ7lXBmZJyvDj7VGwOOSPNSXGzTO25J9s6BK8zYnqMI4VQXVnJHFYjb9W9otHDnmtWs+4+KHnMCUnmEjLqKAzXPLkg5GZUYdp3H25n4W1zA+cvZN+x1XF9cej9lWhX4UBdUbyNinYmq99QBJBlfaXG2/3AMVP7KRZnx8Xra48jhVM8Ok897xsZmQObWqWLxFQPCjJ4HPyVd7UujpFePjHHFRM8PGQZHNDEcYpO5rZI0wStWZMOeYMBsOAU64DrjDzJewJ8XhO0UhAAEIjEVglIxsLyqjnEHo7zYE7hbfbSie0OqZhCy7o9tx9+nogV7qg3X4eGKW9rdH+1Y/9yiXsjg6vnv0mTYEAp5JcSTA1+uVn4PTrmGjmB050It9sMJ19DW99tilfaufe5QTWBwZ3z26TBsZAmcQMtMENE7wowa6qQ/WUWrsayxkXdu3+rlFuanv8UktYXFUfLfoKjYdBC4lZL+/v1/f39+lPh010LsKyTR5DX0VhUwSgiAMb1FYhCIuG/4dyoQxJmXKcZnpeK5Oaj8et6lPc2fetlIhi1gcFV/HlKPoFgQQsi2oftocRsjmNfg7q5GESjteEsK4boogV08T1lQopfII2T6DeORWELJ9ojOUkEmCk8u+4syolF3FGNPMLm3PI16lLDHYRcj2GcQjt4KQ7ROdSwmZtMSTMJYyvrR8KphaRheOJ8tslpb7jOfhWkHI9gnJ8EIWsptwLSoWivi3nDil5SU7ObGyCF6pLhnZPoN45FYQsn2iM5yQ7dPt7VshI9ue8RlaOIOQvU/u5X1kzrt4R8Smi5g57ljO3KL9dV3aPwJcrk2BBUvLkQK0oy9nEbIwKUU0RhFLJ/aOmJemmnfWO/oq9be5/Vpowt6vWlNLPYEFQtZM9ZwGziRk094pcSIqe8fiyBw+0HN9sA4fR19F4W5t3+pnXO77+/tjE+skQq1/BBaHx7e1T9SvI3AqIavr4qrW3Qb6KP1dLWudy2NP2Efpr8dnynYggJB1gDiwiZEm9h5iNlJ/Bx4W13MNIbteTIdaSid4FzHbKCtDyK49nrO9Q8iuHfgRJ/ZyndN548ISqRH7a/GbMo0EELJGgINXH3JihxsO000A4+uXrJiH7K/VecrVE0DI6tmdoebdJvbd+nuGMbiLj7yzfxfMNLIjgbudnHdEO25T/wMdR1QqNffjmgAAAABJRU5ErkJggg==";
+    _sourceImage.src = "data:image/png;base64,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";
 
     //preconfigured "handshakes" (repeated process when spritesheet is updated, consider optimization ideas)
     var _spriteSheetNames = ["head", "eyes", "mouth", "typingHand", "laptop", "buttrock", "bowdown", "yourStats"];//These match pixel art in _sourceImage
@@ -92,17 +92,24 @@
     };
 
     SakriDotNetSpriteSheet.renderFrame = function(spriteSheetName, context, frame, x, y, scale){
-
         var ss = this.getSpriteSheetData(spriteSheetName);
         if(!ss){
             console.log("SakriDotNetSpriteSheet.renderFrame() : ", spriteSheetName, ", no such sprite sheet, make sure SakriDotNetSpriteSheet.init() has been called")
             return false;
         }
-        //context.fillStyle = "#FF0000";
-        //context.fillRect(x, y, ss.width * scale, ss.height * scale);
-        //console.log("SakriDotNetSpriteSheet.renderFrame() : ", (ss.width + 3) * frame, ss.y, ss.width, ss.height, x, y, ss.width * scale, ss.height * scale);
         context.drawImage(_canvas, 1 + (ss.width + 3) * frame, ss.y, ss.width, ss.height,
             x, y, ss.width * scale, ss.height * scale);
+        return true;
+    };
+
+    //TODO: refactor, rename "renderFrame" to "renderFrameToScale", "renderFrameFixedSize" to "renderFrame"
+    SakriDotNetSpriteSheet.renderFrameFixedSize = function(spriteSheetName, context, frame, x, y, width, height){
+        var ss = this.getSpriteSheetData(spriteSheetName);
+        if(!ss){
+            console.log("SakriDotNetSpriteSheet.renderFrame() : ", spriteSheetName, ", no such sprite sheet, make sure SakriDotNetSpriteSheet.init() has been called")
+            return false;
+        }
+        context.drawImage(_canvas, 1 + (ss.width + 3) * frame, ss.y, ss.width, ss.height, x, y, width, height);
         return true;
     };
 
@@ -237,185 +244,20 @@
 
 (function(){
 
-    window.SpeechBubbleManager = {};
+    //uses 3 sprite frames to render a bubble using fixed size left, sretching middle part, fixed size right pieces
+    window.SpeechBubbleSprite = {};
 
-    var _displayTimeoutId = -1,
-        _index = 0,
-        _direction = 1,
-        _ss,
-        _context, _x, _y, _scale;
+    var _leftSidePixels = 4;//update this if the sprite sheet changes
 
-    SpeechBubbleManager.show = function(context, x, y, scale){
-        //console.log("SpeechBubbleManager.show()", x, y, scale);
-        if(_displayTimeoutId > -1){
-            console.log("SpeechBubbleManager.show() Already playing, skip");
-            return;//already displaying
-        }
-        _ss = SakriDotNetSpriteSheet.getSpriteSheetData("yourStats");
-        _context = context;
-        _x = x;
-        _y = y;
-        _scale = scale;
-        _index = 0;
-        _direction = 1;
-        hideBubble();
-        render();
-    };
-
-    SpeechBubbleManager.hide = function(){
-        hideBubble();
-    };
-
-    var hideBubble = function(){
-        //console.log("SpeechBubbleManager.hideBubble()");
-        clearBubbleGraphics();
-        clearTimeout(_displayTimeoutId);
-        _displayTimeoutId = -1;
-    };
-
-    var clearBubbleGraphics = function(){
-        if(_context){
-            _context.clearRect(_x, _y, _ss.width * _scale, _ss.height * _scale);
-        }
-    };
-
-    var render = function(){
-        clearBubbleGraphics();
-        SakriDotNetSpriteSheet.renderFrame("yourStats", _context, _index, _x, _y, _scale);
-        //console.log("SpeechBubbleManager.render()", _index, _ss.frames);
-        _index += _direction;
-        if(_index >= _ss.frames){
-            _displayTimeoutId = setTimeout(render, 2000);
-            _index = _ss.frames - 1;
-            _direction  = -1;
-        }else if(_index < 0){
-            hideBubble();
-        }else{
-            _displayTimeoutId = setTimeout(render, 300);
-        }
-    };
-
-}());
-
-(function(){
-
-    window.PixelConfetti = function(colors, minDuration, maxDuration, updateCallback){
-
-        var _canvas,
-            _context,
-            _isAnimating = false,
-            _rgbs = [],
-            _particles = [],
-            _particlesCopy = [],
-            START_X_0   = 0,
-            START_Y_1   = 1,
-            PEAK_X_2    = 2,
-            PEAK_Y_3    = 3,
-            END_X_4     = 4,
-            MS_START_5  = 5,
-            MS_END_6    = 6,
-            COLOR_7     = 7,
-            NUM_PROPS_8 = 8;
-
-        var rgb = {};
-        for(var i=0; i < colors.length; i++){
-            MathUtil.hexToRgb(colors[i], rgb);
-            _rgbs.push(rgb.r, rgb.g, rgb.b);
-        };
-
-        //refactor, too easy to forget to call?
-        this.updateCanvas = function(canvas){
-            _canvas = canvas;
-            _context = canvas.getContext("2d")
-        };
-
-        this.stop = function(){
-            stopRenderLoop();
-        };
-
-        this.addParticles = function(total, emitterX, emitterY){
-            var indexTotal = _particles.length + total * NUM_PROPS_8, peakX, start = new Date().getTime();
-            for(var i = _particles.length; i < indexTotal; i += NUM_PROPS_8){
-                peakX = Math.floor(Math.random() * _canvas.width);
-                _particles[i + START_X_0]   = emitterX;
-                _particles[i + START_Y_1]   = emitterY;
-                _particles[i + PEAK_X_2]    = peakX;
-                _particles[i + PEAK_Y_3]    = Math.ceil(Math.random() * (emitterY * .6));
-                _particles[i + END_X_4]     = Math.round(peakX + (peakX - emitterX) * .5);
-                _particles[i + MS_START_5]  = start;
-                _particles[i + MS_END_6]    = start + Math.round(MathUtil.getRandomNumberInRange(minDuration, maxDuration));
-                _particles[i + COLOR_7]     = Math.floor(Math.random() * colors.length);
-            }
-            if(_particles.length && !_isAnimating){
-                startRenderLoop();
-            }
-        };
-
-        var render = function(){
-            _context.clearRect(0, 0, _canvas.width, _canvas.height);
-            var imgData = _context.getImageData(0,0,_canvas.width, _canvas.height);
-            data = imgData.data;
-            _particlesCopy.length = 0;
-            var normal, positionNormal, x, y, now = new Date().getTime(),
-                dataIndex, colorIndex, rowSize = _canvas.width * 4;
-            for(var i=0; i<_particles.length; i += NUM_PROPS_8){
-                if(now > _particles[i + MS_END_6]){
-                    continue;//particle trajectory complete
-                }
-                normal = MathUtil.normalize(now, _particles[i + MS_START_5], _particles[i + MS_END_6]);
-                if(normal < .3 ){
-                    positionNormal = MathUtil.map(normal, 0, .3, 0, 1);//going up
-                    x = MathUtil.interpolate(UnitEasing.easeInQuad(positionNormal), _particles[i + START_X_0], _particles[i + PEAK_X_2]);
-                    y = MathUtil.interpolate(UnitEasing.easeOutQuad(positionNormal), _particles[i + START_Y_1], _particles[i + PEAK_Y_3]);
-                }else{
-                    positionNormal = MathUtil.map(normal, .3, 1, 0, 1);//going down
-                    x = MathUtil.interpolate(UnitEasing.easeOutQuad(positionNormal), _particles[i + PEAK_X_2], _particles[i + END_X_4]);
-                    y = MathUtil.interpolate(UnitEasing.easeInQuad(positionNormal), _particles[i + PEAK_Y_3], _canvas.height);
-                }
-                if(x < 0 || x > _canvas.width){
-                    continue;//out of bounds, particle trajectory complete
-                }
-                dataIndex = Math.floor(y) * rowSize + Math.floor(x) * 4;
-                colorIndex = _particles[i + COLOR_7] * 3;
-                data[dataIndex] = _rgbs[colorIndex];
-                data[dataIndex + 1] = _rgbs[colorIndex + 1];
-                data[dataIndex + 2] = _rgbs[colorIndex + 2];
-                data[dataIndex + 3] = 255 - Math.floor(i / _particles.length * 100);
-
-                _particlesCopy.push(_particles[i + START_X_0], _particles[i + START_Y_1], _particles[i + PEAK_X_2],
-                    _particles[i + PEAK_Y_3], _particles[i + END_X_4], _particles[i + MS_START_5],
-                    _particles[i + MS_END_6], _particles[i + COLOR_7]
-                );
-            }
-            _context.putImageData(imgData, 0, 0);
-            _particles = _particlesCopy.slice();//only keep active particles
-            if(!_particles.length){
-                stopRenderLoop();
-            }
-        };
-
-        var startRenderLoop = function(){
-            //console.log("PixelConfetti.startRenderLoop()");
-            _isAnimating = true;
-            renderLoop();
-        };
-
-        var stopRenderLoop = function(){
-            //console.log("PixelConfetti.stopRenderLoop()");
-            _context.clearRect(0, 0, _canvas.width, _canvas.height);//find way to not have to clear everytime? wasteful
-            _isAnimating = false;
-            _particles.length = 0;
-        };
-
-        var renderLoop = function(){
-            if(_isAnimating){
-                render();
-                if(updateCallback){
-                    updateCallback();
-                }
-                requestAnimationFrame(renderLoop);
-            }
-        };
+    SpeechBubbleSprite.render = function(context, x, y, width, height){
+        var _spriteSheet = SakriDotNetSpriteSheet.getSpriteSheetData("yourStats");
+        var _scale = Math.floor(Math.max(height / _spriteSheet.height, 1));//minimum height is _spriteSheet.height
+        SakriDotNetSpriteSheet.renderFrame("yourStats", context, 0, x, y, _scale);
+        SakriDotNetSpriteSheet.renderFrameFixedSize("yourStats", context, 1,
+            x + _leftSidePixels * _scale , y,
+            width - _scale * _spriteSheet.width - _leftSidePixels * _scale,
+            _scale * _spriteSheet.height);
+        SakriDotNetSpriteSheet.renderFrame("yourStats", context, 2, x + width - _scale * _spriteSheet.width, y, _scale);
     };
 
 }());

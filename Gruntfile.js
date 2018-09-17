@@ -21,15 +21,15 @@ module.exports = function(grunt) {
             "./js/CardHtmlRenderer.js",
             "./js/CardsMenu.js",
             "./js/Card.js",
-            "./js/EffectsLayer.js",
+            "./js/MenuButton.js",
             "./js/SakriDotNetHomeApp.js"
         ],
         'release/js/StatsModuleConcat.js': [
             "./js/utils.js",
             "./js/layout/AppLayout.js",
             "./js/data.js",
-            "./js/statsModule/LineChart.js",
-            "./js/statsModule/PieChart.js",
+            "./js/widget/LineChart.js",
+            "./js/widget/PieChart.js",
             "./js/sprites.js",
             "./js/StatsModuleSpaghetti.js"
         ]
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
 
     var minifyCssFiles = {
         './release/css/sakriDotNet.min.css' : './css/sakriDotNet.css',
-        './release/css/statsModule.min.css' : './css/statsModule.css'
+        './release/css/statsModule.min.css' : './css/widget.css'
     };
 
     grunt.initConfig({
@@ -150,11 +150,11 @@ npm install grunt-contrib-uglify --save-dev
         'embedMinifiedScript:./index.html:./release/js/SakriDotNet.min.js:./release/index.html',
         'embedMinifiedScript:./faq.html:./release/js/SakriDotNet.min.js:./release/faq.html',
         'embedMinifiedScript:./portfolio.html:./release/js/SakriDotNet.min.js:./release/portfolio.html',
-        'embedMinifiedScript:./statsModule.html:./release/js/StatsModule.min.js:./release/statsModule.html',
+        'embedMinifiedScript:./widget.html:./release/js/StatsModule.min.js:./release/widget.html',
         'embedMinifiedCss:./release/index.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/faq.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/portfolio.html:./release/css/sakriDotNet.min.css',
-        'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css',
+        'embedMinifiedCss:./release/widget.html:./release/css/widget.min.css',
         'copyToRelease:./index.html:./release/indexWithSource.html',
         'copyToRelease:./css/SakriDotNet.css:./release/css/SakriDotNet.css',
         'copyToRelease:./css/StatsModule.css:./release/css/StatsModule.css'

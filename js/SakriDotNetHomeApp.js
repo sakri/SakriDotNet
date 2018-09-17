@@ -9,7 +9,7 @@
             _menu,
             _cardCanvasRenderer,
             _cardHtmlRenderer = new CardHtmlRenderer(),
-            _effectsLayer;
+            _menuButton;
 
 
         //*****************************
@@ -48,8 +48,14 @@
             document.body.appendChild(_menuContainer);
             _menuCanvas = createCanvas();
             _menuContainer.appendChild(_menuCanvas);
-            _menu = new CardsMenu(_menuCanvas, showCardHandler);
-             _effectsLayer = new EffectsLayer(showStatsModule, backButtonURL);
+            _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCardHandler);
+            //MenuButton shouldn't be included in apps that don't show it, so if(window.MenuButton)
+            if(!backButtonURL){
+                _menuButton = new MenuButton(showStatsModule, backButtonURL);
+            }else{
+                _menuButton = {};//todo : find better solution, this is a placeholder to avoid errors
+                _menuButton.start = _menuButton.stop = _menuButton.addToPulse = function(){};
+            }
             commitWindowResize();
         };
 
@@ -129,6 +135,7 @@
 
         var commitWindowResize = function () {
             AppData.storeInteraction();
+            hideIframe();
             _menuCanvas.width = _menuContainer.offsetWidth;
             _menuCanvas.height = _menuContainer.offsetHeight;
             AppLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
@@ -138,7 +145,7 @@
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
             renderCardsCanvasAssets();
             setTimeout(showNavigationButtons, 700, true);
-            setTimeout(_effectsLayer.showStatsButton.bind(_effectsLayer), 400, true);
+            setTimeout(_menuButton.start.bind(_menuButton), 400);
         };
 
         //*****************************************
@@ -178,6 +185,10 @@
 
         var mouseWheelHandler = function (event) {
             _menu.scrollWheelUpdate(event.deltaX, event.deltaY);
+        };
+
+        var cardsScrollUpdate = function(){
+            _menuButton.addToPulse();
         };
 
         //*********************************************
@@ -242,7 +253,7 @@
                 _statsModule.style.visibility = "hidden";
             }else{
                 _statsModule.style.display = "block";
-                _statsModule.contentWindow.updateWidgets();
+                _statsModule.contentWindow.updateWidgets();//should not be called from here?
                 _statsModule.contentWindow.showStats(AppData.getAchievementNormal() == 1);
             }
             //TODO: watch out for resize calls?
@@ -250,17 +261,17 @@
             _statsModule.style.height = AppLayout.bounds.height + "px";
         };
 
-        //TODO: refactor
+        //TODO: refactor, very awkward...
         var _closeIframeButton;
         function showStatsShareCallback(showCloseStatsButton){
             if (!_closeIframeButton) {
                 _closeIframeButton = new TabButton(closeIframeButtonClickHandler, appConfig.closeStatsButtonZ);
             }
-            resizeStatsShareButton();
+            resizeCloseStatsModuleButton();
             _closeIframeButton.show(showCloseStatsButton);
         };
 
-        function resizeStatsShareButton(){
+        function resizeCloseStatsModuleButton(){
             var buttonHeight = (AppLayout.headerBounds.height * .7);//calculate every time for resizing
             var buttonWidth = Math.round(buttonHeight * 2.4);
             if(AppLayout.bounds.isPortrait()){
@@ -272,12 +283,19 @@
         };
 
         var closeIframeButtonClickHandler = function(){
-            _statsModule.contentWindow.stopCelebrations()
+            hideIframe();
+            _menuButton.start();
+        };
+
+        var hideIframe = function(){
+            if(!_statsModule){
+                return;
+            }
+            _statsModule.contentWindow.stopCelebrations();
             _statsModule.style.display = "none";
             _closeIframeButton.show(false);
             _menuContainer.style.display = "block";
-            _effectsLayer.showStatsButton(true);
-        };
+        }
 
         var menuButtonClickHandler = function(){
             if(backButtonURL){
@@ -326,16 +344,13 @@
             data.visited = true;
             tagShowCardEvent(data);
             showNavigationButtons(false);
-            _effectsLayer.show(false);
+            _menuButton.stop();
             _cardHtmlRenderer.renderCard(data, closeCardHandler);
         };
 
         var closeCardHandler = function () {
             _menu.deselectCard();
-            _effectsLayer.show(true);
-            if(_statsModule == null){
-                _effectsLayer.promptStats();//don't annoy user if they have already opened the stats view
-            }
+            _menuButton.start();
             setTimeout(showNavigationButtons, 700, true);//TODO: store intervalId and stop if?? resize??
         };
     }

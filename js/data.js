@@ -38,7 +38,7 @@
     appConfig.loaderCanvasZ = 100;
     appConfig.loaderTitleZ = 120;
     appConfig.menuButtonZ = 190;
-    appConfig.effectsLayerZ = 200;
+    appConfig.menuButtonPromptZ = 195;
     appConfig.closeCardButtonZ = 250;
     appConfig.closeStatsButtonZ = 300;
 
@@ -114,7 +114,12 @@
             this.interactionsHistory[i] = 0;
         }
         _actionsPerMinuteIntervalId = setInterval(this.createInteractionsHistorySegment.bind(this), intervalDuration);//ticks once a minute
-    }
+    };
+
+    AppData.stopInteractionsHistory = function(){
+        clearInterval(_actionsPerMinuteIntervalId);
+        _actionsPerMinuteIntervalId = -1;
+    };
 
     AppData.createInteractionsHistorySegment = function(){
         this.interactionsHistory.shift();

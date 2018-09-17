@@ -1,3 +1,10 @@
+/**
+ * DEPENDENCIES:
+ * utils MathLib, Rectangle, AppData (not good)
+ */
+
+
+
 (function() {
 
     window.PieChart = function(bgColor){

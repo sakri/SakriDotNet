@@ -4,10 +4,9 @@
 
     <title>Home Loader Image Parser</title>
 
-    <script src="js/home_version_00_23/utils.js"></script>
-    <script src="js/home_version_00_23/data.js"></script>
-    <script src="js/home_version_00_23/Sprites.js"></script>
-    <script src="js/home_version_00_23/SakriDotNetLoader.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/Sprites.js"></script>
 
 
     <style>
@@ -103,15 +102,25 @@
 
         var _testNormal = 0;
         var _animating = true;
+        var _bubbleBounds = new Rectangle();
+        var _speechBubble = new SpeechBubbleSprite();
         function renderSpriteSheets(){
             _context.clearRect(0,0,_canvas.width, _canvas.height);
+            if(_testNormal == 0){
+                _bubbleBounds.x = Math.floor(5 + Math.random() * 50);
+                _bubbleBounds.y = Math.floor(200 + Math.random() * 50);
+                _bubbleBounds.width = Math.round(100 + Math.random() * 250);
+                _bubbleBounds.height = Math.round(60 + Math.random() * 100);
+                var scale = _speechBubble.setBounds(_bubbleBounds);
+                console.log("speech bubble scale = ", scale, _bubbleBounds.toString());
+            }
             _testNormal += .001;//Math.random() * .05;
             _testNormal = _testNormal > 1 ?  0 : _testNormal
             //PixelGuyHeadSprite.renderFrame(_context, 450, 400, 8, Math.floor(Math.random() * 5), Math.floor(Math.random() * 4));
             PixelGuyTypingManager.render(_context, 50, 10, 8, _testNormal);
             ButtrockManager.render(_context, 350, 120, 12, _testNormal);
             BowdownManager.render(_context, 50, 420, 10, _testNormal);
-            SakriDotNetSpriteSheet.renderFrame("yourStats", _context, Math.min(Math.floor(_testNormal * 3), 2), 5, 200, 6);
+            _speechBubble.render(_context);
             if(_animating){
                 requestAnimationFrame(renderSpriteSheets);
             }

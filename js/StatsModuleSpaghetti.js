@@ -9,7 +9,7 @@
 
 
 
-//quick access to required dom elements
+//quick access to required dom elements (bit of a crap solution)
 var _ui = {
     requiredElementIds : ["appContainer", "interactionsContainer", "lineChartCanvas", "pieContainer",
         "pieChartContainer", "pieChartCanvas", "cardNotVisitedStatLabel", "cardVisitedStatLabel",
@@ -27,7 +27,7 @@ function initUIElements(){
 };
 
 //TODO: refactor _introComplete (quick hack)
-var _maxAppWidth = 800, _appWidth, _appHeight, _introComplete = false;//...is _maxAppWidth too small? test on samsung, iphone9
+var _maxAppWidth = 800, _appWidth, _appHeight, _introComplete = false, _lineChart, _pieChart;
 
 function getAppWidth(){
     return _appWidth;
@@ -594,7 +594,7 @@ function stopCelebrations(){
 var tagShowStatsModule = function(){
     if (gtag) {
         //gtag('event', 'showSection', {'event_category': appName + ":" + data.title.substr(0, 20)});
-        gtag('event', 'showStatsModule', {'event_category' : "statsModule"});
+        gtag('event', 'showStatsModule', {'event_category' : "widget"});
     }
 };
 

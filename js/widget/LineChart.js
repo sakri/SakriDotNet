@@ -1,3 +1,8 @@
+/**
+ * DEPENDENCIES:
+ * utils MathLib, Rectangle
+ */
+
 (function() {
 
     window.LineChart = function(bgColor){
@@ -68,7 +73,7 @@
             context.restore();
 
             context.fillStyle = appConfig.themeColor;
-            context.font="14px Helvetica,Arial,sans-serif";
+            context.font="14px Helvetica,Arial,sans-serif";//TODO: This cannot be hardcoded!!!!
             context.textBaseline = "top";//top, bottom, middle, alphabetic, hanging
             context.fillText(String(maxValue), Math.round(canvas.width * .92) , Math.round(canvas.height * this.vMargin));
             //context.textBaseline = "bottom";//top, bottom, middle, alphabetic, hanging

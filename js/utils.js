@@ -243,7 +243,11 @@
 
         this.smallerSide = function(){
             return Math.min(this.width, this.height);
-        }
+        };
+
+        this.biggerSide = function(){
+            return Math.max(this.width, this.height);
+        };
 
         this.isPortrait = function(){
             return !this.isLandscape();
@@ -251,6 +255,10 @@
 
         this.clone = function(){
             return new Rectangle(this.x, this.y, this.width, this.height);
+        };
+
+        this.equals = function(rect){
+            return this.x == rect.x && this.y == rect.y && this.width == rect.width && this.height == rect.height;
         };
 
         this.toString = function(){
@@ -360,7 +368,7 @@
             //console.log("UnitAnimator.start()");
             _duration = durationMS;
             _updateCallBack = updateCallBack;
-            _completeCallBack = completeCallBack;//optional
+            _completeCallBack = completeCallBack;
             _easingFunction = easingFunction || UnitEasing.easeLinear;//optional, sets default
             _animating = true;
             _animationStart = Date.now();
@@ -372,6 +380,9 @@
             _animating = false;
         };
 
+        this.isAnimating = function(){
+            return _animating == true;// (return _animating) can't possibly return a reference?
+        };
 
         //PRIVATE METHODS
 
