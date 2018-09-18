@@ -141,7 +141,7 @@
                         js/html5/css features from scratch, while not relying on other peoples code, libs, frameworks.</li>
                     <li>Follow minimal principles in design and code (still working on it).</li>
                 </ul>
-            <p>The site is in progress. I've taken a "start up approach" : Complete an MVP (minimum viable product),
+            <p>The site is still in progress, I've taken a "start up approach" : Complete an MVP (minimum viable product),
             release (August 17, 2018), then improve the site while promoting it, and looking for new customers.</p>
             <p>The "pixel guy" has been my sites identity/icon since the start, it's also been recycled for avatars,
                 profile pics etc. on my various social media profiles. </p>
@@ -167,19 +167,26 @@
             to render, function correctly, and look good in *every* screen dimension. When the screen is resized,
             layout calculations are repeated, and the app updates itself accordingly.</p>
             <h4>Stats Module</h4>
-            This is a showcase for a minimal app, with some data visualization and animation. Users are asked to complete
+            <p>This is a showcase for a minimal app, with some data visualization and animation. Users are asked to complete
             a set of tasks on the website, and are rewarded with a Pixel Confetti Animation. A standalone version of the
-            Stats Module can be tested here : <a href="statsModule.html">stats module</a>
+            Stats Module can be tested here : <a href="statsModule.html">stats module</a></p>
             <H4>No Javascript version</H4>
             <p>I wanted the html markup to be as clean as possible, and to look good for browsers with javascript
                 turned off. The markup is clean, but the "no js" version is still at the MVP stage ;)
-            See it by turning off javascript in your browser, or by opening the page with a noJs=true param.
+                See it by turning off javascript in your browser, or by opening the page with a noJs=true param.</p>
+            <a href="http://www.sakri.net?noJs=true">http://www.sakri.net?noJs=true</a>
             <H4>Navigation options</H4>
             <p>The cards can be scrolled with touch, mousewheel and keyboard (up, down, enter)</p>
-            <a href="http://www.sakri.net?noJs=true">http://www.sakri.net?noJs=true</a>
+            <H4>Grunt build script</H4>
+            <p>Minifies and concatenates all the javascript and css files, then embeds them into the html pages to
+            remove unnecessary calls to the server, speeding up page load. All the pages are currently under 100kb
+            including all html, javascript and css. I am planning to move to webpack as soon as a number of javascript
+            classes (intend to be released as separate libraries) have been developed further.</p>
+
             <h2>Year : 2000 - 2018</h2>
             <span>Client : <a href="http://www.sakri.net">Sakri Rosenstrom</a></span>
             <span>Technologies : Javascript, Html5, Canvas, css, Grunt, photoshop</span>
+            <span>Sources : <a href="https://github.com/sakri/SakriDotNet/">SakriDotNet github</a></span>
             <span>Moodboard : <a href="https://www.pinterest.com/54kr1/sakrinet-inspiration/">pinterest moodboard</a></span>
         </div>
     </section>
@@ -400,7 +407,7 @@
     <section id="helpJoe">
         <div class="sectionContent">
             <h1>Help Joe</h1>
-            <img src="./portfolio/2005/helpJoe/screenshot1.png" alt="Screenshot of Henkel Help Joe tooth whitening paste viral campaign" />
+            <img src="./portfolio/2005/helpJoe/screenshot2.png" alt="Screenshot of Henkel Help Joe tooth whitening paste viral campaign" />
             <p>Henkel wanted to try a viral approach to promoting their new tooth whitening paste called Express White.
                 Nascom produced a "guitar hero" like game, where videos of a comedian brushing his teeth could be scrubbed with
                 a users mouse.  I was responsible for implementing the game mechanics and
