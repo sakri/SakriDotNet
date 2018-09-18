@@ -61,13 +61,13 @@
 
             //render center of Donut background
             context.beginPath();
-            context.fillStyle = _lightColor;
+            context.fillStyle = normal==1 ? _themeColor : _lightColor;
             context.arc(_centerX, _centerY, _innerRadius, 0, MathUtil.PI2);
             context.fill();
             context.stroke();
 
             //render percentage label
-            context.fillStyle = _darkColor;
+            context.fillStyle = normal==1 ? _lightColor : _darkColor;
             context.font="bold " + Math.round(_innerRadius * .7) + "px Helvetica,Arial,sans-serif";
             context.textBaseline = "middle";//top, bottom, middle, alphabetic, hanging
             context.textAlign = "center";

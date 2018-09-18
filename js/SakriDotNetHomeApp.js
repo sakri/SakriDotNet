@@ -247,7 +247,7 @@
                 _statsModule.onload = function() {
                     console.log("_statsModule.onload()");
                     _statsModule.style.visibility = "visible";
-                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  closeIframeButtonClickHandler);
+                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  celebrateStatsCompleteHandler);
                     _statsModule.contentWindow.showStats(true);
                 };
                 _statsModule.style.visibility = "hidden";
@@ -280,6 +280,11 @@
             }
             var button = _closeIframeButton.init("X", buttonWidth, buttonHeight, 1.1, (AppLayout.bounds.width - buttonWidth * 1.25) / AppLayout.bounds.width);
             button.style.position = "fixed";
+        };
+
+        var celebrateStatsCompleteHandler = function(){
+            _menuButton.missionAccomplished();
+            closeIframeButtonClickHandler();
         };
 
         var closeIframeButtonClickHandler = function(){
@@ -344,7 +349,7 @@
             data.visited = true;
             tagShowCardEvent(data);
             showNavigationButtons(false);
-            _menuButton.stop();
+            _menuButton.end();
             _cardHtmlRenderer.renderCard(data, closeCardHandler);
         };
 

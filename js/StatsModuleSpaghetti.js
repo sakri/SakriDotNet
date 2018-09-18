@@ -175,7 +175,7 @@ function getSpentEnoughTimeRenderer(){
     return getBadgeRenderer("Spent over 1 min on site", AppData.getStatsSpentEnoughTimeNormal());
 };
 function getOpenedAllCardsRenderer(){
-    return getBadgeRenderer("Opened All Cards", AppData.getStatsOpenedAllCardsNormal());
+    return getBadgeRenderer("Open ALL THE Cards", AppData.getStatsOpenedAllCardsNormal());
 };
 function clickedShareRenderer(){
     return getBadgeRenderer("Clicked the Share Button", AppData.getStatsClickEnoughShareButtonsNormal());

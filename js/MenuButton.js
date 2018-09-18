@@ -21,6 +21,7 @@
             render();
             translateButtonIn();
         };
+
         this.end = function(){
             if(!_canvas){
                 return;
@@ -40,6 +41,22 @@
             removeSpeechBubble();
         };
 
+        this.addToPulse = function(){
+            if(_unitAnimator.isAnimating()){
+                return;
+            }
+            incrementPulse();
+            render();
+            startIdleTimer();
+        };
+
+        //could be better...
+        this.missionAccomplished = function(){
+            _missionAccomplished = true;
+        };
+
+
+        /*
         this.updateStatsProgress = function(normal){
             console.log("MenuButton.updateStatsProgress()", normal);
             if(!_canvas ||!_unitAnimator ||_unitAnimator.isAnimating() || _progressNormal == normal){
@@ -63,16 +80,7 @@
             _progressNormal = UnitEasing.easeOutSine(MathUtil.interpolate(normal, _statsUpdateAnimation.from, _statsUpdateAnimation.to));
             incrementPulse();
             render();
-        };
-
-        this.addToPulse = function(){
-            if(_unitAnimator.isAnimating()){
-                return;
-            }
-            incrementPulse();
-            render();
-            startIdleTimer();
-        };
+        };*/
 
 
         //PRIVATE PROPERTIES & METHODS
@@ -80,17 +88,24 @@
         var  _donut,  _canvas, _context, _speechBubble,  _progressNormal = 0, _pulseNormal = 0,
             _avatarScale, _pulseRgb, _unitAnimator = new UnitAnimator(),
             _canvasBounds = new Rectangle(),
+            _missionAccomplished = false,
             _speechBubbleBounds = new Rectangle(),
             _donutDisplayBounds = new Rectangle(), _donutBounds = new Rectangle(),
             _avatarDisplayBounds = new Rectangle(), _avatarBounds = new Rectangle(),
-            _statsVisited = false, _promptMessages = [
+            _statsVisited = false,
+            _promptMessages = [
             "Click for your stats!",
             "Doing great!",
             "Steady rockin!",
             "Like a Boss!!!",
             "You on FIRE!!!11",
-            "Celebrate in 3-2-1..."
-        ];
+            "Celebrate in 3-2-1..."],
+            _completedPromptMessages = [
+                "Tell your friends!",
+                "Tell yo mama!",
+                "Sharing is caring!",
+                "I'm @sakri on twitter..."
+            ];
 
         function incrementPulse(){
             _pulseNormal += .02;
@@ -250,7 +265,12 @@
             _speechBubble.style.display = "block";
             _speechBubbleBounds.width = _canvas.width * 2;
             _speechBubbleBounds.height = _canvas.height * .45;
-            var message = _statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * _progressNormal)] : _promptMessages[0];
+            var message = "";
+            if(_missionAccomplished){
+                message = _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
+            }else{
+                message = _statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * _progressNormal)] : _promptMessages[0];
+            }
             SpeechBubble.updateSpeechBubble(_speechBubble, message, _speechBubbleBounds.width, _speechBubbleBounds.height);
             playSpeechBubbleAnimation();
 
