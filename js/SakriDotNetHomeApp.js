@@ -54,7 +54,7 @@
                 _menuButton = new MenuButton(showStatsModule, backButtonURL);
             }else{
                 _menuButton = {};//todo : find better solution, this is a placeholder to avoid errors
-                _menuButton.start = _menuButton.stop = _menuButton.addToPulse = function(){};
+                _menuButton.start = _menuButton.end = _menuButton.stop = _menuButton.addToPulse = function(){};
             }
             commitWindowResize();
         };
@@ -248,7 +248,7 @@
                     console.log("_statsModule.onload()");
                     _statsModule.style.visibility = "visible";
                     _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  celebrateStatsCompleteHandler);
-                    _statsModule.contentWindow.showStats(true);
+                    _statsModule.contentWindow.showStats();
                 };
                 _statsModule.style.visibility = "hidden";
             }else{

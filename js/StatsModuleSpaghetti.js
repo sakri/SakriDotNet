@@ -43,11 +43,13 @@ function init(){
         _ui.elements.testControllers.style.display = "none";
         return;
     }
+    initStandalone();
+};
 
+function initStandalone(){
     AppData.setMockData();
     AppData.startInteractionsHistory(10000, 6);
     SakriDotNetSpriteSheet.init();
-
     showStats(true);
 };
 
@@ -69,7 +71,7 @@ function initFromApp(data, sprites, googleAnalyticsTag, showShareCallback, celeb
 var _introScrollToTargets, _vIntroTarget, _previousIntroTarget, _unitAnimator = new UnitAnimator(),
     _introScrollFrom, _introScrollTo;
 
-function showStats(playIntro){
+function showStats(){
     document.body.style.overflowY = "hidden";
     document.body.style.overflowX = "hidden";
     _introComplete = false;
@@ -79,50 +81,15 @@ function showStats(playIntro){
     _celebrateTimeoutId = -1;
     commitWindowResize();
 
-    if(_appWidth < _maxAppWidth){
-        //disable UI /Scrolling somehow?
-        //document.body.style.pointerEvents = "none";
-        if(playIntro){
-            startVIntro();
-            return;
-        }else{
-            scrollTo(0, document.body.scrollHeight - AppLayout.bounds.height);
-        }
-    }
+    scrollToStats();
     showNextAchievement();//sets _introComplete
 };
-function startVIntro(){
-    _ui.elements.interactionsContainer.style.opacity = _ui.elements.pieContainer.style.opacity = _ui.elements.badgesContainer.style.opacity = 0;
-    _unitAnimator.start(800, vIntroFirstItemUpdate, nextVerticalIntroStep);
-    _introScrollFrom = 0;
-};
 
-function vIntroFirstItemUpdate(normal){
-    scrollTo(0,0);//keep it at 0
-    _vIntroTarget.style.opacity = MathUtil.smoothstep(normal, 0, .80);
-};
-
-function nextVerticalIntroStep(){
-    if(!_introScrollToTargets.length){
-        showNextAchievement();//very hackish and hard to follow
-        return;
+function scrollToStats(){
+    if(_appWidth < _maxAppWidth){
+        scrollTo(0, document.body.scrollHeight - AppLayout.bounds.height);
     }
-    _introScrollFrom = _previousIntroTarget ? _previousIntroTarget.offsetTop : 0;
-    _vIntroTarget = _introScrollToTargets.shift();
-    _previousIntroTarget = _vIntroTarget;
-    _introScrollTo = Math.min(_vIntroTarget.offsetTop, document.body.scrollHeight - AppLayout.bounds.height);
-    _vIntroTarget.style.opacity = 1;
-    _unitAnimator.start(1500, vIntroNextItemUpdate, nextVerticalIntroStep);
-    //console.log("nextVerticalIntroStep()", _ui.elements.pieContainer.offsetTop);
-};
-
-function vIntroNextItemUpdate(normal){
-    var adjusted = MathUtil.smoothstep(normal, 0, .8);
-    _vIntroTarget.style.opacity = UnitEasing.easeOutSine(adjusted);
-    scrollTo(0,
-        MathUtil.interpolate(UnitEasing.easeInOutSine(adjusted), _introScrollFrom, _introScrollTo)
-    );
-};
+}
 
 function updateWidgets(){
     updateInteractionsCanvas();
@@ -186,6 +153,11 @@ function getEnoughInteractionsRenderer(){
 
 var _avatarContext, _avatarX, _avatarY, _avatarScale;
 
+function updateAchievementsTitle(progressNormal){
+    var value = progressNormal==1 ? "COMPLETE!" : "Achievements: " + Math.floor(progressNormal * 100) + "%";
+    _ui.elements.achievementsTitle.innerHTML = value;
+};
+
 function updateBadges(){
     _badgeRendererBgIndex = 0;
     var listHtml = "";
@@ -236,7 +208,7 @@ function showNextAchievement(){
     }
     _ui.elements.badgesList.childNodes[_badgeIntroItemIndex].style.opacity = 1;
     PixelGuyHeadSprite.renderAvatar(_avatarContext, _avatarX, _avatarY, _avatarScale, normal);
-    _badgesIntroTimeoutId = setTimeout(showNextAchievement, 70);//make sure dom has been updated with new list
+    _badgesIntroTimeoutId = setTimeout(showNextAchievement, 300);//make sure dom has been updated with new list
     _badgeIntroItemIndex++;
 };
 
@@ -352,12 +324,6 @@ function setVLayoutContainerPositions(appWidth){
     _ui.elements.shareContainer.style.setProperty("height", Math.round(appWidth * .08) + "px");
     _ui.elements.shareContainer.style.setProperty("margin-bottom", Math.round(appWidth * .2) + "px");
 
-
-}
-
-function updateAchievementsTitle(progressNormal){
-    var value = progressNormal==1 ? "COMPLETE!" : "Achievements: " + Math.floor(progressNormal * 100) + "%";
-    _ui.elements.achievementsTitle.innerHTML = value;
 }
 
 //=========================================
@@ -456,14 +422,17 @@ var _confetti,
     _buttrockBounds = new Rectangle(),
     _buttrockScale;
 
+//this is shite, fix it!!!
 function isCelebrating(){
-    return  _celebrateCanvas && _celebrateCanvas.display == "block";
+    return  _badgesContainerDance!=null || (_celebrateCanvas && _celebrateCanvas.display == "block");
 };
 
 var _toCelebratePanelRotations = 0;
-var _badgesContainerDance = {};
+var _badgesContainerDance;
 function celebrateVictory(){
+    scrollToStats();
     updateAchievementsTitle(1);
+    _badgesContainerDance = {};
     _badgesContainerDance.toRadian = MathUtil.PI2 * 2.25;
     _badgesContainerDance.toRadius = 70;
     _unitAnimator.start(2500, updateCelebrateBadgesRotate, startConfetti);
@@ -482,6 +451,7 @@ function updateCelebrateBadgesRotate(normal){
 };
 
 function startConfetti(){
+    _badgesContainerDance = undefined;
     _ui.elements.badgesContainer.style.transform = "translate( 0px , 0px) scale(1)";
     _ui.elements.appContainer.style.opacity = 0.1;
     document.body.style.overflow = "hidden";
