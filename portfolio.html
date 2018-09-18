@@ -141,33 +141,30 @@
                         js/html5/css features from scratch, while not relying on other peoples code, libs, frameworks.</li>
                     <li>Follow minimal principles in design and code (still working on it).</li>
                 </ul>
-            <p>The site is in progress still. I wanted to take a "start up approach" : Complete an MVP (minimum viable product),
-            release (August 17, 2018). Then continue improving the site while promoting it, and looking for new
-            customers.</p>
-            <p>I've been using the "pixel guy" as my sites identity/icon since the start, also recycling it for avatars,
-                profile pics etc. </p>
-            <p>I spent time studying Googles Material Design documents while designing/building the prototype. Their
-                way of thinking works great for me : Often wearing designer/developer hats simultaneously only serves to
-                distract and slows down the process. Following material principles reduced the amount of design decisions
+            <p>The site is in progress. I've taken a "start up approach" : Complete an MVP (minimum viable product),
+            release (August 17, 2018), then improve the site while promoting it, and looking for new customers.</p>
+            <p>The "pixel guy" has been my sites identity/icon since the start, it's also been recycled for avatars,
+                profile pics etc. on my various social media profiles. </p>
+            <p>I spent time reading Googles Material Design documents while designing/building the prototype. The
+                approach works great for me : Wearing designer/developer hats simultaneously only serves to
+                distract and slows the process down. Following material principles reduced the amount of design decisions
                 and allowed me to focus on the code.</p>
             <a href="https://material.io/design/components/cards.html">Google Material Design Card doc</a>
             <p>Some feature highlights:</p>
             <H4>Loader</H4>
-            <p>I wanted this to be as lightweight as possible. Normally this would be "embedded" in the html page (rather
-            than an external js load). Instead of a sprite sheet, I created a photoshop file with all the animated
-            pixels in separate layers. Using "Export layers to files", a custom app then loads the assets and exports
-            points. These are then used by the script to generate the spritesheets for the canvas animation.  I plan to use
-            this technique in upcoming features of the website.  The loader then uses a query selector to discover a list of
-            images to load and observes them.</p>
+            <p>I wanted a lightweight, yet attractive "first impression". The "pixel guy" comes from a .png sprite sheet
+            whose source is embedded in javascript. The loader uses a query selector to discover a list of
+            images to load and observes them, represented by the coloured circles. Conceptually the "pixel guy"
+            codes them on his computer, typing faster and faster as he nears completion.</p>
             </p>
             <H4>Cards Menu</H4>
-            <p>I hadn't seen this done yet (probably has) so I decided to replicate the mobile OS "recent apps" menu.
+            <p>An html canvas replicate of the mobile OS "recent apps" menu, with the aim of "native like" performance.
             The app reads the "section" tags from the mark up, then makes "screenshots" of them, and passes these
-            to the menu for scrolling. The original html content is then discarded. When a card is opened, it zooms in
-            and is rendered in html (to enable scrolling and selection of text/images).</p>
+            to the menu for scrolling (the original dom content is discarded). When a card is opened, it zooms in
+            and is rendered in html (to enable text scrolling and selection of text/images).</p>
             <H4>Responsive design</H4>
-            <p>The menu supports slightly different layouts for horizontal and vertical orientation. It's designed
-            to render, function correctly, and look good in *every* screen dimension. If the screen is resized, the
+            <p>The menu supports different layouts for horizontal and vertical orientation. It's designed
+            to render, function correctly, and look good in *every* screen dimension. When the screen is resized,
             layout calculations are repeated, and the app updates itself accordingly.</p>
             <h4>Stats Module</h4>
             This is a showcase for a minimal app, with some data visualization and animation. Users are asked to complete
@@ -175,16 +172,15 @@
             Stats Module can be tested here : <a href="statsModule.html">stats module</a>
             <H4>No Javascript version</H4>
             <p>I wanted the html markup to be as clean as possible, and to look good for browsers with javascript
-                turned off. The markup is clean, but the "no js" version is still at the MVP stage ;)  You can
-            see it by turning off javascript in your browser, or by opening the page with a noJs=true param. For no
-                particular reason, here's my <a href="https://cssstats.com/stats?url=http%3A%2F%2Fsakri.net&ua=Browser%20Default" target="blank">css stats</a></p>
+                turned off. The markup is clean, but the "no js" version is still at the MVP stage ;)
+            See it by turning off javascript in your browser, or by opening the page with a noJs=true param.
             <H4>Navigation options</H4>
             <p>The cards can be scrolled with touch, mousewheel and keyboard (up, down, enter)</p>
             <a href="http://www.sakri.net?noJs=true">http://www.sakri.net?noJs=true</a>
             <h2>Year : 2000 - 2018</h2>
             <span>Client : <a href="http://www.sakri.net">Sakri Rosenstrom</a></span>
             <span>Technologies : Javascript, Html5, Canvas, css, Grunt, photoshop</span>
-            <span>Client : <a href="https://www.pinterest.com/54kr1/sakrinet-inspiration/">pinterest moodboard</a></span>
+            <span>Moodboard : <a href="https://www.pinterest.com/54kr1/sakrinet-inspiration/">pinterest moodboard</a></span>
         </div>
     </section>
 
