@@ -2,17 +2,21 @@ module.exports = function(grunt) {
 
     grunt.log.write(' --BUILDING : sakri.net');
 
+    //TODO: script should read the html page, grab js/css files then min/concat, instead of maintaining the list twice!
     var minifyJsFiles = {
         './release/js/SakriDotNet.min.js' : './release/js/SakriDotNetConcat.js',
         './release/js/StatsModule.min.js' : './release/js/StatsModuleConcat.js'
     };
+
     var concatJSFiles = {
+        /* app */
         'release/js/SakriDotNetConcat.js': [
             "./js/utils.js",
             "./js/layout/AppLayout.js",
             "./js/layout/CardMenuLayout.js",
             "./js/layout/CardContentLayout.js",
             "./js/data.js",
+            "./js/animation/Transition.js",
             "./js/sprites.js",
             "./js/SakriDotNetLoader.js",
             "./js/CanvasInteractionManager.js",
@@ -20,16 +24,20 @@ module.exports = function(grunt) {
             "./js/CardCanvasRenderer.js",
             "./js/CardHtmlRenderer.js",
             "./js/CardsMenu.js",
+            "./js/widget/DonutChart.js",
+            "./js/widget/SpeechBubble.js",
             "./js/Card.js",
             "./js/MenuButton.js",
             "./js/SakriDotNetHomeApp.js"
         ],
+        /* stats view app */
         'release/js/StatsModuleConcat.js': [
             "./js/utils.js",
             "./js/layout/AppLayout.js",
             "./js/data.js",
             "./js/widget/LineChart.js",
             "./js/widget/PieChart.js",
+            "./js/widget/PixelConfetti.js",
             "./js/sprites.js",
             "./js/StatsModuleSpaghetti.js"
         ]
@@ -37,7 +45,7 @@ module.exports = function(grunt) {
 
     var minifyCssFiles = {
         './release/css/sakriDotNet.min.css' : './css/sakriDotNet.css',
-        './release/css/statsModule.min.css' : './css/widget.css'
+        './release/css/statsModule.min.css' : './css/statsModule.css'
     };
 
     grunt.initConfig({
@@ -147,17 +155,20 @@ npm install grunt-contrib-uglify --save-dev
         'concat',
         'uglify',
         'cssmin',
+
         'embedMinifiedScript:./index.html:./release/js/SakriDotNet.min.js:./release/index.html',
         'embedMinifiedScript:./faq.html:./release/js/SakriDotNet.min.js:./release/faq.html',
         'embedMinifiedScript:./portfolio.html:./release/js/SakriDotNet.min.js:./release/portfolio.html',
-        'embedMinifiedScript:./widget.html:./release/js/StatsModule.min.js:./release/widget.html',
+        'embedMinifiedScript:./statsModule.html:./release/js/StatsModule.min.js:./release/statsModule.html',
+
         'embedMinifiedCss:./release/index.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/faq.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/portfolio.html:./release/css/sakriDotNet.min.css',
-        'embedMinifiedCss:./release/widget.html:./release/css/widget.min.css',
+        'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css',
+
         'copyToRelease:./index.html:./release/indexWithSource.html',
-        'copyToRelease:./css/SakriDotNet.css:./release/css/SakriDotNet.css',
-        'copyToRelease:./css/StatsModule.css:./release/css/StatsModule.css'
+        'copyToRelease:./css/sakriDotNet.css:./release/css/sakriDotNet.css',
+        'copyToRelease:./css/statsModule.css:./release/css/statsModule.css'
     ]);
 
 };
