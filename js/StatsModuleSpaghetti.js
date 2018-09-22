@@ -300,6 +300,7 @@ function positionSharePanel(width){
     _ui.elements.sharePanel.style.height = sharePanelHeight + "px";
     _ui.elements.sharePanel.style.left = Math.round(AppLayout.bounds.centerX() - width * .5) + "px";
     _ui.elements.sharePanel.style.top = Math.round(AppLayout.bounds.centerY() - sharePanelHeight * .5) + "px";
+    _ui.elements.sharePanel.style.backgroundColor = appConfig.themeColor;
 }
 
 function absPositionContainer(container, xNormal, yNormal, widthNormal, heightNormal){

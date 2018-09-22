@@ -15,7 +15,10 @@
     };
 
     //TODO: consider restricting updates to minimum normal changes (performance, or might become jerky?)
-    CardMenuLayout.updateCardBoundsToScrollNormal = function(cardBounds, tabBounds, index, normal){
+    CardMenuLayout.updateCardBoundsToScrollNormal = function(card, index, normal){
+        var cardBounds = card.bounds;
+        var tabBounds = card.tabBounds;
+        var hitBounds = card.hitBounds;
         if(index < 4){
             var radian = MathUtil.interpolate(normal, _cornerRadians[index], _cornerRadians[index + 1]);
             cardBounds.x = _rightCornerCenterX + Math.cos(radian) * _cornerRadius;

@@ -117,8 +117,9 @@ h1, h2, p{
 
 #sharePanelExamples{
     padding: 0;
+    padding-right: 5%;
     margin: 0;
-    width:100%;
+    width:95%;
     height:80%;
     overflow: auto;
     font-weight: normal;
@@ -126,9 +127,9 @@ h1, h2, p{
 }
 
 #shareContent{
-    width: 80%;
+    width: 90%;
     height: 85%;
-    margin: 10%;
+    margin: 5%;
     margin-top: 3%;
 }
 
@@ -136,6 +137,7 @@ h1, h2, p{
     margin-top: .5em;
     padding-top: .4em;
     border-width: 0;
+    color: #FFFFFF;
 }
 
 #shareContent ul{

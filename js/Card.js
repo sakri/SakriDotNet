@@ -10,7 +10,6 @@
         //PUBLIC VARIABLES
         this.bounds = new Rectangle();
         this.tabBounds = new Rectangle();
-        this.hitBounds = new Rectangle();
         this.animateFromBounds = new Rectangle();
         this.animateToBounds = new Rectangle();
 
@@ -30,6 +29,18 @@
                 MathUtil.interpolate(normal, this.animateFromBounds.width, this.animateToBounds.width),
                 MathUtil.interpolate(normal, this.animateFromBounds.height, this.animateToBounds.height)
             );
+        };
+
+        //something is still not quite right. clicking near the tab produces some unexpected hits
+        this.containsPoint = function(x, y){
+            if(this.bounds.containsPoint(x,y)){
+                if(y > this.bounds.y + this.tabBounds.bottom()){
+                    return true;
+                }
+                return this.tabBounds.containsPoint(x - this.bounds.x, y - this.bounds.y);
+            }
+            return false;
+            //return this.hitBounds.containsPoint(x - this.bounds.x, y - this.bounds.y) || this.tabBounds.containsPoint(x - this.bounds.x, y - this.bounds.y);
         };
 
 
@@ -95,28 +106,28 @@
             context.fillStyle = "#FFFFFF";//data.themeColor; //MathUtil.getRandomRGBAColorString(.2);
             //context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
-            var tabCornderRadius = tabBounds.bottom();
-            var tabCenterWidth = tabWidth - tabCornderRadius;
+            var tabCornerRadius = tabBounds.bottom();//why not height?
+            var tabCenterWidth = tabWidth - tabCornerRadius;//this is a bug.. should be tabCornerRadius * 2
 
             //Top Left Corner to tab
             context.beginPath();
-            context.moveTo(bounds.x, bounds.y + tabCornderRadius);
-            context.lineTo(tabX, bounds.y + tabCornderRadius);
+            context.moveTo(bounds.x, bounds.y + tabCornerRadius);
+            context.lineTo(tabX, bounds.y + tabCornerRadius);
 
             //Left side of tab Semi sphere
-            context.arc(tabX + tabCornderRadius, bounds.y + tabCornderRadius , tabCornderRadius, Math.PI, Math.PI * 1.5);
+            context.arc(tabX + tabCornerRadius, bounds.y + tabCornerRadius , tabCornerRadius, Math.PI, Math.PI * 1.5);
 
             //tab top
             context.lineTo(tabX + tabCenterWidth, bounds.y);
 
             //Right side of tab Semi sphere
-            context.arc(tabX + tabCenterWidth, bounds.y + tabCornderRadius, tabCornderRadius, Math.PI * 1.5, MathUtil.PI2);
+            context.arc(tabX + tabCenterWidth, bounds.y + tabCornerRadius, tabCornerRadius, Math.PI * 1.5, MathUtil.PI2);
 
             //rest of card
-            context.lineTo(bounds.right(), bounds.y + tabCornderRadius);//top right
+            context.lineTo(bounds.right(), bounds.y + tabCornerRadius);//top right
             context.lineTo(bounds.right(), bounds.bottom());//bottom right
             context.lineTo(bounds.x, bounds.bottom());//bottom left
-            context.lineTo(bounds.x, bounds.y + tabCornderRadius);//top left
+            context.lineTo(bounds.x, bounds.y + tabCornerRadius);//top left
             context.closePath();
 
             context.save();
@@ -131,13 +142,13 @@
             context.restore();
 
             //Theme color graphic
-            var circleX = tabX + tabCornderRadius * .8;
-            var circleY = bounds.y + tabCornderRadius * .6;
-            var circleRadius = tabCornderRadius * .2;
+            var circleX = tabX + tabCornerRadius * .8;
+            var circleY = bounds.y + tabCornerRadius * .6;
+            var circleRadius = tabCornerRadius * .2;
 
             context.fillStyle = data.themeColor;
             context.beginPath();
-            //context.moveTo(tabX + tabCornderRadius * .65, tabBounds.y + tabCornderRadius * .5);
+            //context.moveTo(tabX + tabCornerRadius * .65, tabBounds.y + tabCornerRadius * .5);
             context.arc(circleX, circleY, circleRadius * .75, 0, Math.PI * 2);
             context.fill();
             context.closePath();
@@ -145,7 +156,7 @@
             context.save();
             if(data.visited){
                 context.beginPath();
-                context.lineWidth = Math.ceil(tabCornderRadius * .04);
+                context.lineWidth = Math.ceil(tabCornerRadius * .04);
                 context.strokeStyle = "#FFFFFF";//MathUtil.getRandomRGBColorString();//
                 if(data.storyReadComplete){
                     context.lineCap="round";

@@ -13,6 +13,9 @@
  *      Rectangle:
  *      - reusable object with some util functions ( update(x,y,w,h) , inflate(value), left(), right(), centerX() etc.
  *
+ *       CanvasUtil:
+ *      - a couple of factory methods
+ *
  *      UnitEasing
  *      - common easing functions
  *
@@ -241,6 +244,17 @@
             return this.width > this.height;
         };
 
+        this.isPortrait = function(){
+            return !this.isLandscape();
+        };
+
+        this.isSquareish = function(maxDiffNormal){
+            if(this.isLandscape()){
+                return this.width / this.height - 1 < maxDiffNormal;
+            }
+            return this.height / this.width - 1 < maxDiffNormal;
+        }
+
         this.smallerSide = function(){
             return Math.min(this.width, this.height);
         };
@@ -249,16 +263,31 @@
             return Math.max(this.width, this.height);
         };
 
-        this.isPortrait = function(){
-            return !this.isLandscape();
-        };
-
         this.clone = function(){
             return new Rectangle(this.x, this.y, this.width, this.height);
         };
 
         this.equals = function(rect){
             return this.x == rect.x && this.y == rect.y && this.width == rect.width && this.height == rect.height;
+        };
+
+        this.isSet = function(){
+            //console.log("Rectangle.isSet()", isNaN(this.x) , isNaN(this.y) , isNaN(this.width) , isNaN(this.height));
+            return !(isNaN(this.x) || isNaN(this.y) || isNaN(this.width) || isNaN(this.height));
+        };
+
+        this.getNumberOfSetItems = function(){
+            var setItems = isNaN(this.x) ? 0 : 1;
+            setItems += (isNaN(this.y) ? 0 : 1);
+            setItems += (isNaN(this.width) ? 0 : 1);
+            return setItems + (isNaN(this.height) ? 0 : 1);
+        };
+
+        this.replaceNullValuesFrom = function(source){
+            this.x = isNaN(this.x) ? source.x : this.x;
+            this.y = isNaN(this.y) ? source.y : this.y;
+            this.width = isNaN(this.width) ? source.width : this.width;
+            this.height = isNaN(this.height) ? source.height : this.height;
         };
 
         this.toString = function(){
@@ -344,10 +373,6 @@
 //==============::UNIT ANIMATOR::===============
 //==============================================
 
-/**
- *
- * Dependency on MathUtil
- */
 (function (){
 
     window.UnitAnimator = function() {
@@ -381,7 +406,7 @@
         };
 
         this.isAnimating = function(){
-            return _animating == true;// (return _animating) can't possibly return a reference?
+            return _animating === true;// (return _animating) can't possibly return a reference?
         };
 
         //PRIVATE METHODS
@@ -416,3 +441,45 @@
     };
 
 }());
+
+
+//=============================================================
+//==============::Canvas Util::=================
+//=============================================================
+
+(function() {
+
+    window.CanvasUtil = {};
+
+    CanvasUtil.enablePixelArtScaling = function(context){
+        context.imageSmoothingEnabled = false;
+        context.mozImageSmoothingEnabled = false;
+        context.webkitImageSmoothingEnabled = false;
+        context.msImageSmoothingEnabled = false;
+    };
+
+    CanvasUtil.createCanvas = function(width, height, parent, zIndex){
+        console.log("CanvasUtil.createCanvas()", width, height, zIndex);
+        var canvas = document.createElement("canvas");
+        canvas.style.position = "absolute";
+        canvas.style.margin = "0";
+        canvas.style.padding = "0";
+        canvas.style.borderWidth = "0";
+        canvas.style.zIndex = zIndex;
+        parent.appendChild(canvas);
+        return canvas;
+    };
+
+    CanvasUtil.resize = function(canvas, width, height){
+        if(canvas.width !== width || canvas.height !== height){
+            canvas.width = width;
+            canvas.height = height;
+        }
+        console.log("CanvasUtil.resize()", canvas.width, canvas.height);
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, width, height);
+        return context;
+    };
+
+}());
+

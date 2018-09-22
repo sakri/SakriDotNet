@@ -88,13 +88,12 @@
         var  _donut,  _canvas, _context, _speechBubble,  _progressNormal = 0, _pulseNormal = 0,
             _avatarScale, _pulseRgb, _unitAnimator = new UnitAnimator(),
             _canvasBounds = new Rectangle(),
+            _donutBounds = new Rectangle(), _avatarBounds = new Rectangle(),
+            _rectTransition = new RectangleTransition(),
             _missionAccomplished = false,
-            _speechBubbleBounds = new Rectangle(),
-            _donutDisplayBounds = new Rectangle(), _donutBounds = new Rectangle(),
-            _avatarDisplayBounds = new Rectangle(), _avatarBounds = new Rectangle(),
             _statsVisited = false,
             _promptMessages = [
-            "Click for your stats!",
+            "Click me for your stats!",
             "Doing great!",
             "Steady rockin!",
             "Like a Boss!!!",
@@ -126,14 +125,8 @@
         var resize = function(width, height){
             //console.log("MenuButton.resize()", width, height);
             initCanvas();//Also initializes bg colors, refactor
-            //in the past a context could be lost during resize
-            _canvas.width = width
-            _canvas.height = height;
-            _context = _canvas.getContext("2d");
-            _context.imageSmoothingEnabled = false;
-            _context.mozImageSmoothingEnabled = false;
-            _context.webkitImageSmoothingEnabled = false;
-            _context.msImageSmoothingEnabled = false;
+            _context = CanvasUtil.resize(_canvas, width, height);
+            CanvasUtil.enablePixelArtScaling(_context);
             if(width == AppLayout.bounds.width){
                 _canvas.style.left = _canvas.style.top = "0px";
                 calculateButtonLayoutFullScreen();
@@ -146,21 +139,16 @@
 
         var calculateButtonLayout = function(){
             var ss = SakriDotNetSpriteSheet.getSpriteSheetData("head");
-
-            _avatarDisplayBounds.x = _avatarDisplayBounds.y = Math.round(_canvas.width * .33);
-            _avatarDisplayBounds.width = _avatarDisplayBounds.height = Math.round(_canvas.width * .65);
-            _avatarScale = Math.floor(_avatarDisplayBounds.height / ss.height);
-            _avatarDisplayBounds.width = _avatarDisplayBounds.height = _avatarScale * ss.height;
-            _avatarBounds.updateToRect(_avatarDisplayBounds);
-
-            _donutDisplayBounds.updateToRect(_avatarDisplayBounds);
-            _donutBounds.updateToRect(_donutDisplayBounds);
-
+            AppLayout.updateRectToLayoutRectState(_avatarBounds, "progressGraphic");
+            _avatarScale = Math.floor(_avatarBounds.height / ss.height);
+            _avatarBounds.width = _avatarBounds.height = _avatarScale * ss.height;
+            _donutBounds.updateToRect(_avatarBounds);
             _canvasBounds.update(0, 0, _canvas.width, _canvas.height);
         };
 
         //only happens prior to transition from app to statsView
         var calculateButtonLayoutFullScreen = function(){
+            //button background is drawn to _canvasBounds
             _canvasBounds.x = AppLayout.bounds.right() - _canvasBounds.width;
             _canvasBounds.y = AppLayout.bounds.bottom() - _canvasBounds.width;
             _avatarBounds.x += AppLayout.bounds.width - _canvasBounds.width;
@@ -204,6 +192,7 @@
         function renderButtonBG(){
 
             _context.save();
+            //_context.fillStyle = appConfig.appBgColor;
             _context.clearRect(0, 0, _canvas.width, _canvas.height);
 
             //TODO: these calculations shouldn't happen on every render
@@ -261,19 +250,19 @@
         //======================================================
 
         function showSpeechBubble(){
-            _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, appConfig.menuButtonPromptZ);//TODO hardcoded doc.body: should be  a parent arg
-            _speechBubble.style.display = "block";
-            _speechBubbleBounds.width = _canvas.width * 2;
-            _speechBubbleBounds.height = _canvas.height * .45;
             var message = "";
             if(_missionAccomplished){
                 message = _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
             }else{
                 message = _statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * _progressNormal)] : _promptMessages[0];
             }
-            SpeechBubble.updateSpeechBubble(_speechBubble, message, _speechBubbleBounds.width, _speechBubbleBounds.height);
+            _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, appConfig.menuButtonPromptZ);//TODO hardcoded doc.body: should be  a parent arg
+            _speechBubble.style.display = "block";
+            AppLayout.updateLayoutRectBoundsToState("speechBubble", "transitionFrom");
+            var bounds = AppLayout.getJsonRectBounds("speechBubble");
+            bounds.y += (AppLayout.bounds.bottom() - _canvas.height);
+            SpeechBubble.updateSpeechBubble(_speechBubble, message, bounds.width, bounds.height);
             playSpeechBubbleAnimation();
-
         };
 
         function removeSpeechBubble(){
@@ -303,18 +292,7 @@
         //==============:: ANIMATIONS::==============
         //======================================================
 
-        //TODO: move to animations.js
         //only one element is translated at any given moment.
-
-        var _rectTransition = new RectangleTransition(), _transitionElement,
-            _transitionRect = new Rectangle(), _transFrom = new Rectangle(), _transTo = new Rectangle;
-
-        function updateElementTransition(normal){
-            _rectTransition.updateToProgressNormal(normal);
-            _transitionElement.style.transform = TransitionCSSUtil.getTranslateStringFromRect(_transitionRect);
-            incrementPulse();//consider moving into render()
-            render();
-        };
 
         function updateCanvasRectTransition(normal){
             _rectTransition.updateToProgressNormal(normal);
@@ -322,72 +300,70 @@
             render();
         };
 
-        function getOutOfScreenX(){
-            return _canvas.width + 10;//used a few times, easier to update for all at once
-        };
-
-        //==================> TRANSITIONS
-
         //--------TRANSLATE BUTTON IN/OUT---------
         var translateButtonIn = function(){
-            _transitionElement = _canvas;
-            _transFrom.update(_canvas.width, _canvas.height);
-            _transTo.update(0, 0);
-            _transitionRect = _canvasBounds;//needed to update canvas.style.transition
-            _rectTransition.init(_transitionRect, _transFrom, _transTo);
-            _unitAnimator.start(1000, updateElementTransition, startIdleTimer, UnitEasing.easeOutSine);
+            _rectTransition.fromRect.update(_canvas.width, _canvas.height);
+            _rectTransition.toRect.update(0, 0);
+            _rectTransition.init(AppLayout.getJsonRectBounds("menuButton"));
+            _unitAnimator.start(1000, updateTransitionMenuButton, startIdleTimer, UnitEasing.easeOutSine);
         };
 
         var translateButtonOut = function(){
-            _transitionElement = _canvas;
-            _transFrom.update(0, 0);
-            _transTo.update(_canvas.width, _canvas.height);
-            _rectTransition.init(_canvasBounds, _transFrom, _transTo);
-            _unitAnimator.start(1000, updateElementTransition, null, UnitEasing.easeOutSine);
+            _rectTransition.fromRect.update(0, 0);
+            _rectTransition.toRect.update(_canvas.width, _canvas.height);
+            _rectTransition.init(_canvasBounds);
+            _unitAnimator.start(1000, updateTransitionMenuButton, null, UnitEasing.easeOutSine);
         };
+
+        function updateTransitionMenuButton(normal){
+            updateCanvasRectTransition(normal);
+            _canvas.style.transform = TransitionCSSUtil.getTranslateStringFromRect(AppLayout.getJsonRectBounds("menuButton"));
+        };
+
 
         //--------DONUT CHART IN/OUT---------
         var animateDonutIn = function(){
-            _avatarBounds.x = getOutOfScreenX();
-            _transFrom.update(_avatarBounds.x);
-            _transTo.update(_donutDisplayBounds.x);
-            _rectTransition.init(_donutBounds, _transFrom, _transTo);
+            //console.log("MenuButton.animateDonutIn()");
+            _avatarBounds.x = AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x;
+            _rectTransition.fromRect.update(_avatarBounds.x);
+            _rectTransition.toRect.update(AppLayout.updateLayoutRectBoundsToState("progressGraphic", "default").x);
+            _rectTransition.init(_donutBounds);
             _unitAnimator.start(500, updateCanvasRectTransition, startIdleTimer , UnitEasing.easeOutSine);
         };
 
         var animateDonutOut = function(){
-            //console.log("MenuButton.animateDonutOut()");
-            _avatarBounds.x = getOutOfScreenX();
-            _transFrom.update(_donutDisplayBounds.x);
-            _transTo.update(_avatarBounds.x);
-            _rectTransition.init(_donutBounds, _transFrom, _transTo);
+            _avatarBounds.x = AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x;
+            _rectTransition.fromRect.update(AppLayout.updateLayoutRectBoundsToState("progressGraphic", "default").x);
+            _rectTransition.toRect.update(_avatarBounds.x);
+            //console.log("MenuButton.animateDonutOut() : ", _rectTransition.fromRect.toString(), _rectTransition.toRect.toString());
+            _rectTransition.init(_donutBounds);
             _unitAnimator.start(500, updateCanvasRectTransition, animateAvatarIn , UnitEasing.easeInSine);
         };
 
         //--------AVATAR CHART IN/OUT---------
         var animateAvatarIn = function(){
-            //console.log("MenuButton.animateAvatarIn()");
-            _donutBounds.x = getOutOfScreenX();
-            _transFrom.update(_donutBounds.x);
-            _transTo.update(_avatarDisplayBounds.x);
-            _rectTransition.init(_avatarBounds, _transFrom, _transTo);
+            _donutBounds.x = AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x;
+            _rectTransition.fromRect.update(_donutBounds.x);
+            _rectTransition.toRect.update(AppLayout.updateLayoutRectBoundsToState("progressGraphic", "default").x);
+            //console.log("MenuButton.animateAvatarIn() : ", _rectTransition.fromRect.toString(), _rectTransition.toRect.toString());
+            _rectTransition.init(_avatarBounds);
             _unitAnimator.start(500, updateCanvasRectTransition, showSpeechBubble , UnitEasing.easeOutSine);
         };
         var animateAvatarOut = function(){
             //console.log("MenuButton.animateAvatarOut()");
-            _transFrom.update(_avatarDisplayBounds.x);
-            _transTo.update(_donutBounds.x);
-            _rectTransition.init(_avatarBounds, _transFrom, _transTo);
+            _donutBounds.x = AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x;
+            _rectTransition.fromRect.update(AppLayout.updateLayoutRectBoundsToState("progressGraphic", "default").x);
+            _rectTransition.toRect.update(AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x);
+            _rectTransition.init(_avatarBounds);
             _unitAnimator.start(500, updateCanvasRectTransition, animateDonutIn , UnitEasing.easeOutSine);
         };
 
         //--------SPEECH BUBBLE IN/OUT---------
         // one animation, 25% in, 50% hover, 25% out, calls pulse
         var playSpeechBubbleAnimation = function(){
-            _speechBubbleBounds.y = AppLayout.bounds.height - _canvas.height * .7 - _speechBubble.offsetHeight;
-            _transFrom.update(AppLayout.bounds.right());
-            _transTo.update(_transFrom.x - _speechBubble.offsetWidth * 1.5);
-            _rectTransition.init(_speechBubbleBounds, _transFrom, _transTo);
+            _rectTransition.fromRect.update(AppLayout.bounds.right());
+            _rectTransition.toRect.update(_rectTransition.fromRect.x - _speechBubble.offsetWidth * 1.5);
+            _rectTransition.init(AppLayout.getJsonRectBounds("speechBubble"));
             updateSpeechBubbleTranslate(0);
             _unitAnimator.start(3500, updateSpeechBubbleTranslate, speechBubbleAnimationComplete);
         };
@@ -407,7 +383,7 @@
             }
             var positionNormal = normal < .15 ? MathUtil.smoothstep(normal, 0, .15) : 1 - MathUtil.smoothstep(normal, .85, 1);
             _rectTransition.updateToProgressNormal(positionNormal);
-            _speechBubble.style.transform = TransitionCSSUtil.getTranslateStringFromRect(_speechBubbleBounds);
+            _speechBubble.style.transform = TransitionCSSUtil.getTranslateStringFromRect(AppLayout.getJsonRectBounds("speechBubble"));
             incrementPulse();
             render();
         };
@@ -415,44 +391,46 @@
 
         //--------TO STATS MODULE IN/OUT---------
         var playToStatsViewAnimation = function(){
-            _donutBounds.x = getOutOfScreenX();
+            _donutBounds.x = AppLayout.updateLayoutRectBoundsToState("progressGraphic", "transitionFrom").x;
             stopIdleTimer();
             removeSpeechBubble();
             //_canvas.style.setProperty("filter", "");
             //_canvas.style.setProperty("-webkit-filter", "");
-
-            _transFrom.update(_avatarBounds.x, _avatarBounds.y, _avatarBounds.width, _avatarBounds.height);
-            var fullScreenSize = Math.floor(AppLayout.bounds.smallerSide() * .5);
-            _transTo.update(
-                Math.floor(AppLayout.bounds.centerX() - fullScreenSize * .5),
-                Math.floor(AppLayout.bounds.centerY() - fullScreenSize * .5),
-                fullScreenSize, fullScreenSize);
-            _rectTransition.init(_avatarBounds, _transFrom, _transTo);
-            //console.log("MenuButton.playToStatsViewAnimation()", _avatarBounds.toString(), _transFrom.toString(), _transTo.toString());
+            _rectTransition.fromRect.updateToRect(_avatarBounds);
+            AppLayout.updateRectToLayoutRectState(_rectTransition.toRect, "transitionMenuButtonToCenter");
+            _rectTransition.init(_avatarBounds);
+            //console.log("MenuButton.playToStatsViewAnimation()", _avatarBounds.toString(), _rectTransition.fromRect.toString(), _rectTransition.toRect.toString());
             _unitAnimator.start(500, updateToStatsViewTransition, playToStatsViewAnimationStep2, UnitEasing.easeOutSine);
         };
 
-        var updateToStatsViewTransition = function(normal){
+        var renderToStatsViewPixelGuy = function(normal){
             _rectTransition.updateToProgressNormal(normal);
-            incrementPulse();//consider moving into render()
-            renderButtonBG();
             var scale = _avatarBounds.width / (PixelGuyHeadSprite.unscaledWidth - 1);//shadow screws up centering otherwise
             PixelGuyHeadSprite.renderAvatar(_context, _avatarBounds.x, _avatarBounds.y, scale, _progressNormal);
-        }
+        };
+
+        var updateToStatsViewTransition = function(normal){
+            incrementPulse();//consider moving into render()
+            renderButtonBG();
+            renderToStatsViewPixelGuy(normal);
+        };
 
         var playToStatsViewAnimationStep2 = function(){
             if(showStatsModuleCallback){
                 showStatsModuleCallback();
             }
-            _transFrom.updateToRect(_transTo);
-            var bigAvatar = Math.floor(AppLayout.bounds.biggerSide() * 2);
-            _transTo.update(
-                Math.floor(_transFrom.x - bigAvatar * .5),
-                Math.floor(_transFrom.y - bigAvatar * .5),
-                bigAvatar, bigAvatar);
-            _rectTransition.init(_avatarBounds, _transFrom, _transTo);
-            //console.log("MenuButton.playToStatsViewAnimationStep2()", _avatarBounds.toString(), _transFrom.toString(), _transTo.toString());
-            _unitAnimator.start(500, updateToStatsViewTransition, toStatsViewAnimationComplete, UnitEasing.easeInSine);
+            _rectTransition.fromRect.updateToRect(_rectTransition.toRect);
+            var size = AppLayout.bounds.biggerSide() * 1.3;
+            _rectTransition.toRect.update(AppLayout.bounds.centerX() - size * .5, AppLayout.bounds.centerY() - size * .5, size, size);
+            _rectTransition.init(_avatarBounds);
+            //console.log("MenuButton.playToStatsViewAnimationStep2()", _avatarBounds.toString(), _rectTransition.fromRect.toString(), _rectTransition.toRect.toString());
+            _unitAnimator.start(500, updateToStatsViewTransition2, toStatsViewAnimationComplete, UnitEasing.easeInSine);
+        };
+
+        var updateToStatsViewTransition2 = function(normal){
+            _context.fillStyle = appConfig.appBgColor;
+            _context.fillRect(0, 0, _canvas.width, _canvas.height);
+            renderToStatsViewPixelGuy(normal);
         };
 
         var toStatsViewAnimationComplete = function(){

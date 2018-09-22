@@ -32,9 +32,19 @@
             var interpol, i;
             for(i=0; i<_interpolations.length; i++){
                 interpol = _interpolations[i];
-                interpol.target[interpol.prop] = interpol.easing(MathUtil.interpolate(normal, interpol.from, interpol.to));
+                interpol.target[interpol.prop] = MathUtil.interpolate(interpol.easing(normal), interpol.from, interpol.to);
             }
         };
+
+        this.toString = function(){
+            var stri = "InterpolationList{";
+            var interpol, i;
+            for(i=0; i<_interpolations.length; i++){
+                interpol = _interpolations[i];
+                stri += ("\n\tinterpol : prop : " + interpol.prop + ", from : " + interpol.from + ", to : " + interpol.to + ", target:" + interpol.target);
+            }
+            return stri + "\n}\n";
+        }
 
         this.clear = function(){
             _interpolations.length = 0;
@@ -56,7 +66,7 @@
             interpolation.to = to;
             interpolation.easing = easeFunction || UnitEasing.easeLinear;
             return interpolation;
-        }
+        };
 
     };
 }());
@@ -66,6 +76,9 @@
 (function() {
 
     window.RectangleTransition = function(){
+
+        this.fromRect = new Rectangle();
+        this.toRect = new Rectangle();
 
         var _interpolations = new InterpolationList();
         var _xEase, _yEase, _widthEase, _heightEase;
@@ -77,17 +90,21 @@
             _heightEase = heightEase;
         };
 
-        this.init = function(targetRect, fromRect, toRect){
+        this.init = function(targetRect){
             _interpolations.clear();
-            _interpolations.addInterpolation(targetRect, "x",       fromRect.x,         toRect.x,       _xEase);
-            _interpolations.addInterpolation(targetRect, "y",       fromRect.y,         toRect.y,       _yEase);
-            _interpolations.addInterpolation(targetRect, "width",   fromRect.width,     toRect.width,   _widthEase);
-            _interpolations.addInterpolation(targetRect, "height",  fromRect.height,    toRect.height,  _heightEase);
+            _interpolations.addInterpolation(targetRect, "x",       this.fromRect.x,         this.toRect.x,       _xEase);
+            _interpolations.addInterpolation(targetRect, "y",       this.fromRect.y,         this.toRect.y,       _yEase);
+            _interpolations.addInterpolation(targetRect, "width",   this.fromRect.width,     this.toRect.width,   _widthEase);
+            _interpolations.addInterpolation(targetRect, "height",  this.fromRect.height,    this.toRect.height,  _heightEase);
         };
 
         this.updateToProgressNormal = function(normal){
             _interpolations.interpolate(normal);
         };
+
+        this.logInterpolations = function(){
+            console.log(_interpolations.toString());
+        }
 
     };
 }());

@@ -154,7 +154,7 @@
             var i, card;
             for(i = _cards.length - 1; i > -1; i--){
                 card = _cards[i];
-                if(card.hasContent() && card.bounds.containsPoint(x, y)){
+                if(card.hasContent() && card.containsPoint(x, y)){
                     return card;
                 }
             }
@@ -254,7 +254,7 @@
             for(i=0; i<6; i++){
                 card = _cards[i];
                //calculate max needed render height by referencing next position (optimization)
-                CardMenuLayout.updateCardBoundsToScrollNormal(card.bounds, card.tabBounds, i, _scrollNormal);
+                CardMenuLayout.updateCardBoundsToScrollNormal(card, i, _scrollNormal);
                 card.render(_context, _data[_dataIndex + i], i > 2);
             }
         };

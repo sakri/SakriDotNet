@@ -1,22 +1,17 @@
 /**
- * DEPENDENCIES:
- * utils
- */
-
-/**
  * Created by Sakri Rosenstrom on 15-06-18
- * DEPENDENCIES : MathUtil, Rectangle, Sprites
+ * DEPENDENCIES : MathUtil, Rectangle, Sprites, UnitAnimator, AppLayout
  *
  * Contains:
  *
  *      LoaderCircles:
- *      - manages coloured circles in loader
+ *      - manages "loading circles" in loader
  *
  *      SakriDotNetLoader
- *      - creates canvas, manages pixel guy, circles and title
+ *      - manages loader assets (pixel guy, circles and title), and animations
  *
  *      SakriDotNetLoaderController
- *      - reads html page, observes load, manages Loader
+ *      - reads html page, observes load, updates Loader
  *
  *      SakriDotNetLoaderTestController
  *      - mocks LoaderController behaviour
@@ -30,38 +25,41 @@
 
 (function(){
 
+    //Receives a (potentially) changing number of circles representing "load items"
+    //Animates circles from "emitter x,y" to evenly spaced out locations within bounds
+    //Does not receive progress information for individual "load items"
+    //Instead, displays the "last ball" as "loading" using _fakeProgressNormal
     window.LoaderCircles = function(){
 
         var _circles,
-            _circlesAnimProgress = 0,
-            _circlesAnimMax = 100;
+            _fakeProgressNormal = 0,
+            _emitter, _radius, _lineWidth = 2;
 
-        //TODO: needs some cleanup. startX used to be param : emitterX (some context)
-        this.init = function(colors, numCircles, bounds, emitterX, emitterY){
 
-            if(_circles && _circles.length > 0 && _circles.length == numCircles){
+        this.udpateCircles = function(colors, numCircles, bounds, emitter){
+
+            if(_circles && _circles.length > 0 && _circles.length === numCircles){
                 return;
             }
 
-            _circles= [];
+            _circles = [];
             var circleXIncrement = bounds.width / numCircles;
-            var radius = Math.min(Math.round(circleXIncrement * .35), bounds.height);
+            _radius = Math.min(Math.round(circleXIncrement * .3), bounds.height);
+            _lineWidth = _radius * .3;
+            _emitter = emitter;
             for(var i=0; i < numCircles; i++){
                 _circles[i] = {
-                    startX : emitterX,
+                    currentX : emitter.x,
+                    currentY : emitter.y,
                     endX : Math.round(bounds.x + circleXIncrement * i + circleXIncrement * .5),
-                    startY : emitterY,
                     endY : bounds.y,
-                    radius : radius,
                     color : colors[i % colors.length],
                     animNormal : 0
                 };
-                _circles[i].currentX = _circles[i].startX;
-                _circles[i].currentY = _circles[i].startY;
             }
         };
 
-        this.renderLoaderCircles = function(normal, context){
+        this.renderLoading = function(normal, context){
             var renderCount = Math.round(normal * _circles.length);
             var i, circle, animNormal, radiusNormal, radius;
 
@@ -69,37 +67,44 @@
             var circleScaleDurationNormalSpacer = (1 - circleScaleDurationNormal) / renderCount;
             var circleSpacing = 1 / renderCount;
 
+            context.strokeStyle = "#222222";
+            context.lineWidth = _lineWidth;
             for(i=0; i<renderCount; i++){
                 circle = _circles[i];
                 if(!circle){
-                    console.log("renderLoaderCircles no circle : ", i, renderCount, _circles.length, normal, "TODO: Remove");
+                    //console.log("renderLoading no circle : ", i, renderCount, _circles.length, normal, "TODO: Remove");
                     return;
                 }
-                circle.animNormal = Math.min(circle.animNormal + .03, 1)
+                circle.animNormal = Math.min(circle.animNormal + .03, 1);
                 animNormal = UnitEasing.easeOutSine(circle.animNormal, 0, 1, 1);
-                circle.currentX = MathUtil.interpolate(animNormal, circle.startX, circle.endX);
-                circle.currentY = MathUtil.interpolate(animNormal, circle.startY, circle.endY);
+                circle.currentX = MathUtil.interpolate(animNormal, _emitter.x, circle.endX);
+                circle.currentY = MathUtil.interpolate(animNormal, _emitter.y, circle.endY);
                 context.fillStyle = circle.color;
 
                 radiusNormal = MathUtil.smoothstep(
-                    _circlesAnimProgress / 100,
+                    _fakeProgressNormal,
                     i * circleScaleDurationNormalSpacer,
                     i * circleScaleDurationNormalSpacer + circleSpacing * 2
                 );
-                radius = circle.radius + Math.sin(radiusNormal * Math.PI) * (circle.radius * .4);
+                radius = _radius + Math.sin(radiusNormal * Math.PI) * (_radius * .4);//ok.. whatever?
 
                 context.beginPath();
-                if(i == renderCount - 1){
-                    var angle = Math.PI * _circlesAnimProgress / 100;
+                if(i === renderCount - 1){
+                    var angle = Math.PI * _fakeProgressNormal;
                     context.arc(circle.currentX, circle.currentY, radius, Math.PI - angle, Math.PI + angle);
                 }else{
                     context.arc(circle.currentX, circle.currentY, radius, 0, MathUtil.PI2);
                 }
-                context.fill();
                 context.closePath();
+                context.fill();
+                context.stroke();
             }
-            _circlesAnimProgress++;
-            _circlesAnimProgress %= _circlesAnimMax;
+            _fakeProgressNormal += .01;
+            _fakeProgressNormal = (_fakeProgressNormal < 1) ? _fakeProgressNormal : 0;
+        };
+
+        this.introComplete = function(){
+            return _circles && _circles.length && _circles[_circles.length - 1].animNormal === 1;
         };
 
         this.prepareExit = function(endX, endY){
@@ -114,7 +119,9 @@
         };
 
         this.renderLoaderCirclesCompleteTransition = function(normal, context){
-            var i, circle, animNormal, smoothStepIncrement = (1 / _circles.length);
+            var i, circle, smoothStepIncrement = (1 / _circles.length), animNormal;
+            context.strokeStyle = "#222222";
+            context.lineWidth = _lineWidth;
             for(i=0; i<_circles.length; i++){
                 circle = _circles[i];
                 animNormal = MathUtil.smoothstep(normal, smoothStepIncrement * i, 1);
@@ -122,14 +129,11 @@
                 circle.currentY = MathUtil.interpolate(animNormal, circle.startY, circle.endY);
                 context.fillStyle = circle.color;
                 context.beginPath();
-                context.arc(circle.currentX, circle.currentY, circle.radius, 0, MathUtil.PI2);
-                context.fill();
+                context.arc(circle.currentX, circle.currentY, _radius, 0, MathUtil.PI2);
                 context.closePath();
+                context.fill();
+                context.stroke();
             }
-        };
-
-        this.introComplete = function(){
-            return _circles && _circles.length && _circles[_circles.length - 1].animNormal == 1;
         };
 
     };
@@ -142,142 +146,191 @@
 
 (function() {
 
-    window.SakriDotNetLoader = function(index) {
+    window.SakriDotNetLoader = function() {
 
         //PRIVATE VARIABLES
         var _canvas, _context,
-            _smileyBounds = new Rectangle(),
-            _smileyScale,
-            _circles,
-            _title,
-            _endAnimNormal;
-
+            _rectTransition = new RectangleTransition(),
+            _unitAnimator = new UnitAnimator(),
+            _pixelGuyBounds = new Rectangle(),
+            _pixelGuyScale,
+            _titleBounds,
+            _laptopBounds = new Rectangle(),
+            _circlesBounds = new Rectangle(),
+            _circlesEmitter = {x:0, y:0},
+            _circles = new LoaderCircles(),
+            _title;
 
         //PUBLIC API
 
-        this.init = function(colors, numCircles){
+        this.init = function(){
+            this.resize();
             createLoaderCanvas();
-            console.log("SakriDotNetLoader.init()", AppLayout.bounds.width, PixelGuyTypingSprite.unscaledWidth, AppLayout.bounds.height, PixelGuyTypingSprite.unscaledHeight);
-            _smileyScale = Math.floor((AppLayout.bounds.isLandscape() ? AppLayout.bounds.height * .25  / PixelGuyTypingSprite.unscaledHeight : AppLayout.bounds.width * .75  / PixelGuyTypingSprite.unscaledWidth));
-            _smileyBounds.width = PixelGuyTypingSprite.unscaledWidth * _smileyScale;
-            _smileyBounds.height = PixelGuyTypingSprite.unscaledHeight * _smileyScale;
-            _smileyBounds.x = Math.round(_canvas.width * .5 - _smileyBounds.width * .5);
-            _smileyBounds.y = Math.round(_canvas.height * .5 - _smileyBounds.height * .5);
             createLoaderTitle();
-            _circles = new LoaderCircles();
-            this.updateCircles(colors, numCircles);
+            playPixelGuyIn();
         };
 
-        //rename to something more descriptive (should read like a story)
         this.updateCircles = function(colors, numCircles){
-            if(!_circles){
-                return;
+            if(_circles){
+                _circles.udpateCircles(colors, numCircles, _circlesBounds, _circlesEmitter);
             }
-            var bounds = new Rectangle(
-                Math.round(_smileyBounds.x + _smileyBounds.width * .1),
-                Math.round(_smileyBounds.y + _smileyBounds.height * 1.6),
-                Math.floor(_smileyBounds.width * .8),
-                Math.floor(_smileyBounds.height * .1)
-            );
-
-            _circles.init(colors, numCircles, bounds, Math.round(_smileyBounds.x + _smileyBounds.width * .25), Math.round(_smileyBounds.bottom() - _smileyBounds.height * .2));
-        }
-
-        this.renderLoading = function(normal){
-            _context.fillStyle = appConfig.appBgColor;
-            _context.fillRect(0, 0, _canvas.width, _canvas.height);//=============== TODO: SHRINK!!! (no need for fullscreen)
-            PixelGuyTypingManager.render(_context, _smileyBounds.x, _smileyBounds.y, _smileyScale, normal);
-            _circles.renderLoaderCircles(normal, _context);
-        };
-
-        this.prepareExit = function(){
-            _endAnimNormal = 0;
-            _circles.prepareExit(_smileyBounds.x, -_smileyBounds.centerY());
-            var buttrockSpriteSheet = SakriDotNetSpriteSheet.getSpriteSheetData("buttrock");
-            var rockBounds = new Rectangle(0, 0, buttrockSpriteSheet.width * _smileyScale, buttrockSpriteSheet.height * _smileyScale);
-            _smileyBounds.update(
-                Math.round(_smileyBounds.x + _smileyBounds.width * .75 - buttrockSpriteSheet.width * _smileyScale * .5),
-                Math.round(_smileyBounds.y - _smileyBounds.height * .4),
-                rockBounds.width, rockBounds.height
-            );
         };
 
         this.circlesIntroComplete = function(){
-            return _circles.introComplete();
+            return !_unitAnimator.isAnimating() && _circles.introComplete();
         };
 
-        this.renderButtrock = function() {
+        this.render = function(normal){
             _context.fillStyle = appConfig.appBgColor;
-            _context.fillRect(0, 0, _canvas.width, _canvas.height);//=============== TODO: SHRINK!!! (no need for fullscreen)
-            ButtrockManager.render(_context, _smileyBounds.x, _smileyBounds.y, _smileyScale, .1);
-        }
-
-        this.renderEndSequence = function(normal){
-            this.renderButtrock();
-            var laptopX = -_canvas.width * .75 + Math.round(_canvas.width  * UnitEasing.easeInSine(1 - normal));
-            var laptopY = -_canvas.height * .5 + Math.round(_canvas.height  * UnitEasing.easeOutSine(1 - normal));
-            SakriDotNetSpriteSheet.renderFrame("laptop", _context, 2, laptopX, laptopY , _smileyScale);
-
-            var translateY = Math.round(MathUtil.smoothstep(normal, .45, 1) * (-_canvas.height * .4));
-            var translateX = Math.round(UnitEasing.easeInSine(MathUtil.smoothstep(normal, .45, 1)) * (_canvas.width * .2));
-            _title.style.transform = "translate(" + translateX + "px ," + translateY + "px)";
-
-            _circles.renderLoaderCirclesCompleteTransition(normal, _context);
+            _context.fillRect(0, 0, _canvas.width, _canvas.height);
+            PixelGuyTypingManager.render(_context, _pixelGuyBounds.x, _pixelGuyBounds.y, _pixelGuyScale, normal);
+            if(!_unitAnimator.isAnimating()){
+                _circles.renderLoading(normal, _context);//don't render during intro sequence
+            }
         };
 
-        var _rockExtraTransition = {};
-        this.prepareRockExtra = function(){
-            _rockExtraTransition.scaleFrom = _smileyScale;
-            _rockExtraTransition.scaleTo = _smileyScale * .3;
-            _rockExtraTransition.xFrom = _smileyBounds.x;
-            _rockExtraTransition.xTo = _canvas.width * 1.1;
-            _rockExtraTransition.yFrom = _smileyBounds.y;
-            _rockExtraTransition.yTo = _canvas.height * .9;
+        this.playExitAnimation = function(callback){
+            preparePixelGuyBoundsRockOut();
+            playEndSequence(callback);
         };
 
-        this.rockExtra = function(normal){
-            var moveNormal = MathUtil.smoothstep(normal, .45, 1);
-            _smileyScale = MathUtil.interpolate(moveNormal, _rockExtraTransition.scaleFrom, _rockExtraTransition.scaleTo);
-            _smileyBounds.x = MathUtil.interpolate(UnitEasing.easeInSine(moveNormal), _rockExtraTransition.xFrom, _rockExtraTransition.xTo);
-            _smileyBounds.y = MathUtil.interpolate(UnitEasing.easeOutSine(moveNormal), _rockExtraTransition.yFrom, _rockExtraTransition.yTo);
-            this.renderButtrock();
+        this.resize = function(){
+            _unitAnimator.stop();
+            calculateLayout();
         };
 
-        //LOADER TITLE
-        function createLoaderTitle(){
+        //Private methods
+
+        var calculateLayout = function(){
+            _pixelGuyBounds.updateToRect(AppLayout.getJsonRectBounds("loaderPixelGuy"));
+            _pixelGuyScale = Math.floor(Math.min(_pixelGuyBounds.width  / PixelGuyTypingSprite.unscaledWidth, _pixelGuyBounds.height  / PixelGuyTypingSprite.unscaledHeight));
+            _pixelGuyBounds.width = PixelGuyTypingSprite.unscaledWidth * _pixelGuyScale;
+            _pixelGuyBounds.height = PixelGuyTypingSprite.unscaledHeight * _pixelGuyScale;
+            _pixelGuyBounds.x = Math.round(AppLayout.bounds.centerX() - _pixelGuyBounds.width * .5);
+            _pixelGuyBounds.y = Math.round(AppLayout.bounds.centerY() - _pixelGuyBounds.height * .5);
+            _laptopBounds.update(_pixelGuyBounds.x * .85, _pixelGuyBounds.y);
+
+            _circlesBounds.update(
+                Math.round(_pixelGuyBounds.x + _pixelGuyBounds.width * .1),
+                Math.round(_pixelGuyBounds.y + _pixelGuyBounds.height * 1.6),
+                Math.floor(_pixelGuyBounds.width * .8),
+                Math.floor(_pixelGuyBounds.height * .1)
+            );
+
+            _circlesEmitter.x = Math.round(_pixelGuyBounds.x + _pixelGuyBounds.width * .25);
+            _circlesEmitter.y = Math.round(_pixelGuyBounds.bottom() - _pixelGuyBounds.height * .2);
+
+            _titleBounds = AppLayout.getJsonRectBounds("loaderTitle");
+            _titleBounds.height = _pixelGuyBounds.height * .6;
+        };
+
+        var preparePixelGuyBoundsRockOut = function(){
+            _circles.prepareExit(_pixelGuyBounds.x, -_pixelGuyBounds.centerY());
+            _pixelGuyBounds.update(
+                Math.round(_pixelGuyBounds.x + _pixelGuyBounds.width * .5),
+                Math.round(_pixelGuyBounds.y - _pixelGuyBounds.height * .4),
+                ButtrockManager.unscaledWidth * _pixelGuyScale,
+                ButtrockManager.unscaledHeight * _pixelGuyScale
+            );
+            if(_pixelGuyBounds.right() > _canvas.width){
+                _pixelGuyBounds.x =  _canvas.width - _pixelGuyBounds.width;
+            }
+        };
+
+        var createLoaderTitle = function(){
             _title = document.createElement("h1");
             _title.style.color = "#222222";//needs to match dark pixels in sprites.js
             _title.style.position = "absolute";
             _title.style.overflow = "hidden";
             _title.style.textAlign = "center";
-            _title.style.width = "100%";
-            _title.style.margin = "0px";
-            _title.style.padding = "0px";
+            _title.style.margin =  "0";
+            _title.style.padding =  "0";
+            _title.style.borderWidth = "0";
             _title.style.zIndex = appConfig.loaderTitleZ;
-            _title.style.fontSize = Math.round(_smileyBounds.height * .35) + "px";
-            _title.style.top = Math.round(_smileyBounds.y - _smileyBounds.height) + "px";
+            _title.style.fontSize = Math.round(_titleBounds.height * .8) + "px";
+            _title.style.width = _titleBounds.width + "px";
+            _title.style.height = _titleBounds.height + "px";
+            _title.style.left = _titleBounds.x + "px";
+            _title.style.top = _titleBounds.y + "px";//should use css transition translate instead?
             _title.innerHTML = "sakri.net";
             document.body.appendChild(_title);
         };
 
-        //LOADER CANVAS
         var createLoaderCanvas = function(){
-            if(!_canvas){
-                _canvas = document.createElement("canvas");
-                _canvas.style.position = "absolute";
-                _canvas.style.top = "0px";
-                _canvas.style.margin = "0px";
-                _canvas.style.padding = "0px";
-                _canvas.style.zIndex = appConfig.loaderCanvasZ;
+            _canvas = _canvas || CanvasUtil.createCanvas(AppLayout.bounds.width, AppLayout.bounds.height, document.body, appConfig.loaderCanvasZ);
+            _canvas.style.left = _canvas.style.top = "0px";
+            _context = CanvasUtil.resize(_canvas, AppLayout.bounds.width, AppLayout.bounds.height);
+            CanvasUtil.enablePixelArtScaling(_context);
+        };
+
+
+        //ANIMATIONS
+
+        //TODO: create RectTransitionSequence() to handle this
+        var playPixelGuyIn = function(){
+            _title.style.display = "none";
+            _rectTransition.fromRect.update(NaN, AppLayout.updateLayoutRectBoundsToState("loaderPixelGuy", "transitionFrom").y);
+            _rectTransition.toRect.update(NaN, _pixelGuyBounds.y);
+            _rectTransition.init(_pixelGuyBounds);
+            _unitAnimator.start(300, _rectTransition.updateToProgressNormal, playTitleIn , UnitEasing.easeInSine);
+        };
+
+        var playTitleIn = function(){
+            _title.style.display = "block";
+            _rectTransition.toRect.update(NaN, _titleBounds.y);
+            _rectTransition.fromRect.update(NaN, AppLayout.updateLayoutRectBoundsToState("loaderTitle", "transitionFrom").y);
+            _rectTransition.init(_titleBounds);
+            _unitAnimator.start(300, updateTitleAnimation, null , UnitEasing.easeInSine);
+        };
+
+        var updateTitleAnimation = function(normal){
+            _rectTransition.updateToProgressNormal(normal);
+            _title.style.top = _titleBounds.y + "px";//should use css transition translate instead?
+        };
+
+        var playEndSequence = function(callback){
+            _rectTransition.fromRect.updateToRect(_pixelGuyBounds);
+            _rectTransition.toRect.updateToRect(AppLayout.updateLayoutRectBoundsToState("loaderPixelGuy", "transitionTo"));
+            _rectTransition.toRect.width *= .3;
+            _rectTransition.toRect.height *= .3;
+            _rectTransition.setEasings(UnitEasing.easeInSine, UnitEasing.easeOutSine);
+            _rectTransition.init(_pixelGuyBounds);
+            _unitAnimator.start(2000, updateEndSequenceAnimation, callback);
+        };
+
+        var updateEndSequenceAnimation = function(normal){
+            _context.fillStyle = appConfig.appBgColor;
+            _context.fillRect(0, 0, _canvas.width, _canvas.height);
+            renderEndSequenceLaptop(MathUtil.smoothstep(normal, 0, .3));
+            renderEndSequenceTitle(MathUtil.smoothstep(normal, .35, .7));
+            renderEndSequenceButtrock(MathUtil.smoothstep(normal, .7, 1));
+            _circles.renderLoaderCirclesCompleteTransition(MathUtil.smoothstep(normal, 0, .8), _context);
+        };
+
+        var renderEndSequenceLaptop = function(normal) {
+            if(normal===1){
+                return;//only render if within screen bounds
             }
-            _canvas.width = document.documentElement.clientWidth;
-            _canvas.height = document.documentElement.clientHeight;
-            _context = _canvas.getContext("2d");
-            _context.imageSmoothingEnabled = false;
-            _context.mozImageSmoothingEnabled = false;
-            _context.webkitImageSmoothingEnabled = false;
-            _context.msImageSmoothingEnabled = false;
-            document.body.appendChild(_canvas);
+            var laptopX = MathUtil.interpolate(UnitEasing.easeInSine(normal), _laptopBounds.x, -_pixelGuyBounds.width);
+            var laptopY = MathUtil.interpolate(UnitEasing.easeOutSine(normal), _laptopBounds.y, AppLayout.bounds.height * .1);
+            SakriDotNetSpriteSheet.renderFrame("laptop", _context, 2, laptopX, laptopY , _pixelGuyScale);
+        };
+
+        var renderEndSequenceTitle = function(normal) {
+            if(!normal || normal===1){
+                return;//only translate if normal is changing
+            }
+            var translateX = MathUtil.interpolate(UnitEasing.easeInSine(normal), 0, _pixelGuyBounds.width);
+            var translateY = MathUtil.interpolate(UnitEasing.easeOutSine(normal), 0, -_pixelGuyBounds.y);
+            _title.style.transform = "translate(" + translateX + "px ," + translateY + "px)";
+        };
+
+        var renderEndSequenceButtrock = function(normal) {
+            if(normal){
+                _rectTransition.updateToProgressNormal(normal);
+            }
+            var scale = _pixelGuyScale = Math.floor(Math.min(_pixelGuyBounds.width  / ButtrockManager.unscaledWidth, _pixelGuyBounds.height  / ButtrockManager.unscaledHeight));
+            ButtrockManager.render(_context, _pixelGuyBounds.x, _pixelGuyBounds.y, scale, .1);
         };
 
     }
@@ -289,61 +342,34 @@
 
 (function() {
 
-    window.SakriDotNetLoaderController = function(colors) {
+    window.SakriDotNetLoaderController = function(completeCallBack) {
 
-        var _loader = new SakriDotNetLoader(),
-            _images,
-            _endAnimNormal,
-            _completeCallBack;
+        var _loader = new SakriDotNetLoader(), _images;
 
-        //PUBLIC API
-
-        this.start = function(completeCallBack){
-            //console.log("SakriDotNetLoaderController.start() 1");
-            _completeCallBack = completeCallBack;
-            _loader.init(colors, document.body.querySelectorAll("section, article").length);
-            //console.log("SakriDotNetLoaderController.start() 2 _images :", _images.length, ", sections:", sectionNodes.length);
+        this.start = function(){
+            _loader.init();
+            updateLoaderCircles();
             updateImagesLoad();
         };
 
-        function updateImagesLoad(){
+        var updateLoaderCircles = function(){
+            _loader.updateCircles(appConfig.colorPalette, document.body.querySelectorAll("section, article").length);
+        };
+
+        var updateImagesLoad = function(){
             var completed = 0;
+            updateLoaderCircles();
             _images = document.querySelectorAll("img");
-            _loader.updateCircles(colors, document.body.querySelectorAll("section, article").length);
             for(var i=0; i < _images.length; i++){
                 completed += (_images[i].complete ? 1 : 0);
             }
-            _loader.renderLoading(completed / _images.length);
+            _loader.render(completed / _images.length);
             if(completed >= _images.length && _loader.circlesIntroComplete() ){
-                //console.log("SakriDotNetLoaderController.updateImagesLoad() COMPLETE ");
-                _loader.prepareExit();
-                _endAnimNormal = 0;
-                updateLoadCompleteTransition();
+                _loader.playExitAnimation(completeCallBack);
                 return;
             }
             window.requestAnimationFrame(updateImagesLoad);
         };
-
-        function updateLoadCompleteTransition(){
-            _loader.renderEndSequence(_endAnimNormal);
-            if(_endAnimNormal > 1){
-                _endAnimNormal = 0;
-                _loader.prepareRockExtra();
-                return rockExtra();
-            }
-            _endAnimNormal += .015;
-            window.requestAnimationFrame(updateLoadCompleteTransition);
-        };
-
-        function rockExtra(){
-            _loader.rockExtra(_endAnimNormal);
-            _endAnimNormal += .03;
-            if(_endAnimNormal > 1){
-                return _completeCallBack ? _completeCallBack() : false;
-            }
-            window.requestAnimationFrame(rockExtra);
-        };
-
     }
 }());
 
@@ -355,52 +381,27 @@
 (function() {
 
     //loads with mock progress, loops for all eternity (until stopped)
-    window.SakriDotNetLoaderTestController = function(colors) {
+    window.SakriDotNetLoaderTestController = function() {
 
         var _loader = new SakriDotNetLoader(), _animNormal, _callback;
 
         this.start = function(){
             _animNormal = 0;
-            _callback = _callback || this.start.bind(this);
-            _loader.init(colors, Math.floor(MathUtil.getRandomNumberInRange(3, 10)));
+            _callback = this.start.bind(this);
+            _loader.init();
+            _loader.updateCircles(appConfig.colorPalette, Math.round(MathUtil.getRandomNumberInRange(4, 12)));
             updateProgress();
         };
 
-        //LOADER UPDATES AND STATES
-
-        function updateProgress(){
+        var updateProgress = function(){
             _animNormal += Math.random() * .01;
-            if(_animNormal>1){
+            if(_animNormal > 1 && _loader.circlesIntroComplete()){
                 //console.log("SakriDotNetLoaderTestController.updateProgress() COMPLETE ");
-                _loader.prepareExit();
-                _animNormal = 0;
-                updateLoadCompleteTransition();
+                _loader.playExitAnimation(_callback);
                 return;
             }
-            _loader.renderLoading(_animNormal);
+            _loader.render(_animNormal);
             window.requestAnimationFrame(updateProgress);
-        };
-
-        function updateLoadCompleteTransition(){
-            _loader.renderEndSequence(_animNormal);
-            if(_animNormal > 1){
-                _animNormal = 0;
-                _loader.prepareRockExtra();
-                rockExtra();
-                return;
-            }
-            _animNormal += .02;
-            window.requestAnimationFrame(updateLoadCompleteTransition);
-        };
-
-        function rockExtra(){
-            _loader.rockExtra(_animNormal);
-            if(_animNormal > 2){
-                setTimeout(_callback, 1000);
-                return;
-            }
-            _animNormal += .02;
-            window.requestAnimationFrame(rockExtra);
         };
 
     }

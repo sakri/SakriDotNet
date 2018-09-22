@@ -5,7 +5,7 @@
 
 (function() {
 
-    window.appConfig = {}
+    window.appConfig = {};
     appConfig.appBgColor = "#ededed";
     appConfig.cardBgColor = "#ffffff";
     appConfig.colorPalette = ["#049CD8", "#FBD000", "#E52521", "#43B047"];
@@ -17,7 +17,7 @@
     var _nextPaletteColorIndex = 0;
     appConfig.getNextPaletteColor = function(){
         var color = this.colorPalette[_nextPaletteColorIndex % this.colorPalette.length];
-        _nextPaletteColorIndex++
+        _nextPaletteColorIndex++;
         return color;
     };
 
@@ -61,7 +61,7 @@
         //Card state related, maybe move
         this.visited = false;
         this.storyReadComplete = false;
-        this.liked = false;
+        //this.liked = false;
     };
 
 }());
@@ -155,7 +155,7 @@
     };
     AppData.getStatsReadEnoughArticlesNormal = function(required){
         required = required || 2;
-        return Math.min(AppData.numCardsStoryReadComplete() / 2, 1);//dangerous if there are less than "required" cards!
+        return Math.min(AppData.numCardsStoryReadComplete() / required, 1);//dangerous if there are less than "required" cards!
     };
     AppData.getStatsSpentEnoughTimeNormal = function(requiredSeconds){
         requiredSeconds = requiredSeconds || 60;
@@ -219,39 +219,35 @@
         }
         var visitedBinaryString = parts[0].toString(2);
         //1000101
-        if(visitedBinaryString.length - 1 != this.cards.length){
+        if(visitedBinaryString.length - 1 !== this.cards.length){
             console.log("AppData.updateFromVisitStatsUrlParam() Invalid visits : ", visitedBinaryString);
             return;
         }
         var readBinaryString = parts[1].toString(2);
-        if(readBinaryString.length - 1 != this.cards.length){
+        if(readBinaryString.length - 1 !== this.cards.length){
             console.log("AppData.updateFromVisitStatsUrlParam() Invalid articles completed : ", readBinaryString);
             return;
         }
         var card;
         for(i=0; i<this.cards.length; i++){
             card = this.cards[i];
-            card.visited = visitedBinaryString.charAt(i + 1) == "1";
-            card.storyReadComplete = readBinaryString.charAt(i + 1) == "1";
+            card.visited = visitedBinaryString.charAt(i + 1) === "1";
+            card.storyReadComplete = readBinaryString.charAt(i + 1) === "1";
         }
         this.userInteractions = parts[2];
         this.setVisitStart(parts[3] * 1000);
     };
 
-    AppData.copy = function(data){
-
-    };
-
     //-------------TESTING
-
+    /*
     AppData.setMockData = function(total){
         this.cards = this.generateMockData(total);
-    }
+    };
 
     AppData.generateMockData = function(total){
         var totalCards = total || MathUtil.getRandomNumberInRange(3, 8);
         var i, data, _dataList = [];
-        for(var i=0; i<totalCards; i++){
+        for(i=0; i<totalCards; i++){
             data = new CardData();
             data.themeColor = appConfig.getNextPaletteColor();
             data.title = i + " o'clock mock";
@@ -302,6 +298,6 @@
         console.log("   > duration : ", this.minutesSinceStart() + "m:" , this.secondsSinceStart(), "s",  "shareClick : ", this.shareClick , " interactions : ", this.userInteractions );
         console.log("   > actions per minute : " , this.interactionsHistory );
         return "";
-    };
+    };*/
 
 }());

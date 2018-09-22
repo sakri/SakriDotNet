@@ -18,14 +18,12 @@
 
         //TODO: consider renaming to ? startLoader? start()?
         this.init = function () {
-            //_appParamsUrl.searchParams.get("loopLoader") == "true"
-            //_loader = new SakriDotNetLoaderTestController(colors);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
             AppData.startInteractionsHistory(10000, 6);
             _cardCanvasRenderer = new CardCanvasRenderer(storyReadCompleteHandler);
-            var _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController(appConfig.colorPalette) : new SakriDotNetLoaderController(appConfig.colorPalette);
-            _loader.start(loadCompleteHandler);
+            var _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
+            _loader.start();
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
         };
 
