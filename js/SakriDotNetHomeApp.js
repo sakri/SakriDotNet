@@ -4,8 +4,7 @@
     window.SakriDotNetHomeApp = function (appName, backButtonURL) {
 
         //private properties
-        var _menuContainer,
-            _menuCanvas,
+        var _menuCanvas,
             _menu,
             _cardCanvasRenderer,
             _cardHtmlRenderer = new CardHtmlRenderer(),
@@ -16,7 +15,6 @@
         //**********::PUBLIC API::*****
         //*****************************
 
-        //TODO: consider renaming to ? startLoader? start()?
         this.init = function () {
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
@@ -31,7 +29,7 @@
         //**********::LOGIC::*****
         //************************
 
-        function loadCompleteHandler(){
+        var loadCompleteHandler = function(){
             console.log("App.load complete() ", AppData.msSinceStart() , "ms since script start");
 
             window.addEventListener("resize", windowResizeHandler);
@@ -41,15 +39,13 @@
             AppData.cards = parseSectionsData();
             document.body.innerHTML = "";
 
-            _menuContainer = document.createElement("div");
-            _menuContainer.classList.add("canvasContainer");
-            document.body.appendChild(_menuContainer);
-            _menuCanvas = createCanvas();
-            _menuContainer.appendChild(_menuCanvas);
+            _menuCanvas = CanvasUtil.createCanvas(AppLayout.bounds.width, AppLayout.bounds.height, document.body, appConfig.loaderCanvasZ),
+            _menuCanvas.style.left = _menuCanvas.style.top = "0px";
+
             _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCardHandler);
             //MenuButton shouldn't be included in apps that don't show it, so if(window.MenuButton)
             if(!backButtonURL){
-                _menuButton = new MenuButton(showStatsModule, backButtonURL);
+                _menuButton = new MenuButton(showStatsModule);
             }else{
                 _menuButton = {};//todo : find better solution, this is a placeholder to avoid errors
                 _menuButton.start = _menuButton.end = _menuButton.stop = _menuButton.addToPulse = function(){};
@@ -86,22 +82,13 @@
             return dataList.reverse();//html order is displayed in inverse order in menu
         };
 
-        var createCanvas = function (width, height) {
-            var canvas = document.createElement("canvas");
-            canvas.style.position = "absolute";
-            canvas.style.top = "0px";
-            canvas.style.left = "0px";
-            //console.log("App.createCanvas() : ", canvas.width, canvas.height);
-            return canvas;
-        };
-
         //must occur in separate frames due to getDataUrl(), also renderTitleImage() must happen prior to renderTabImage()
         var renderCardsCanvasAssets = function () {
             var i, cardData, showReadMore;
             for (i = 0; i < AppData.cards.length; i++){
                 cardData = AppData.cards[i];
                 cardData.contentLayout.updateLayout();
-                showReadMore = i == AppData.cards.length - 1;//only card on top needs this (never visible for others)
+                showReadMore = i === AppData.cards.length - 1;//only card on top needs this (never visible for others)
                 _cardCanvasRenderer.createCardCanvasAssets(cardData, showReadMore);
             }
 
@@ -134,16 +121,17 @@
         var commitWindowResize = function () {
             AppData.storeInteraction();
             hideIframe();
-            _menuCanvas.width = _menuContainer.offsetWidth;
-            _menuCanvas.height = _menuContainer.offsetHeight;
-            AppLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
+
+            AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             _windowResizeTimeoutId = -1;
 
             console.log("App.commitResize()", AppLayout.bounds.toString());
+            _menuCanvas.width = AppLayout.bounds.width;
+            _menuCanvas.height = AppLayout.bounds.height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
             renderCardsCanvasAssets();
-            setTimeout(showNavigationButtons, 700, true);
             setTimeout(_menuButton.start.bind(_menuButton), 400);
+            setTimeout(showNavigationButtons, 700, true);
         };
 
         //*****************************************
@@ -152,7 +140,7 @@
 
         var keyPressHandler = function(event){
             _cardHtmlRenderer.isOpen() ? keyPressCardOpenHandler(event.keyCode) : keyPressCardsMenu(event.keyCode);
-        }
+        };
 
         var keyPressCardOpenHandler = function (keyCode) {
             switch (keyCode) {
@@ -193,12 +181,7 @@
         //**********::STATS MODULE::********
         //*********************************************
 
-        //addStat( click, open card, article read, timeSpent
-        //prompt
-        //show button, button states
-        //open
-
-        var _statsSource;
+        var _statsSource, _statsModule, _closeIframeButton;
         var loadStatsModule = function(){
             if(_statsSource){
                 console.log("App.loadStatsModule() stats mod already loaded");
@@ -206,27 +189,22 @@
             }
             var req = new XMLHttpRequest();
             req.onreadystatechange = function () {
-                if (req.readyState != 4 || req.status != 200){
+                if (req.readyState !== 4 || req.status !== 200){
                     return;
                 }
                 _statsSource = req.responseText;
                 console.log("stats mod loaded");
             };
-            req.onerror = function(){
-                console.log("stats mod load ERROR");
-            }
             req.open("GET", "./statsModule.html");
             req.send();
         };
 
-        var _statsModule;
         var showStatsModule = function(){
             if(!_statsSource){
                 console.log("App.showStatsModule() warning : module not loaded");
                 return;
             }
-            console.log("App.showStatsModule()");
-            _menuContainer.style.display = "none";
+            _menuCanvas.style.display = "none";
             if(!_statsModule){
                 _statsModule = document.createElement("iframe");
                 _statsModule.style.position = "absolute";
@@ -252,7 +230,7 @@
             }else{
                 _statsModule.style.display = "block";
                 _statsModule.contentWindow.updateWidgets();//should not be called from here?
-                _statsModule.contentWindow.showStats(AppData.getAchievementNormal() == 1);
+                _statsModule.contentWindow.showStats(AppData.getAchievementNormal() === 1);
             }
             //TODO: watch out for resize calls?
             _statsModule.style.width = AppLayout.bounds.width + "px";
@@ -260,16 +238,13 @@
         };
 
         //TODO: refactor, very awkward...
-        var _closeIframeButton;
-        function showStatsShareCallback(showCloseStatsButton){
-            if (!_closeIframeButton) {
-                _closeIframeButton = new TabButton(closeIframeButtonClickHandler, appConfig.closeStatsButtonZ);
-            }
+        var showStatsShareCallback = function(showCloseStatsButton){
+            _closeIframeButton = _closeIframeButton || new TabButton(closeIframeButtonClickHandler, appConfig.closeStatsButtonZ);
             resizeCloseStatsModuleButton();
             _closeIframeButton.show(showCloseStatsButton);
         };
 
-        function resizeCloseStatsModuleButton(){
+        var resizeCloseStatsModuleButton = function(){
             var buttonHeight = (AppLayout.headerBounds.height * .7);//calculate every time for resizing
             var buttonWidth = Math.round(buttonHeight * 2.4);
             if(AppLayout.bounds.isPortrait()){
@@ -291,22 +266,17 @@
         };
 
         var hideIframe = function(){
-            if(!_statsModule){
-                return;
+            if(_statsModule){
+                _statsModule.contentWindow.stopCelebrations();
+                _statsModule.style.display = "none";
+                _closeIframeButton.show(false);
+                _menuCanvas.style.display = "block";
             }
-            _statsModule.contentWindow.stopCelebrations();
-            _statsModule.style.display = "none";
-            _closeIframeButton.show(false);
-            _menuContainer.style.display = "block";
-        }
+        };
 
         var menuButtonClickHandler = function(){
             if(backButtonURL){
-                var params = "";
-                if(appConfig.visitStats){
-                    params = "?visitStats=" + appConfig.visitStats;
-                }
-                window.location = backButtonURL + params;
+                window.location = backButtonURL + appConfig.visitStats ? "?visitStats=" + appConfig.visitStats : "";
             }
         };
 
@@ -315,7 +285,7 @@
         //*********************************************
 
         var isLive = function(){
-            return location.href.indexOf("localhost") == -1 && gtag;
+            return location.href.indexOf("localhost") === -1 && gtag;
         };
 
         var tagShowCardEvent = function(data){

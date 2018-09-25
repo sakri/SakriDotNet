@@ -459,7 +459,7 @@
     };
 
     CanvasUtil.createCanvas = function(width, height, parent, zIndex){
-        console.log("CanvasUtil.createCanvas()", width, height, zIndex);
+        //console.log("CanvasUtil.createCanvas()", width, height, zIndex);
         var canvas = document.createElement("canvas");
         canvas.style.position = "absolute";
         canvas.style.margin = "0";
@@ -475,11 +475,10 @@
             canvas.width = width;
             canvas.height = height;
         }
-        console.log("CanvasUtil.resize()", canvas.width, canvas.height);
+        //console.log("CanvasUtil.resize()", canvas.width, canvas.height);
         var context = canvas.getContext("2d");
         context.clearRect(0, 0, width, height);
         return context;
     };
 
 }());
-

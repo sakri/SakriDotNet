@@ -164,6 +164,71 @@
         }
     };
 
+    AppLayout.transitions = {
+        closeButtonIn : {
+            target : "closeButton",
+            from : "transitionFrom",
+            to : "default",
+            easing : [UnitEasing.easeOutSine]
+        },
+        closeButtonOut : {
+            target : "closeButton",
+            from : "default",
+            to : "transitionFrom",
+            easing : [UnitEasing.easeInSine]
+        }
+    };
+
+    AppLayout.resize = function(x, y, width, height){
+        this.bounds.update(x, y, width, height);
+        updateLayoutRectangles(AppLayout);
+        updateTransitions();
+        //this.debugLayout();
+    };
+
+
+    //api only exposes layout Rectangle (or bounds) objects, not underlying data. All logic should reside in private methods.
+    AppLayout.getJsonRectBounds = function(name){
+        return getJsonRect(name).bounds;
+    };
+
+    //api only exposes layout Rectangle (or bounds) objects, not underlying data. All logic should reside in private methods.
+    AppLayout.getLayoutTransition = function(name){
+        if(!this.transitions[name] || !this.transitions[name].transition){
+            console.warn("AppLayout.getLayoutTransition() name : ", name, " is not available. Please check AppLayout.transitions");
+        }
+        return this.transitions[name].transition;
+    };
+
+    AppLayout.populateTransitionForLayoutRect = function(transition, layoutRectName, fromState, toState){
+        var jsonRect = getJsonRect(layoutRectName);
+        updateRectToState(transition.fromRect, jsonRect, fromState);
+        updateRectToState(transition.toRect, jsonRect, toState);
+        transition.init(jsonRect.bounds);
+    };
+
+    AppLayout.localToGlobal = function(layoutRectName){
+        var jsonRect = getJsonRect(layoutRectName);
+        return localToGlobal(jsonRect, jsonRect.bounds);
+    };
+
+    AppLayout.updateLayoutRectBoundsToState = function(layoutRectName, state){
+        var jsonRect = getJsonRect(layoutRectName);
+        updateRectToState(jsonRect.bounds, jsonRect, state);
+        return jsonRect.bounds;
+    };
+
+    AppLayout.updateRectToLayoutRectState = function(updateRect, layoutRectName, state){
+        var jsonRect = getJsonRect(layoutRectName);
+        updateRectToState(updateRect, jsonRect, state);
+    };
+
+    AppLayout.debugLayout = function(){
+        renderDebugLayoutRects();
+    };
+
+    //PRIVATE METHODS
+
     //positions are "local" to container bounds
     var rectNormalCalculator = {
         x : function(rect, bounds, value){
@@ -244,64 +309,18 @@
         }
     };
 
-    //TODO: from legacy code, try to get rid of it
-    var _propNames = ["x", "y", "width", "height", "left", "right", "top", "bottom", "centerX", "centerY"];
+
+    var _layoutRectangles = {};
+    var _layoutName = "horizontal";//used to select corresponding layout rect
+    var _calcRect = new Rectangle();//TODO: see comment in usage (would be nice to remove)
 
     function getJsonRect(name){
-        var jsonRect = _jsonRectangles[name];
+        var jsonRect = _layoutRectangles[name];
         if(!jsonRect){
-            console.warn("AppLayout.getJsonRect() name : ", name, " is not available. Please check AppLayout.rectangles");
+            console.warn("AppLayout.getJsonRect() name : ", name, " is not available. Make sure updateLayout() has been called, or check AppLayout.rectangles");
             return;
         }
         return jsonRect;
-    };
-
-    AppLayout.getJsonRectBounds = function(name){
-        return getJsonRect(name).bounds;
-    };
-
-    //TODO: rename to "populateTransition" or so
-    AppLayout.initTransition = function(transition, layoutRectName, fromState, toState){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(transition.fromRect, jsonRect, fromState);
-        updateRectToState(transition.toRect, jsonRect, toState);
-        transition.init(jsonRect.bounds);
-    };
-
-    AppLayout.localToGlobal = function(layoutRectName){
-        var jsonRect = getJsonRect(layoutRectName);
-        return localToGlobal(jsonRect, jsonRect.bounds);
-    };
-
-    function localToGlobal(jsonRect, rect){
-        if(jsonRect.parent){
-            console.log("whee lToG : ", jsonRect.parent.bounds.toString());
-            rect.x += jsonRect.parent.bounds.x;
-            rect.y += jsonRect.parent.bounds.y;
-            localToGlobal(jsonRect.parent, rect);
-        }
-        return rect;
-    };
-
-    AppLayout.updateLayoutRectBoundsToState = function(layoutRectName, state){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(jsonRect.bounds, jsonRect, state);
-        return jsonRect.bounds;
-    };
-
-    AppLayout.updateRectToLayoutRectState = function(updateRect, layoutRectName, state){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(updateRect, jsonRect, state);
-    };
-
-    var getNumberOfPropertiesInOrientationRect = function(rect){
-        if(isNaN(rect.orientationRectPropertyCount)){
-            rect.orientationRectPropertyCount = 0;
-            for(var prop in rect){
-                rect.orientationRectPropertyCount += _propNames.indexOf(prop) > -1 ? 1: 0;
-            }
-        }
-        return rect.orientationRectPropertyCount;
     };
 
     var updateRectToState = function(rect, jsonRect, state){
@@ -309,25 +328,29 @@
             console.warn("AppLayout.updateRectToState() warning : provided jsonRect is not valid : ", jsonRect);
             return;
         }
-        state = state || "default"
+        state = state || "default";
+        if(state === "default" && jsonRect.bounds.isSet()){
+            rect.updateToRect(jsonRect.bounds);
+            return;//All layout rectangles "default" is set in updateLayout()
+        }
         var sourceRect = jsonRect[state];
         if(!sourceRect){
-            console.warn("AppLayout.updateLayoutRectToState() state : ", state, " is not available. Please check AppLayout.rectangles");
-            console.log(jsonRect);
+            console.warn("AppLayout.updateLayoutRectToState() state : ", state, " is not available in layoutRect : ", jsonRect.name ,". Please check AppLayout.rectangles");
             return;
         }
+        rect.update();//reset to null values
         var orientationRect = sourceRect["all"] || sourceRect[_layoutName];
         var numOrientationRectProps = getNumberOfPropertiesInOrientationRect(orientationRect);
-        rect.update();//reset
         var propName, value, loops = 0;
+        //this can be optimized, no need to loop through all values every time
         while(rect.getNumberOfSetItems() < numOrientationRectProps){
             for(propName in rectNormalCalculator){
                 value = orientationRect[propName];
-                //console.log(propName, value, rect.toString());
+                //console.log("update : ", propName, value, rect.toString());
                 if(!isNaN(value)){
                     rectNormalCalculator[propName](rect, jsonRect.parent.bounds, Number(value));//calls x(), y(), w, h, left() etc.
                 }else if(!isNaN(rect[value])){
-                    if(_propNames.indexOf(propName) < 4){
+                    if(isRectangleProperty(propName)){
                         rect[propName] = rect[value];//propName == "x", "y", "width" or "height"
                     }else{
                         positionCalculator[propName](rect, jsonRect.parent.bounds, rect[value]);//propName == "left", "right", "top", "bottom", "centerX", "centerY"
@@ -342,56 +365,85 @@
         if(rect.isSet()){
             return;
         }
-        if(state=="default"){
-            console.warn("AppLayout.setJsonRectBoundsToState() incomplete calculation : ", jsonRect.name, state,  orientationRect, rect.toString());
+        if(state === "default"){
+            console.warn("AppLayout.setJsonRectBoundsToState() incomplete default state calculation : ", jsonRect.name, " : " ,  orientationRect, ", result: ",  rect.toString());
             return;
         }
-        updateRectToState(_calcRect, jsonRect, "default");//TODO: Review, could lead to problems?
-        rect.replaceNullValuesFrom(_calcRect);
+        rect.replaceNullValuesFrom(jsonRect.bounds);
     };
-    var _calcRect = new Rectangle();//TODO: see comment in usage
 
-    var _jsonRectangles = [];
-    var crunchLayoutTree = function(jsonRect){
-        _jsonRectangles.length = 0;
-        var childJsonRect, childName;
-        for(childName in jsonRect.rectangles){
-            childJsonRect = jsonRect.rectangles[childName];
-            childJsonRect.parent = jsonRect;
-            childJsonRect.bounds = childJsonRect.bounds || new Rectangle();
-            childJsonRect.name = childName;
-            _jsonRectangles[childName] = childJsonRect;
-            updateRectToState(childJsonRect.bounds, childJsonRect, "default");
-            //console.log("=====> crunchLayoutTree()", childName, childJsonRect.bounds.toString());
-            if(childJsonRect.rectangles){
-                crunchLayoutTree(childJsonRect);//recurse
+    var updateLayoutRectangles = function(layoutRect){
+        updateLayoutName();
+        _layoutRectangles = {};
+        traverseLayoutRectangles(AppLayout);
+    };
+
+    //traverses recursively through all "layout rectangles", creates/updates bounds to "default"
+    var traverseLayoutRectangles = function(layoutRect){
+        var childLayoutRect, childName;
+        for(childName in layoutRect.rectangles){
+            childLayoutRect = layoutRect.rectangles[childName];
+            childLayoutRect.parent = layoutRect;
+            childLayoutRect.bounds = childLayoutRect.bounds || createNullRectangle();
+            updateRectToState(childLayoutRect.bounds, childLayoutRect, "default");
+            childLayoutRect.name = childName;
+            _layoutRectangles[childName] = childLayoutRect;
+            //console.log("=====> updateLayoutRectangles()", childName, childLayoutRect.bounds.toString());
+            if(childLayoutRect.rectangles){
+                traverseLayoutRectangles(childLayoutRect);
             }
         }
     };
 
-    var _layoutName;
-    AppLayout.resize = function(x, y, width, height){
-        this.bounds.update(x, y, width, height);
+    var createNullRectangle = function(){
+        var rect = new Rectangle();
+        rect.update();
+        return rect;
+    };
+
+    //loops through Transitions object, creates/updates Transition instances (contained in Transitions)
+    //TODO: should receive a transitions Object as a param
+    var updateTransitions = function(){
+        var i, transition;
+        for(var jsonTransition in AppLayout.transitions){
+            transition =  jsonTransition.transition || new RectangleTransition();
+            //transition.fromRect.updateToRect();
+        }
+    };
+
+    var updateLayoutName = function(){
         if(AppLayout.bounds.isSquareish(.2)){
             _layoutName = "square";
         }else{
             _layoutName = AppLayout.bounds.isLandscape() ? "landscape" : "portrait";
         }
-        crunchLayoutTree(AppLayout);
-        //this.debugLayout();
     };
 
-    AppLayout.debugLayout = function(){
-        var canvas = getDebugCanvas();
-        drawLayoutTree(canvas.getContext("2d"), AppLayout);
+    var getNumberOfPropertiesInOrientationRect = function(rect){
+        if(isNaN(rect.orientationRectPropertyCount)){
+            rect.orientationRectPropertyCount = 0;
+            for(var prop in rect){
+                rect.orientationRectPropertyCount += (positionCalculator[prop] ? 1: 0);
+            }
+        }
+        return rect.orientationRectPropertyCount;
     };
 
-    AppLayout.debugRect = function(rectangle, containerRect, color){
-        containerRect = containerRect || AppLayout.bounds;
-        var context = getDebugCanvas().getContext("2d");
-        context.fillStyle = color || MathUtil.getRandomRGBAColorString(.4);
-        context.fillRect(containerRect.x + rectangle.x, containerRect.y + rectangle.y, rectangle.width, rectangle.height);
+    var isRectangleProperty = function(propName){
+        return propName === "x" || propName === "y" || propName === "width" || propName === "height";
     };
+
+    var localToGlobal = function(jsonRect, rect){
+        if(jsonRect.parent){
+            console.log("whee lToG : ", jsonRect.parent.bounds.toString());
+            rect.x += jsonRect.parent.bounds.x;
+            rect.y += jsonRect.parent.bounds.y;
+            localToGlobal(jsonRect.parent, rect);
+        }
+        return rect;
+    };
+
+    //---------------:: DEBUGGING
 
     var _debugCanvas;
     function getDebugCanvas(){
@@ -399,20 +451,23 @@
         _debugCanvas.width = AppLayout.bounds.width;
         _debugCanvas.height = AppLayout.bounds.height;
         _debugCanvas.style.position = "absolute";
-        _debugCanvas.style.zIndex = 600;
+        _debugCanvas.style.zIndex = appConfig.debugLayer;
         document.body.appendChild(_debugCanvas);
         return _debugCanvas;
     };
 
-    var drawLayoutTree = function(context, jsonRect){
-        var childJsonRect, childName;
-        for(childName in jsonRect.rectangles){
-            childJsonRect = jsonRect.rectangles[childName];
-            context.fillStyle = MathUtil.getRandomRGBAColorString(.4);
-            context.fillRect(jsonRect.bounds.x + childJsonRect.bounds.x, jsonRect.bounds.y + childJsonRect.bounds.y, childJsonRect.bounds.width, childJsonRect.bounds.height);
-            console.log("drawLayoutTree()", childName, childJsonRect.bounds.toString());
-            if(childJsonRect.rectangles){
-                drawLayoutTree(context, childJsonRect);//recurse
+    var renderDebugLayoutRects = function(layoutRect, color){
+        layoutRect = layoutRect ? getJsonRect(layoutRect) : AppLayout;
+        var canvas = getDebugCanvas();
+        var context = canvas.getContext("2d");//could be optimized, but this is a debug feature
+        var childLayoutRect, childName;
+        for(childName in layoutRect.rectangles){
+            childLayoutRect = layoutRect.rectangles[childName];
+            context.fillStyle = color || MathUtil.getRandomRGBAColorString(.4);
+            context.fillRect(jsonRect.bounds.x + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
+            //console.log("renderDebugLayoutRects()", childName, childLayoutRect.bounds.toString());
+            if(childLayoutRect.rectangles){
+                renderDebugLayoutRects(childLayoutRect, color);//recurse
             }
         }
     };

@@ -41,6 +41,7 @@
     appConfig.menuButtonPromptZ = 195;
     appConfig.closeCardButtonZ = 250;
     appConfig.closeStatsButtonZ = 300;
+    appConfig.debugLayer = 500;
 
 }());
 

@@ -8,7 +8,7 @@
 
 (function() {
 
-    window.MenuButton = function(showStatsModuleCallback, backButtonUrl) {
+    window.MenuButton = function(showStatsModuleCallback) {
 
         //PUBLIC API
 
@@ -16,38 +16,35 @@
             //console.log("MenuButton.start()");
             var size = Math.min(AppLayout.bounds.width * .25, AppLayout.bounds.height * .2);
             resize(size, size);
-            _donut = _donut || new DonutChart("#FFFFFF", appConfig.themeColor, _pulseColor, "#222222");
+            _donut = _donut || new DonutChart("#FFFFFF", appConfig.themeColor, "#222222");
             _progressNormal = AppData.getAchievementNormal();
             render();
             translateButtonIn();
         };
 
         this.end = function(){
-            if(!_canvas){
-                return;
+            if(_canvas){
+                stopIdleTimer();
+                translateButtonOut();
             }
-            stopIdleTimer();
-            translateButtonOut();
         };
 
         this.stop = function(){
             //console.log("MenuButton.stop()")
-            if(!_canvas){
-                return;
+            if(_canvas){
+                stopIdleTimer();
+                _unitAnimator.stop();
+                _canvas.style.display = "none";//TODO: shit hack, refactor
+                removeSpeechBubble();
             }
-            stopIdleTimer();
-            _unitAnimator.stop();
-            _canvas.style.display = "none";//TODO: shit hack, refactor
-            removeSpeechBubble();
         };
 
         this.addToPulse = function(){
-            if(_unitAnimator.isAnimating()){
-                return;
+            if(!_unitAnimator.isAnimating()){
+                incrementPulse();
+                render();
+                startIdleTimer();
             }
-            incrementPulse();
-            render();
-            startIdleTimer();
         };
 
         //could be better...
@@ -55,38 +52,10 @@
             _missionAccomplished = true;
         };
 
-
-        /*
-        this.updateStatsProgress = function(normal){
-            console.log("MenuButton.updateStatsProgress()", normal);
-            if(!_canvas ||!_unitAnimator ||_unitAnimator.isAnimating() || _progressNormal == normal){
-                return;
-            }
-            if(_donutBounds.x > _canvas.width){
-                _progressNormal = normal;
-                animateDonutIn();
-                return;
-            }
-            //animate if pie is visible
-            _statsUpdateAnimation.from = _progressNormal;
-            _statsUpdateAnimation.start.to = normal;
-            var diff = _statsUpdateAnimation.start.to - _statsUpdateAnimation.from;
-            _unitAnimator.start(2000 * (1 - diff), animateStatsProgressUpdate);
-            startIdleTimer();
-        };
-
-        var _statsUpdateAnimation = {from: 0, to:0};
-        function animateStatsProgressUpdate(normal){
-            _progressNormal = UnitEasing.easeOutSine(MathUtil.interpolate(normal, _statsUpdateAnimation.from, _statsUpdateAnimation.to));
-            incrementPulse();
-            render();
-        };*/
-
-
         //PRIVATE PROPERTIES & METHODS
 
         var  _donut,  _canvas, _context, _speechBubble,  _progressNormal = 0, _pulseNormal = 0,
-            _avatarScale, _pulseRgb, _unitAnimator = new UnitAnimator(),
+            _avatarScale, _pulseRgb, _unitAnimator = new UnitAnimator(), _bgRipple = new ToStatsButtonBackground(),
             _canvasBounds = new Rectangle(),
             _donutBounds = new Rectangle(), _avatarBounds = new Rectangle(),
             _rectTransition = new RectangleTransition(),
@@ -121,7 +90,7 @@
             playToStatsViewAnimation();
         };
 
-        //resizes canvas and positions eiter to button (bottom right) or transition (full screen) state
+        //resizes canvas and positions either to button (bottom right) or transition (full screen) state
         var resize = function(width, height){
             //console.log("MenuButton.resize()", width, height);
             initCanvas();//Also initializes bg colors, refactor
@@ -135,6 +104,7 @@
                 _canvas.style.top = AppLayout.bounds.bottom() - height + "px";
                 calculateButtonLayout();
             }
+            _bgRipple.init(_canvas, _canvasBounds, appConfig.themeColor, "#FFFFFF");
         };
 
         var calculateButtonLayout = function(){
@@ -165,23 +135,15 @@
             _canvas.style.position = "fixed";
             _canvas.style.zIndex = appConfig.menuButtonZ;
             _canvas.addEventListener("click", menuButtonClickHandler);
-
             _pulseRgb = MathUtil.hexToRgb(appConfig.themeColor);
-            _pulseColor = MathUtil.rgbToHex(
-                Math.round(MathUtil.interpolate(.5, _pulseRgb.r, 255)),
-                Math.round(MathUtil.interpolate(.5, _pulseRgb.g, 255)),
-                Math.round(MathUtil.interpolate(.5, _pulseRgb.b, 255))
-            );
         };
-        var _pulseColor;
 
         //======================================================
         //==============:: Render ::=======================
         //======================================================
 
-        function render(){
-            //_context.clearRect(0,0,_canvas.width, _canvas.height);
-            renderButtonBG();
+        var render = function(){
+            _bgRipple.render(_pulseNormal);
             if(_donutBounds.x < _canvas.width){
                 _donut.render(_canvas, _donutBounds, _progressNormal);
             }else{
@@ -189,87 +151,31 @@
             }
         };
 
-        function renderButtonBG(){
-
-            _context.save();
-            //_context.fillStyle = appConfig.appBgColor;
-            _context.clearRect(0, 0, _canvas.width, _canvas.height);
-
-            //TODO: these calculations shouldn't happen on every render
-            var twelveOClock = Math.PI * 1.5;
-            var numRipples = 4;//@derschmale
-            var centerAlpha = .6;
-
-            var centerRadiusNormal = .8;
-            var pulseRadianNormal = (1 - centerRadiusNormal);
-            var i, fromNormal, toNormal, rippleNormal, radius,
-                centerRadius = _canvasBounds.width * centerRadiusNormal,
-                pulseRadius = _canvasBounds.width * pulseRadianNormal,
-                rippleAlpha,
-                spacer = pulseRadianNormal / numRipples;
-            var maxStrokeWidth = pulseRadius * .3;
-
-            //draw whiteBG
-            _context.beginPath();
-            _context.fillStyle = "#FFFFFF";
-            _context.moveTo(_canvasBounds.right(), _canvasBounds.bottom());
-            _context.arc(_canvasBounds.right(), _canvasBounds.bottom(), _canvasBounds.width, Math.PI, twelveOClock);
-            _context.fill();
-
-            //draw ripples, RIPPLES!!!11
-            _context.strokeStyle = appConfig.themeColor;
-            for(i = 0; i < numRipples; i++){
-                fromNormal = spacer * i / pulseRadianNormal;
-                toNormal = spacer * (i + 1) / pulseRadianNormal;
-                rippleNormal = UnitEasing.easeOutSine(MathUtil.interpolate(_pulseNormal, fromNormal, toNormal));
-                radius = centerRadius + rippleNormal * pulseRadius;
-
-                _context.beginPath();
-                _context.lineWidth = (1 - rippleNormal) * maxStrokeWidth;
-                //rippleAlpha = MathUtil.interpolate(i/numRipples, centerAlpha, 0);
-                //_context.strokeStyle = _pulseColor;//MathUtil.createRGBAColorString(_pulseRgb.r, _pulseRgb.g, _pulseRgb.b, .5);
-                _context.moveTo(_canvasBounds.right() - radius, _canvasBounds.bottom());
-                _context.arc(_canvasBounds.right(), _canvasBounds.bottom(), radius, Math.PI, twelveOClock);
-                _context.stroke();
-            }
-
-            //draw center
-            _context.beginPath();
-            _context.fillStyle = appConfig.themeColor;
-            //_context.fillStyle = _pulseColor;//MathUtil.createRGBAColorString(_pulseRgb.r, _pulseRgb.g, _pulseRgb.b, centerAlpha);
-            _context.moveTo(_canvasBounds.right(), _canvasBounds.bottom());
-            radius = centerRadiusNormal * _canvasBounds.width - maxStrokeWidth/2 + maxStrokeWidth * _pulseNormal;
-            _context.arc(_canvasBounds.right(), _canvasBounds.bottom(), radius, Math.PI, twelveOClock);
-            _context.fill();
-
-            _context.restore();
-        };
-
         //======================================================
         //==============:: PROMPT ::=======================
         //======================================================
 
-        function showSpeechBubble(){
-            var message = "";
-            if(_missionAccomplished){
-                message = _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
-            }else{
-                message = _statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * _progressNormal)] : _promptMessages[0];
-            }
+        var showSpeechBubble = function(){
             _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, appConfig.menuButtonPromptZ);//TODO hardcoded doc.body: should be  a parent arg
             _speechBubble.style.display = "block";
-            AppLayout.updateLayoutRectBoundsToState("speechBubble", "transitionFrom");
-            var bounds = AppLayout.getJsonRectBounds("speechBubble");
-            bounds.y += (AppLayout.bounds.bottom() - _canvas.height);
-            SpeechBubble.updateSpeechBubble(_speechBubble, message, bounds.width, bounds.height);
+            var bounds = AppLayout.updateLayoutRectBoundsToState("speechBubble", "transitionFrom");
+            bounds.y += (AppLayout.bounds.bottom() - _canvas.height);//local to global
+            SpeechBubble.updateSpeechBubble(_speechBubble, getPromptMessage(), bounds.width, bounds.height);
             playSpeechBubbleAnimation();
         };
 
-        function removeSpeechBubble(){
-            if(!_speechBubble){
-                return;
+        var getPromptMessage = function(){
+            if(_missionAccomplished){
+                return _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
+            }else{
+                return _statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * _progressNormal)] : _promptMessages[0];
             }
-            _speechBubble.style.display = "none";
+        };
+
+        var removeSpeechBubble = function(){
+            if(_speechBubble){
+                _speechBubble.style.display = "none";
+            }
         };
 
         //======================================================
@@ -294,7 +200,7 @@
 
         //only one element is translated at any given moment.
 
-        function updateCanvasRectTransition(normal){
+        var updateCanvasRectTransition = function(normal){
             _rectTransition.updateToProgressNormal(normal);
             incrementPulse();//consider moving into render()
             render();
@@ -311,11 +217,11 @@
         var translateButtonOut = function(){
             _rectTransition.fromRect.update(0, 0);
             _rectTransition.toRect.update(_canvas.width, _canvas.height);
-            _rectTransition.init(_canvasBounds);
+            _rectTransition.init(AppLayout.getJsonRectBounds("menuButton"));
             _unitAnimator.start(1000, updateTransitionMenuButton, null, UnitEasing.easeOutSine);
         };
 
-        function updateTransitionMenuButton(normal){
+        var updateTransitionMenuButton = function(normal){
             updateCanvasRectTransition(normal);
             _canvas.style.transform = TransitionCSSUtil.getTranslateStringFromRect(AppLayout.getJsonRectBounds("menuButton"));
         };
@@ -375,7 +281,7 @@
             removeSpeechBubble();
         };
 
-        function updateSpeechBubbleTranslate(normal){
+        var updateSpeechBubbleTranslate = function(normal){
             if(normal >.1 && normal <.9){
                 incrementPulse();
                 render();
@@ -411,7 +317,7 @@
 
         var updateToStatsViewTransition = function(normal){
             incrementPulse();//consider moving into render()
-            renderButtonBG();
+            _bgRipple.render(_pulseNormal);
             renderToStatsViewPixelGuy(normal);
         };
 
@@ -423,7 +329,6 @@
             var size = AppLayout.bounds.biggerSide() * 1.3;
             _rectTransition.toRect.update(AppLayout.bounds.centerX() - size * .5, AppLayout.bounds.centerY() - size * .5, size, size);
             _rectTransition.init(_avatarBounds);
-            //console.log("MenuButton.playToStatsViewAnimationStep2()", _avatarBounds.toString(), _rectTransition.fromRect.toString(), _rectTransition.toRect.toString());
             _unitAnimator.start(500, updateToStatsViewTransition2, toStatsViewAnimationComplete, UnitEasing.easeInSine);
         };
 
@@ -434,10 +339,9 @@
         };
 
         var toStatsViewAnimationComplete = function(){
-            //console.log("MenuButton.toStatsViewAnimationComplete()");
             removeSpeechBubble();
             stopIdleTimer();
-            _context.clearRect(0,0,_canvas.width, _canvas.height);
+            _context.clearRect(0, 0, _canvas.width, _canvas.height);
             _canvas.style.display = "none";
         };
 

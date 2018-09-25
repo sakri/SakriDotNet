@@ -5,20 +5,18 @@
 
 (function() {
 
-    window.DonutChart = function(lightColor, themeColor, highlightColor, darkColor){
+    window.DonutChart = function(lightColor, themeColor, darkColor){
 
-        //console.log("DonutChart constructor", lightColor, themeColor, highlightColor,  darkColor);
+        //console.log("DonutChart constructor", lightColor, themeColor,  darkColor);
 
         var _lightColor = lightColor || "#FFFFFF",
             _themeColor = themeColor || "#BBBBBB",
-            _highlightColor = highlightColor || "#CCCCCC",
             _darkColor = darkColor || "#111111",
             _bounds = new Rectangle(),
-            _context, _radius, _centerX, _centerY,
+            _radius, _centerX, _centerY,
             _outerRadius, _innerRadius, _lineWidth,
             _radian;
 
-        //TODO: hardcoded dependency on AppData, move to param
         this.render = function(canvas, bounds, normal){
             if(!canvas){
                 console.log("DonutChart.render() skipping, no canvas provided");
@@ -30,9 +28,9 @@
             _centerX = bounds.x + _radius;
             _centerY = bounds.y + _radius;
 
-            if(_bounds.width != bounds.width || _bounds.height != bounds.height){
+            if(_bounds.width !== bounds.width || _bounds.height !== bounds.height){
                 _radius = Math.floor(Math.min(bounds.width * .5, bounds.height * .5));
-                _lineWidth = _radius * .1,
+                _lineWidth = _radius * .1;
                 _outerRadius = _radius - _lineWidth * .5;
                 _innerRadius = Math.floor(_outerRadius * .6);//careful for mobile, can be very small!
             }
@@ -61,13 +59,13 @@
 
             //render center of Donut background
             context.beginPath();
-            context.fillStyle = normal==1 ? _themeColor : _lightColor;
+            context.fillStyle = normal === 1 ? _themeColor : _lightColor;
             context.arc(_centerX, _centerY, _innerRadius, 0, MathUtil.PI2);
             context.fill();
             context.stroke();
 
             //render percentage label
-            context.fillStyle = normal==1 ? _lightColor : _darkColor;
+            context.fillStyle = normal === 1 ? _lightColor : _darkColor;
             context.font="bold " + Math.round(_innerRadius * .7) + "px Helvetica,Arial,sans-serif";
             context.textBaseline = "middle";//top, bottom, middle, alphabetic, hanging
             context.textAlign = "center";
