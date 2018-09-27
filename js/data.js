@@ -21,10 +21,36 @@
         return color;
     };
 
+    var _promptMessages = [
+        "Click me for your stats!",
+        "Doing great!",
+        "Steady rockin!",
+        "Like a Boss!!!",
+        "You on FIRE!!!11",
+        "Celebrate in 3-2-1..."
+    ];
+    //TODO: AppData shouldn't be accessed from here
+    appConfig.getMissionPromptMessage = function(missionProgressNormal){
+        return AppData.statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * missionProgressNormal)] : _promptMessages[0];
+    };
+    var _completedPromptMessages = [
+            "Tell your friends!",
+            "Tell yo mama!",
+            "Sharing is caring!",
+            "I'm @sakri on twitter..."
+        ];
+    appConfig.getMissionCompletedPromptMessage = function(missionProgressNormal){
+        return _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
+    };
+    //TODO: bindings could be stored as variables to avoid unnecessary instantiation, meh
+    appConfig.getPromptMessagesFunction = function(missionProgressNormal){
+        return missionProgressNormal==1 ? this.getMissionCompletedPromptMessage.bind(this) : appConfig.getMissionPromptMessage.bind(this);
+    };
+
     var appParamsUrl = new URL(window.location.href);
     appConfig.noJs = appParamsUrl.searchParams.get("noJs") == "true";
     appConfig.loopLoader = appParamsUrl.searchParams.get("loopLoader") == "true";
-    appConfig.visitStats = appParamsUrl.searchParams.get("visitStats");
+    appConfig.visitStats = appParamsUrl.searchParams.get("visitStats");//TODO: consider renaming to "visitStatsString" (more descriptive)
 
 
     appConfig.checkNoJs = function(){
@@ -34,9 +60,10 @@
         return this.noJs;
     };
 
-    //Z-index management
+    //Z-index management (TODO: rename all starting with zIndex (zIndexLoaderCanvas etc.) or appConfig.zIndex.loaderCanvas
     appConfig.loaderCanvasZ = 100;
     appConfig.loaderTitleZ = 120;
+    appConfig.cardHtmlZ = 130;
     appConfig.menuButtonZ = 190;
     appConfig.menuButtonPromptZ = 195;
     appConfig.closeCardButtonZ = 250;
@@ -78,11 +105,12 @@
         _actionsPerMinuteIntervalId = -1;
 
     //Public API
-
+    AppData.backButtonURL = "";
     AppData.cards = [];//list of CardData
     AppData.userInteractions = 0;
     AppData.shareClick = false;
-    AppData.viewStats = false;
+    AppData.showStats = false;//TODO: implement fps counter
+    AppData.statsVisited = false;
 
     AppData.setVisitStart = function(msAgo){
         _visitStart = new Date().getTime() - msAgo;
@@ -101,6 +129,9 @@
         return Math.floor(secs / 60 + secs%60);
     };
 
+    AppData.showStatsModule = function(){
+        return this.backButtonURL=="";
+    };
 
     //TODO: move, belongs in it's own class
     AppData.interactionsHistory = [];//array of stored # of user interactions, cut up into "duration segments"

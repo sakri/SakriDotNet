@@ -4,7 +4,8 @@
     window.SakriDotNetHomeApp = function (appName, backButtonURL) {
 
         //private properties
-        var _menuCanvas,
+        var _loader,
+            _menuCanvas,//TODO move to Menu
             _menu,
             _cardCanvasRenderer,
             _cardHtmlRenderer = new CardHtmlRenderer(),
@@ -18,10 +19,12 @@
         this.init = function () {
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
+            AppData.backButtonURL = backButtonURL;
             AppData.startInteractionsHistory(10000, 6);
             _cardCanvasRenderer = new CardCanvasRenderer(storyReadCompleteHandler);
-            var _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
+            _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
             _loader.start();
+            window.addEventListener("resize", windowResizeHandler);
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
         };
 
@@ -30,24 +33,28 @@
         //************************
 
         var loadCompleteHandler = function(){
+            _loader = null;
             console.log("App.load complete() ", AppData.msSinceStart() , "ms since script start");
 
-            window.addEventListener("resize", windowResizeHandler);
             document.addEventListener('keyup', keyPressHandler);
             document.body.addEventListener("wheel", mouseWheelHandler, false);
 
             AppData.cards = parseSectionsData();
             document.body.innerHTML = "";
 
-            _menuCanvas = CanvasUtil.createCanvas(AppLayout.bounds.width, AppLayout.bounds.height, document.body, appConfig.loaderCanvasZ),
+            _menuCanvas = CanvasUtil.createCanvas(document.body, appConfig.loaderCanvasZ);
+            CanvasUtil.resize(_menuCanvas, AppLayout.bounds.width, AppLayout.bounds.height);
             _menuCanvas.style.left = _menuCanvas.style.top = "0px";
 
             _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCardHandler);
-            //MenuButton shouldn't be included in apps that don't show it, so if(window.MenuButton)
-            if(!backButtonURL){
+
+            //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
+            //find better solution for placeholder (avoids errors)
+            if(!AppData.showStatsModule()){
                 _menuButton = new MenuButton(showStatsModule);
+                loadStatsModule();
             }else{
-                _menuButton = {};//todo : find better solution, this is a placeholder to avoid errors
+                _menuButton = {};
                 _menuButton.start = _menuButton.end = _menuButton.stop = _menuButton.addToPulse = function(){};
             }
             commitWindowResize();
@@ -94,14 +101,12 @@
 
             // via url to faq.html & portfolio.html, but not edited. The data is then passed back to index.html
             //if naviating via the "home" button.
-            if(!backButtonURL && appConfig.visitStats){
+            if(!AppData.showStatsModule() && appConfig.visitStats){
                 AppData.updateFromVisitStatsUrlParam(appConfig.visitStats);
                 appConfig.visitStats = undefined;//this blocks the stats from being reset on resize
             }
 
             _menu.setData(AppData.cards);
-            //TODO: nasty hack. Stats module is only available in index.html, the progress is passed
-            loadStatsModule();
         };
 
         //************************************************
@@ -113,16 +118,21 @@
         var windowResizeHandler = function () {
             //TODO: should disable menu interactions
             clearTimeout(_windowResizeTimeoutId);
-            _cardHtmlRenderer.forceClose();
-            _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
+            if(!_loader){
+                _cardHtmlRenderer.forceClose();
+                _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
+            }
             _windowResizeTimeoutId = setTimeout(commitWindowResize, 300);//arbitrary number
         };
 
         var commitWindowResize = function () {
-            AppData.storeInteraction();
-            hideIframe();
-
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            AppData.storeInteraction();
+            if(_loader){
+                _loader.resize();
+                return;
+            }
+            hideIframe();
             _windowResizeTimeoutId = -1;
 
             console.log("App.commitResize()", AppLayout.bounds.toString());
@@ -130,7 +140,7 @@
             _menuCanvas.height = AppLayout.bounds.height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
             renderCardsCanvasAssets();
-            setTimeout(_menuButton.start.bind(_menuButton), 400);
+            setTimeout(showMenuButton, 400);
             setTimeout(showNavigationButtons, 700, true);
         };
 
@@ -178,6 +188,14 @@
         };
 
         //*********************************************
+        //**********::TO STATS MODULE BUTTON::********
+        //*********************************************
+
+        var showMenuButton = function(){
+            _menuButton.start(appConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
+        };
+
+        //*********************************************
         //**********::STATS MODULE::********
         //*********************************************
 
@@ -204,6 +222,7 @@
                 console.log("App.showStatsModule() warning : module not loaded");
                 return;
             }
+            AppData.statsVisited = true;
             _menuCanvas.style.display = "none";
             if(!_statsModule){
                 _statsModule = document.createElement("iframe");
@@ -223,7 +242,7 @@
                 _statsModule.onload = function() {
                     console.log("_statsModule.onload()");
                     _statsModule.style.visibility = "visible";
-                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  celebrateStatsCompleteHandler);
+                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  closeIframeButtonClickHandler);
                     _statsModule.contentWindow.showStats();
                 };
                 _statsModule.style.visibility = "hidden";
@@ -255,14 +274,9 @@
             button.style.position = "fixed";
         };
 
-        var celebrateStatsCompleteHandler = function(){
-            _menuButton.missionAccomplished();
-            closeIframeButtonClickHandler();
-        };
-
         var closeIframeButtonClickHandler = function(){
             hideIframe();
-            _menuButton.start();
+            showMenuButton();
         };
 
         var hideIframe = function(){
@@ -323,7 +337,7 @@
 
         var closeCardHandler = function () {
             _menu.deselectCard();
-            _menuButton.start();
+            showMenuButton();
             setTimeout(showNavigationButtons, 700, true);//TODO: store intervalId and stop if?? resize??
         };
     }

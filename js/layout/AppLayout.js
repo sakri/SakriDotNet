@@ -2,24 +2,6 @@
  * Created by Sakri Rosenstrom on 24-08-18
  * No Dependencies
  *
- * - All app layout calculations
- *      -> From an architectural viewpoint it's heretical:
- *          * Layout should not be an external dependency
- *          * Multiple classes accessing the same layout is risky when making changes
- *      -> From a practical standpoint it's very convenient
- *
- *
- * Contains:
- *
- *      AppLayout:
- *      -
- *
- *      CardMenuLayout:
- *      -
- *
- *      CardContentLayout
- *      -
- *
 
  */
 
@@ -75,6 +57,9 @@
             },
             transitionFrom: {
                 all: {y: -.2}
+            },
+            transitionTo: {
+                all: {x: .75, y: -.2}
             }
         },
         loaderPixelGuy : {
@@ -86,8 +71,18 @@
             transitionFrom: {
                 all: {y: 1.05}
             },
+            laptopTo:{
+                all: {x:-.4, y: 0}
+            }
+        },
+        loaderButtrock : {
+            default: {
+                all: {x: .5, y: .25, width: .3, height: .3}
+            },
             transitionTo: {
-                all: {y: .9, x:1.05}
+                landscape: {y: .95, x:1.1, width:"height", height:.1},
+                square: {y: .95, x:1.1, width:"height", height:.1},
+                portrait: {y: .95, x:1.1, width:.12, height:"width"}
             }
         },
         card : {
@@ -126,24 +121,40 @@
                         all: {x: .33, y: .33, width: .65, height: .65}
                     },
                     transitionFrom: {
-                        all: {x: 1.1}
-                    }
-                },
-                speechBubble : {
-                    default: {
-                        all: {x: 1.1, y: -.25, width: 4.8, height: .5}
-                    },
-                    transitionFrom: {
-                        all: {x: 1.1}
+                        all: {x: 1.1, y:.33}
                     }
                 }
-            },
+            }
         },
-        transitionMenuButtonToCenter: {
+        speechBubble : {
+            default: {
+                all: {x: 0, y: 0, width: 1, height: 1}/* calculated by app, based on menuButton dimensions*/
+            },
+            transitionFrom: {
+                all: {x: 1.1}/* calculated by app, based on menuButton dimensions*/
+            },
+            transitionTo: {
+                all: {x: 1.1}/* calculated by app, based on menuButton dimensions*/
+            }
+        },
+        menuButtonAvatarCenter: {
             default : {
                 landscape: {centerX: .5, y: .25, width: "height", height: .5},
                 square: {x: .25, y: .25, width: .75, height: .75},
                 portrait: {x:.25, centerY: .5, width: .5, height: "width"}
+            },
+            transitionFrom: {
+                all: {x: 0, y: 0, width: 1, height: 1}/* calculated by app, based on avatar dimensions*/
+            }
+        },
+        menuButtonAvatarZoomed: {
+            default : {
+                all: {x: 0, y: 0, width: 1, height: 1}/* calculated by app, based on avatar dimensions*/
+            },
+            transitionTo: {
+                landscape:  {centerX: "width", centerY: "width", width: 2, height: "width"},
+                square:  {centerX: "width", centerY: "width", width: 2, height: "width"},
+                portrait:  {centerX: "height", centerY: "height", width: "height", height: 2}
             }
         },
         homeButton : {
@@ -164,70 +175,51 @@
         }
     };
 
-    AppLayout.transitions = {
-        closeButtonIn : {
-            target : "closeButton",
-            from : "transitionFrom",
-            to : "default",
-            easing : [UnitEasing.easeOutSine]
-        },
-        closeButtonOut : {
-            target : "closeButton",
-            from : "default",
-            to : "transitionFrom",
-            easing : [UnitEasing.easeInSine]
-        }
-    };
-
     AppLayout.resize = function(x, y, width, height){
         this.bounds.update(x, y, width, height);
-        updateLayoutRectangles(AppLayout);
-        updateTransitions();
+        updateLayoutRectangles();
         //this.debugLayout();
     };
 
-
-    //api only exposes layout Rectangle (or bounds) objects, not underlying data. All logic should reside in private methods.
-    AppLayout.getJsonRectBounds = function(name){
-        return getJsonRect(name).bounds;
-    };
-
-    //api only exposes layout Rectangle (or bounds) objects, not underlying data. All logic should reside in private methods.
-    AppLayout.getLayoutTransition = function(name){
-        if(!this.transitions[name] || !this.transitions[name].transition){
-            console.warn("AppLayout.getLayoutTransition() name : ", name, " is not available. Please check AppLayout.transitions");
-        }
-        return this.transitions[name].transition;
+    //api only exposes calculated layout Rectangle bounds
+    AppLayout.getLayoutRectStateBounds = function(layoutRectName, stateName){
+        var layoutRect = getLayoutRect(layoutRectName);
+        return getLayoutRectStateBounds(layoutRect, stateName || "default");
     };
 
     AppLayout.populateTransitionForLayoutRect = function(transition, layoutRectName, fromState, toState){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(transition.fromRect, jsonRect, fromState);
-        updateRectToState(transition.toRect, jsonRect, toState);
-        transition.init(jsonRect.bounds);
+        //console.log("AppLayout.populateTransitionForLayoutRect()", layoutRectName, fromState, toState);
+        var layoutRect = getLayoutRect(layoutRectName);
+        transition.fromRect = getLayoutRectStateBounds(layoutRect, fromState);
+        transition.toRect = getLayoutRectStateBounds(layoutRect, toState);
+        transition.init();
     };
 
-    AppLayout.localToGlobal = function(layoutRectName){
-        var jsonRect = getJsonRect(layoutRectName);
-        return localToGlobal(jsonRect, jsonRect.bounds);
+    //adjustedRect contains calculated values
+    AppLayout.adjustStateRect = function(layoutRectName, state, adjustedRect){
+        var layoutRect = getLayoutRect(layoutRectName);
+        var stateRect = getLayoutRectState(layoutRect, state);
+        var parentBounds = layoutRect.parent.default.bounds;
+        stateRect.x = adjustedRect.x / parentBounds.width;
+        stateRect.y = adjustedRect.y / parentBounds.height;
+        stateRect.width = adjustedRect.width / parentBounds.width;
+        stateRect.height = adjustedRect.height / parentBounds.height;
+        stateRect.bounds.updateToRect(adjustedRect);
+        stateRect.bounds.round();
+        return stateRect.bounds;
     };
 
-    AppLayout.updateLayoutRectBoundsToState = function(layoutRectName, state){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(jsonRect.bounds, jsonRect, state);
-        return jsonRect.bounds;
-    };
-
-    AppLayout.updateRectToLayoutRectState = function(updateRect, layoutRectName, state){
-        var jsonRect = getJsonRect(layoutRectName);
-        updateRectToState(updateRect, jsonRect, state);
-    };
+    /*
+AppLayout.localToGlobal = function(layoutRectName){
+    var jsonRect = getLayoutRect(layoutRectName);
+    return localToGlobal(jsonRect, jsonRect.bounds);
+};
 
     AppLayout.debugLayout = function(){
         renderDebugLayoutRects();
-    };
+    };*/
 
-    //PRIVATE METHODS
+    //PRIVATE PROPERTIES AND METHODS
 
     //positions are "local" to container bounds
     var rectNormalCalculator = {
@@ -310,104 +302,94 @@
     };
 
 
-    var _layoutRectangles = {};
+    var _layoutRectanglesLookup = {};
     var _layoutName = "horizontal";//used to select corresponding layout rect
-    var _calcRect = new Rectangle();//TODO: see comment in usage (would be nice to remove)
 
-    function getJsonRect(name){
-        var jsonRect = _layoutRectangles[name];
-        if(!jsonRect){
-            console.warn("AppLayout.getJsonRect() name : ", name, " is not available. Make sure updateLayout() has been called, or check AppLayout.rectangles");
+    var getLayoutRect = function(layoutRectName){
+        var data = _layoutRectanglesLookup[layoutRectName];
+        if(!data){
+            console.warn("AppLayout.getLayoutRect() layoutRectName : ", layoutRectName, " is not available. Make sure updateLayout() has been called, or check AppLayout.rectangles");
             return;
         }
-        return jsonRect;
+        return data;
     };
 
-    var updateRectToState = function(rect, jsonRect, state){
-        if(!jsonRect){
-            console.warn("AppLayout.updateRectToState() warning : provided jsonRect is not valid : ", jsonRect);
+    var getLayoutRectState = function(layoutRect, stateName){
+        var stateRect = layoutRect[stateName];
+        if(!stateRect){
+            console.warn("AppLayout.getLayoutRectState() state : ", stateName, " is not available in layoutRect : ", layoutRect.name ,". Please check AppLayout.rectangles");
             return;
         }
-        state = state || "default";
-        if(state === "default" && jsonRect.bounds.isSet()){
-            rect.updateToRect(jsonRect.bounds);
-            return;//All layout rectangles "default" is set in updateLayout()
-        }
-        var sourceRect = jsonRect[state];
-        if(!sourceRect){
-            console.warn("AppLayout.updateLayoutRectToState() state : ", state, " is not available in layoutRect : ", jsonRect.name ,". Please check AppLayout.rectangles");
-            return;
-        }
-        rect.update();//reset to null values
-        var orientationRect = sourceRect["all"] || sourceRect[_layoutName];
+        return stateRect;
+    };
+
+    var getLayoutRectStateBounds = function(layoutRect, state){
+        return getLayoutRectState(layoutRect, state).bounds;
+    };
+
+    var calculateStateRectangle = function(layoutRect, stateName){
+        var state = getLayoutRectState(layoutRect, stateName);
+        state.bounds = state.bounds || new Rectangle();
+        state.bounds.update();
+        var orientationRect = state["all"] || state[_layoutName];
         var numOrientationRectProps = getNumberOfPropertiesInOrientationRect(orientationRect);
         var propName, value, loops = 0;
         //this can be optimized, no need to loop through all values every time
-        while(rect.getNumberOfSetItems() < numOrientationRectProps){
+        while(state.bounds.getNumberOfSetItems() < numOrientationRectProps){
             for(propName in rectNormalCalculator){
                 value = orientationRect[propName];
                 //console.log("update : ", propName, value, rect.toString());
                 if(!isNaN(value)){
-                    rectNormalCalculator[propName](rect, jsonRect.parent.bounds, Number(value));//calls x(), y(), w, h, left() etc.
-                }else if(!isNaN(rect[value])){
+                    rectNormalCalculator[propName](state.bounds, layoutRect.parent.default.bounds, Number(value));//calls x(), y(), w, h, left() etc.
+                }else if(!isNaN(state.bounds[value])){
                     if(isRectangleProperty(propName)){
-                        rect[propName] = rect[value];//propName == "x", "y", "width" or "height"
+                        state.bounds[propName] = state.bounds[value];//propName == "x", "y", "width" or "height"
                     }else{
-                        positionCalculator[propName](rect, jsonRect.parent.bounds, rect[value]);//propName == "left", "right", "top", "bottom", "centerX", "centerY"
+                        positionCalculator[propName](state.bounds, layoutRect.parent.default.bounds, state.bounds[value]);//propName == "left", "right", "top", "bottom", "centerX", "centerY"
                     }
                 }
             }
             if(++loops > 3){
-                console.warn("AppLayout.setJsonRectBoundsToState() cannot calculate bounds for : ", jsonRect.name, state,  orientationRect);
+                console.warn("AppLayout.setJsonRectBoundsToState() cannot calculate bounds for : ", layoutRect.name, stateName,  orientationRect);
                 break;
             }
         }
-        if(rect.isSet()){
+        if(state.bounds.isSet()){
+            return state.bounds;
+        }
+        if(stateName === "default"){
+            console.warn("AppLayout.setJsonRectBoundsToState() incomplete default state calculation : ", layoutRect.name, " : " ,  orientationRect, ", result: ",  rect.toString());
             return;
         }
-        if(state === "default"){
-            console.warn("AppLayout.setJsonRectBoundsToState() incomplete default state calculation : ", jsonRect.name, " : " ,  orientationRect, ", result: ",  rect.toString());
-            return;
-        }
-        rect.replaceNullValuesFrom(jsonRect.bounds);
+        state.bounds.replaceNullValuesFrom(layoutRect.default.bounds);
+        return state.bounds;
     };
 
-    var updateLayoutRectangles = function(layoutRect){
+    var updateLayoutRectangles = function(){
         updateLayoutName();
-        _layoutRectangles = {};
-        traverseLayoutRectangles(AppLayout);
+        _layoutRectanglesLookup = {};//not really necessary
+        AppLayout.default = {bounds : AppLayout.bounds};//little hack to enable traversal
+        traverseLayoutRectangles(AppLayout);//bit awkward to pass "self" as a global variable to private method?
     };
 
     //traverses recursively through all "layout rectangles", creates/updates bounds to "default"
     var traverseLayoutRectangles = function(layoutRect){
-        var childLayoutRect, childName;
+        var childLayoutRect, childName, stateName, calculatedBounds;
         for(childName in layoutRect.rectangles){
             childLayoutRect = layoutRect.rectangles[childName];
+            childLayoutRect.name = childName;//only used for debugging
             childLayoutRect.parent = layoutRect;
-            childLayoutRect.bounds = childLayoutRect.bounds || createNullRectangle();
-            updateRectToState(childLayoutRect.bounds, childLayoutRect, "default");
-            childLayoutRect.name = childName;
-            _layoutRectangles[childName] = childLayoutRect;
-            //console.log("=====> updateLayoutRectangles()", childName, childLayoutRect.bounds.toString());
-            if(childLayoutRect.rectangles){
-                traverseLayoutRectangles(childLayoutRect);
-            }
-        }
-    };
-
-    var createNullRectangle = function(){
-        var rect = new Rectangle();
-        rect.update();
-        return rect;
-    };
-
-    //loops through Transitions object, creates/updates Transition instances (contained in Transitions)
-    //TODO: should receive a transitions Object as a param
-    var updateTransitions = function(){
-        var i, transition;
-        for(var jsonTransition in AppLayout.transitions){
-            transition =  jsonTransition.transition || new RectangleTransition();
-            //transition.fromRect.updateToRect();
+            _layoutRectanglesLookup[childName] = childLayoutRect;
+            for(stateName in childLayoutRect){
+                if(stateName !== "rectangles" && stateName !== "name" && stateName !== "parent"){
+                    calculatedBounds = calculateStateRectangle(childLayoutRect, stateName);
+                    calculatedBounds.round();
+                    //console.log("=====> Layout Traverse :\t", childName, ":" , stateName, "\t" , calculatedBounds.toString());
+                }
+             }
+             if(childLayoutRect.rectangles){
+                 traverseLayoutRectangles(childLayoutRect);
+             }
         }
     };
 
@@ -433,18 +415,9 @@
         return propName === "x" || propName === "y" || propName === "width" || propName === "height";
     };
 
-    var localToGlobal = function(jsonRect, rect){
-        if(jsonRect.parent){
-            console.log("whee lToG : ", jsonRect.parent.bounds.toString());
-            rect.x += jsonRect.parent.bounds.x;
-            rect.y += jsonRect.parent.bounds.y;
-            localToGlobal(jsonRect.parent, rect);
-        }
-        return rect;
-    };
-
     //---------------:: DEBUGGING
 
+    /*
     var _debugCanvas;
     function getDebugCanvas(){
         _debugCanvas = _debugCanvas || document.createElement("canvas");
@@ -456,66 +429,23 @@
         return _debugCanvas;
     };
 
+
     var renderDebugLayoutRects = function(layoutRect, color){
-        layoutRect = layoutRect ? getJsonRect(layoutRect) : AppLayout;
         var canvas = getDebugCanvas();
         var context = canvas.getContext("2d");//could be optimized, but this is a debug feature
-        var childLayoutRect, childName;
+        var childLayoutRect, childName, rect;
         for(childName in layoutRect.rectangles){
             childLayoutRect = layoutRect.rectangles[childName];
             context.fillStyle = color || MathUtil.getRandomRGBAColorString(.4);
-            context.fillRect(jsonRect.bounds.x + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
+            rect =
+            context.fillRect( + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
             //console.log("renderDebugLayoutRects()", childName, childLayoutRect.bounds.toString());
             if(childLayoutRect.rectangles){
                 renderDebugLayoutRects(childLayoutRect, color);//recurse
             }
         }
     };
-
-/*
-,
-        shareContainer : {
-            default: {
-                l: {x: .2, y: .2, w: .8, h: .8},
-                s: {x: .1, y: .1, w: .9, h: .9},
-                v: {x: .05, y: .05, w: .9, h: .9}
-            },
-            transitionFrom: {
-                all: {x: 1.1}
-            },
-            transitionTo: {
-                all: {x: -2.1}
-            },
-            avatar : {
-                default: {
-                    l: {x: .2, y: .2, w: .8, h: .8},
-                    s: {x: .1, y: .1, w: .9, h: .9},
-                    v: {x: .05, y: .05, w: .9, h: .9}
-                }
-            },
-            title : {
-                default: {
-                    l: {x: .2, y: .2, w: .8, h: .8},
-                    s: {x: .1, y: .1, w: .9, h: .9},
-                    v: {x: .05, y: .05, w: .9, h: .9}
-                }
-            },
-            suggestions : {
-                default: {
-                    l: {x: .2, y: .2, w: .8, h: .8},
-                    s: {x: .1, y: .1, w: .9, h: .9},
-                    v: {x: .05, y: .05, w: .9, h: .9}
-                }
-            },
-            closeButton : {
-                default: {
-                    l: {x: .2, y: .2, w: .8, h: .8},
-                    s: {x: .1, y: .1, w: .9, h: .9},
-                    v: {x: .05, y: .05, w: .9, h: .9}
-                }
-            }
-        }
-*/
+    */
 
 
 }());

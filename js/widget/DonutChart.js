@@ -24,15 +24,15 @@
             }
 
             var context = canvas.getContext("2d");
-            _radian = MathUtil.PI2 * normal;
-            _centerX = bounds.x + _radius;
-            _centerY = bounds.y + _radius;
 
             if(_bounds.width !== bounds.width || _bounds.height !== bounds.height){
                 _radius = Math.floor(Math.min(bounds.width * .5, bounds.height * .5));
                 _lineWidth = _radius * .1;
                 _outerRadius = _radius - _lineWidth * .5;
                 _innerRadius = Math.floor(_outerRadius * .6);//careful for mobile, can be very small!
+                _radian = MathUtil.PI2 * normal;
+                _centerX = bounds.x + _radius;
+                _centerY = bounds.y + _radius;
             }
             _bounds.updateToRect(bounds);
 

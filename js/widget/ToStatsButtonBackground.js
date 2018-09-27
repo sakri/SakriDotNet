@@ -39,7 +39,7 @@
             var i, fromNormal, toNormal, rippleNormal, radius;
 
             _context.save();
-            _context.clearRect(0, 0, _bounds.width, _bounds.height);
+            _context.clearRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height);
 
             //draw bg
             _context.beginPath();

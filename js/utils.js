@@ -271,6 +271,11 @@
             return this.x == rect.x && this.y == rect.y && this.width == rect.width && this.height == rect.height;
         };
 
+        this.round = function(){
+            this.update(Math.round(this.x), Math.round(this.y), Math.round(this.width), Math.round(this.height))
+        };
+
+
         this.isSet = function(){
             //console.log("Rectangle.isSet()", isNaN(this.x) , isNaN(this.y) , isNaN(this.width) , isNaN(this.height));
             return !(isNaN(this.x) || isNaN(this.y) || isNaN(this.width) || isNaN(this.height));
@@ -458,14 +463,16 @@
         context.msImageSmoothingEnabled = false;
     };
 
-    CanvasUtil.createCanvas = function(width, height, parent, zIndex){
+    CanvasUtil.createCanvas = function(parent, zIndex){
         //console.log("CanvasUtil.createCanvas()", width, height, zIndex);
         var canvas = document.createElement("canvas");
         canvas.style.position = "absolute";
         canvas.style.margin = "0";
         canvas.style.padding = "0";
         canvas.style.borderWidth = "0";
-        canvas.style.zIndex = zIndex;
+        if(!isNaN(zIndex)){
+            canvas.style.zIndex = zIndex;
+        }
         parent.appendChild(canvas);
         return canvas;
     };

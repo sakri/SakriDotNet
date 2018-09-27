@@ -12,7 +12,7 @@
 
     //does not wrap text (yet)
     SpeechBubble.createSpeechBubble = function(parentElement, zIndex){
-        console.log("SpeechBubble.createSpeechBubble()", zIndex);
+        //console.log("SpeechBubble.createSpeechBubble()", zIndex);
         var div = document.createElement("div");
         div.style.position = "fixed";
         div.style.zIndex = zIndex;
@@ -20,13 +20,11 @@
         //div.style.backgroundColor = "#00FFFF";
         div.style.display = "block";
 
-        var canvas = document.createElement("canvas");
-        canvas.style.position = "absolute";
-        canvas.style.margin = canvas.style.padding = canvas.style.borderWidth = 0;
-        div.appendChild(canvas);
+        var canvas = CanvasUtil.createCanvas(div);
 
         var title = document.createElement("p");
         title.style.position = "absolute";
+        title.classList.add("unselectable");
         title.style.margin = title.style.padding = title.style.borderWidth = 0;
         div.appendChild(title);
 
@@ -43,49 +41,50 @@
     };
 
     //bit of a heavy operation, shouldn't be called on requestAnimationFrame
-    SpeechBubble.updateSpeechBubble = function(createdSpeechBubble, message, width, height){
+    SpeechBubble.update = function(createdSpeechBubble, message, bounds){
+        //console.log("SpeechBubble.update()", message);
         var index = _createdBubbles.indexOf(createdSpeechBubble);
         if(index == -1){
-            console.warn("SpeechBubble.updateSpeechBubble() param:createdSpeechBubble must be instantiated by SpeechBubble.createSpeechBubble()");
+            console.warn("SpeechBubble.update() param:createdSpeechBubble must be instantiated by SpeechBubble.createSpeechBubble()");
             return;
         }
-        //console.log("SpeechBubble.updateSpeechBubble()", width, height);
-        createdSpeechBubble.style.width = width + "px";
-        createdSpeechBubble.style.height = height + "px";
+        //console.log("SpeechBubble.update()", width, height);
+        createdSpeechBubble.style.width = bounds.width + "px";
+        createdSpeechBubble.style.height = bounds.height + "px";
+        //createdSpeechBubble.style.backgroundColor = "#FF0000";
 
         var bubbleElement = _bubbleElements[index];
 
         //background
-        bubbleElement.canvas.width = width;
-        bubbleElement.canvas.height = height;
+        bubbleElement.canvas.width = bounds.width;
+        bubbleElement.canvas.height = bounds.height;
         var context = bubbleElement.canvas.getContext("2d");
-        context.clearRect(0, 0, width, height);
-        context.imageSmoothingEnabled = false;
-        context.mozImageSmoothingEnabled = false;
-        context.webkitImageSmoothingEnabled = false;
-        context.msImageSmoothingEnabled = false;
 
         //calculate bubble width:
-        var fontSize = Math.round(height * .3);
+        var fontSize = Math.round(bounds.height * .3);
         context.font = fontSize + "px Helvetica,Arial,sans-serif";
-        var maxTextWidth = width * .9;
-        var hMargin = width * .05;
-        var bubbleWidth = Math.min(context.measureText(message).width + hMargin * 2, maxTextWidth);
+        var maxTextWidth = bounds.width * .9;
+        var hMargin = bounds.width * .05;
+        var bubbleWidth = Math.round(Math.min(context.measureText(message).width + hMargin * 2, maxTextWidth));
 
-        SpeechBubbleSprite.render(context, width - bubbleWidth, 0, bubbleWidth, height);
-        //context.fillStyle = "#000000";
-        //context.fillText(message, 10, height * .75);
+        createdSpeechBubble.style.width = bubbleWidth + "px";
+        bubbleElement.canvas.width = bubbleWidth;
+        var context = bubbleElement.canvas.getContext("2d");
+        context.clearRect(0, 0, bounds.width, bounds.height);
+        CanvasUtil.enablePixelArtScaling(context);
+
+        SpeechBubbleSprite.render(context, 0, 0, bubbleWidth, bounds.height);
 
         //title
         bubbleElement.title.style.fontSize = fontSize + "px";
-        bubbleElement.title.style.textAlign = "right";
+        bubbleElement.title.style.textAlign = "center";
         //bubbleElement.title.style.backgroundColor = "#FF0000";
-        bubbleElement.title.style.left = Math.round(hMargin) + "px";
-        bubbleElement.title.style.top = Math.round(height * .1) + "px";
-        bubbleElement.title.style.width = Math.round(width - hMargin * 2) + "px";
+        bubbleElement.title.style.left = "0px";
+        bubbleElement.title.style.top = Math.round(bounds.height * .1) + "px";
+        bubbleElement.title.style.width = bubbleWidth + "px";
         bubbleElement.title.style.height = Math.round(fontSize * 1.4) + "px";
         bubbleElement.title.innerHTML = message;
-        //SpeechBubble.updateSpeechBubble
+        return bubbleWidth;
     };
 
 
