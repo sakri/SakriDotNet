@@ -1,78 +1,120 @@
 (function() {
 
-    window.TabButton = function(callBack, zIndex){
+    window.TabButton = function(){
 
         //Public API
 
-        //var buttonHeight = (AppLayout.headerBounds.height * .7);
-        //var buttonWidth = Math.round(buttonHeight * 2.4);
-
-        this.init = function(value, buttonWidth, buttonHeight, hideXNormal, showXNormal){
-            create();
-            var borderRadius = Math.round(buttonHeight * .95);
-            _button.style.width = buttonWidth + "px";
-            _button.style.height = buttonHeight + "px";
-            _button.style.borderRadius = "0px 0px " + borderRadius + "px " + borderRadius + "px";
-            _button.style.fontSize = Math.round(buttonHeight * .7) + "px";
-            _button.innerHTML = value;
-            _hideXNormal = hideXNormal;
-            _showXNormal = showXNormal;
+        this.init = function(value, parent, zIndex, rightAlign){
+            createButton(parent, zIndex);
+            calculateLayout(value, rightAlign);
             return _button;
         };
 
-        this.show = function(value){
-            if(!_button){
-                console.log("");
-                return;
-            }
+        this.show = function(duration, clickCallback){
+            _clickCallback = clickCallback;
             _button.style.display = "block";
-            _animator.stop();
-            if(value){
-                _button.disabled = false;
-                animateIn();
-            }else{
-                _button.disabled = true;
-                animateOut();
-            }
+            animateIn(duration);
         };
 
+        this.hide = function(duration){
+            animateOut(duration);
+        };
 
-        //Private api
-
-        var _button, _hideXNormal, _showXNormal, _animator = new UnitAnimator(), _xFrom, _xTo;
-
-        var create = function(){
-            if(_button){
-                return;
-            }
-            _button = document.createElement("button");
-            _button.addEventListener ("click", callBack);//needs to be removed?
-            _button.classList.add("cardCloseButton");
-            _button.style.zIndex = zIndex;
-            document.body.appendChild(_button);//meh
+        this.stop = function(){
+            _animator.stop();
             _button.style.display = "none";
         };
 
-        var animateIn = function(durationMS){
-            _xFrom = AppLayout.bounds.width * _hideXNormal;
-            _xTo = AppLayout.bounds.width * _showXNormal;
-            _button.style.transform = "translate(" + _xFrom + "px, -1px)";
-            _animator.start(800, animationUpdate, null, UnitEasing.easeOutBack);
+        //Private api
+
+        var _button, _clickCallback, _defaultBounds = new Rectangle(), _fromBounds = new Rectangle(),
+            _transition = new RectangleTransition(), _animator = new RectangleTransitionAnimator();
+
+        //TODO: move elsewhere! HtmlUtils or so? Also, revisit, solution isn't bullet proof...
+        var _measuredWidth = 0, _lastMeasuredString = "", _lastMeasuredFontSize = 0;
+        var measureTextWidth = function(string, fontSize){
+            if(string !== _lastMeasuredString || fontSize !== _lastMeasuredFontSize){
+                var _textMeasureSpan = document.createElement("span");
+                _button.appendChild(_textMeasureSpan);
+                //_textMeasureSpan.style.visibility = "hidden";
+                _textMeasureSpan.style.whiteSpace = "nowrap";
+                _textMeasureSpan.style.fontSize = fontSize + "px";
+                _textMeasureSpan.innerHTML = string;
+                console.log("measureTextWidth() fs:", fontSize,  _textMeasureSpan.innerHTML , _textMeasureSpan.offsetWidth, "x6");
+                _measuredWidth = _textMeasureSpan.offsetWidth;
+                _textMeasureSpan.innerHTML = "";
+                _button.removeChild(_textMeasureSpan);
+                _textMeasureSpan = null;
+                _lastMeasuredString = string;
+                _lastMeasuredFontSize = fontSize;
+            }
+            return _measuredWidth;
         };
 
-        var animateOut = function(durationMS){
-            _xFrom = AppLayout.bounds.width * _showXNormal;
-            _xTo = AppLayout.bounds.width * _hideXNormal;
-            _button.style.transform = "translate(" + _xFrom + "px, -1px)";
-            _animator.start(800, animationUpdate, animateOutComplete, UnitEasing.easeInBack);
+        var clickHandler = function(){
+            _clickCallback();
         };
 
-        var animationUpdate = function(normal){
-            _button.style.transform = "translate(" + MathUtil.interpolate(normal, _xFrom, _xTo) + "px, -1px)";
+        var createButton = function(parent, zIndex){
+            if(!_button){
+                _button = document.createElement("button");
+                _button.addEventListener ("click", clickHandler);//needs to be removed?
+                _button.classList.add("cardCloseButton");
+            }
+            _button.style.zIndex = zIndex;
+            parent.appendChild(_button);//meh
+        };
+
+        var calculateLayout = function(value, rightAlign){
+            _defaultBounds.y = 0;
+            _defaultBounds.height = Math.round(TangleUI.getRect("menuButton").height * .3);
+            var fontSize = Math.round(_defaultBounds.height * .6);
+            //console.log();
+            _defaultBounds.width = measureTextWidth(value, fontSize) + _defaultBounds.height * 2;
+            console.log("TabButton.calculateLayout()", fontSize, _defaultBounds.width);
+            var spacer = TangleUI.bounds.smallerSide() * .05;
+
+            //not the most flexible solution, ok for now.
+            if(rightAlign){
+                _defaultBounds.x = Math.round(TangleUI.bounds.right() - spacer - _defaultBounds.width);
+                _fromBounds.x = Math.round(TangleUI.bounds.width * 1.05);
+            }else{
+                _defaultBounds.x = spacer;
+                _fromBounds.x = Math.round(_defaultBounds.width * -1.1);
+            }
+
+            var borderRadius = Math.round(_defaultBounds.height * .95);
+            _button.style.borderRadius = "0px 0px " + borderRadius + "px " + borderRadius + "px";
+            TransitionCSSUtil.showElement(_button, true, _defaultBounds);
+            _button.style.fontSize = fontSize + "px";
+            _button.innerHTML = value;
+            _button.style.display = "none";
+        };
+
+        var animateIn = function(duration){
+            _button.style.display = "block";
+            _transition.updateTargets(_fromBounds, _defaultBounds);
+            _transition.init();
+            //console.log("TabButton.animateIn()", duration, _transition.fromRect.toString(), _transition.toRect.toString(), _transition.rectangle.toString());
+            _animator.setCallbacks(animationUpdate);
+            _animator.setTransition(_transition, duration, UnitEasing.easeOutSine);
+            _animator.play();
+        };
+
+        var animateOut = function(duration){
+            _button.style.display = "block";
+            _animator.setCallbacks(animationUpdate, animateOutComplete);
+            _animator.playReverse();
+        };
+
+        //TODO: create class: RectangleTransitionAnimator with HTML target
+        var animationUpdate = function(normal, rect){
+            TransitionCSSUtil.setTransitionTranslate(_button, rect, _defaultBounds);
         };
 
         var animateOutComplete = function(){
             _button.style.display = "none";
         };
+
     };
 }());

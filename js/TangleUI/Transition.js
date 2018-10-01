@@ -21,7 +21,7 @@
  *
  *      TransitionStore:
  *      - Contains data descriptions of RectangleTransitions which link to LayoutRectangle ids and corresponding
- *      transitions found in AppLayout
+ *      transitions found in TangleUI
  *      - factory methods for creating instances of RectangleTransition and RectangleTransitionAnimator
  *      - some getters/setters/update mechanisms
  *
@@ -43,12 +43,32 @@
         return "translate(" + x + "px, " + y + "px)";
     };
 
+    TransitionCSSUtil.setTransitionTranslate = function(target, fromRect, toRect){
+        //TODO: tighter integration, better solution required, with width, height, alpha, rotation? z?
+        var x = fromRect.x === toRect.x ? "0" : (fromRect.x - toRect.x);
+        var y = fromRect.y === toRect.y ? "0" : (fromRect.y - toRect.y);
+        target.style.transform = this.getTranslateString(x, y);
+    };
+
     TransitionCSSUtil.setTranslateFromRect = function(target, rect){
         target.style.transform = this.getTranslateStringFromRect(rect);
     };
 
+
     TransitionCSSUtil.getTranslateStringFromRect = function(rect){
         return "translate(" + rect.x + "px, " + rect.y + "px)";
+    };
+
+    TransitionCSSUtil.showElement = function(element, value, bounds){
+        if(!value){
+            element.style.visibility = "hidden";
+            return;
+        }
+        element.style.visibility = "visible";
+        element.style.left = Math.round(bounds.x) + "px";
+        element.style.top = Math.round(bounds.y) + "px";
+        element.style.width = Math.round(bounds.width) + "px";
+        element.style.height = Math.round(bounds.height) + "px";
     };
 
 }());
@@ -138,6 +158,11 @@
 
         var _interpolations = new InterpolationList();
         var _xEase, _yEase, _widthEase, _heightEase;
+
+        this.updateTargets = function(fromRect, toRect){
+            this.fromRect.updateToRect(fromRect);
+            this.toRect.updateToRect(toRect);
+        };
 
         this.setEasings = function(xEase, yEase, widthEase, heightEase){
             _xEase = xEase;
@@ -311,132 +336,7 @@
 
     //private static properties and methods
 
-    //TODO: this should be in a separate file, passed as a param
-    var _transitions = {
-
-        /* LOADER ANIMATIONS*/
-        loaderTitleIn : {
-            layoutRectId : "loaderTitle",
-            from : "transitionFrom",
-            to : "default",
-            duration : 300
-        },
-        loaderTitleOut : {
-            layoutRectId : "loaderTitle",
-            from : "default",
-            to : "transitionTo",
-            duration : 300,
-            xEase : UnitEasing.easeInSine,
-            yEase : UnitEasing.easeOutSine
-        },
-        loaderPixelGuyIn : {
-            layoutRectId : "loaderPixelGuy",
-            from : "transitionFrom",
-            to : "default",
-            duration : 400
-        },
-        loaderLaptopOut : {
-            layoutRectId : "loaderPixelGuy",
-            from : "default",
-            to : "laptopTo",
-            duration : 300,
-            xEase : UnitEasing.easeInSine,
-            yEase : UnitEasing.easeOutSine
-        },
-        loaderButtrockOut : {
-            layoutRectId : "loaderButtrock",
-            from : "default",
-            to : "transitionTo",
-            duration : 500,
-            xEase : UnitEasing.easeInSine,
-            yEase : UnitEasing.easeOutSine
-        },
-
-        /* MENU ANIMATIONS (zoom card in / out) */
-
-        /* BUTTONS ANIMATIONS */
-        closeButtonIn : {
-            layoutRectId : "closeButton",
-            from : "transitionFrom",
-            to : "default",
-            duration : 500,
-            easing : UnitEasing.easeOutSine
-        },
-        closeButtonOut : {
-            layoutRectId : "closeButton",
-            from : "default",
-            to : "transitionFrom",
-            duration : 500,
-            easing : UnitEasing.easeInSine
-        },
-
-        /* TO STATS BUTTON ANIMATIONS */
-        menuButtonIn : {
-            layoutRectId : "menuButton",
-            from : "transitionFrom",
-            to : "default",
-            duration : 600,
-            easing : UnitEasing.easeOutSine
-        },
-        menuButtonOut : {
-            layoutRectId : "menuButton",
-            from : "default",
-            to : "transitionFrom",
-            duration : 400,
-            easing : UnitEasing.easeInSine
-        },
-        progressButtonIn : {
-            layoutRectId : "progressGraphic",
-            from : "transitionFrom",
-            to : "default",
-            duration : 500,
-            easing : UnitEasing.easeOutSine
-        },
-        progressButtonOut : {
-            layoutRectId : "progressGraphic",
-            from : "default",
-            to : "transitionFrom",
-            duration : 300,
-            easing : UnitEasing.easeInSine
-        },
-        pixelGuyToStatsModule1 : {
-            layoutRectId : "menuButtonAvatarCenter",
-            from : "transitionFrom",/* calculated by component*/
-            to : "default",
-            duration : 350,
-            xEase : UnitEasing.easeOutSine,
-            yEase : UnitEasing.easeInSine
-        },
-        pixelGuyToStatsModule2 : {
-            layoutRectId : "menuButtonAvatarZoomed",
-            from : "default",
-            to : "transitionTo",
-            duration : 500,
-            easing : UnitEasing.easeOutSine
-        },
-        speechBubbleIn : {
-            layoutRectId : "speechBubble",
-            from : "transitionFrom",
-            to : "transitionTo",
-            duration : 400,
-            easing : UnitEasing.easeOutSine
-        },
-        speechBubbleHover : {
-            layoutRectId : "speechBubble",
-            from : "transitionTo",
-            to : "transitionTo",
-            duration : 2000
-        },
-        speechBubbleOut : {
-            layoutRectId : "speechBubble",
-            from : "transitionTo",
-            to : "transitionFrom",
-            duration : 300,
-            easing : UnitEasing.easeInSine
-        }
-
-
-    };
+    var _transitions = [];
 
     var getTransitionDataForId = function(transitionId){
         var data = _transitions[transitionId];
@@ -446,6 +346,12 @@
         return data;
     };
 
+    var populateTransitionForLayoutRect = function(transition, layoutRectName, fromState, toState){
+        //console.log("TransitionStore.populateTransitionForLayoutRect()", layoutRectName, fromState, toState);
+        transition.fromRect = TangleUI.getRect(layoutRectName, fromState);
+        transition.toRect = TangleUI.getRect(layoutRectName, toState);
+        transition.init();
+    };
 
 
     window.TransitionStore = {};
@@ -455,21 +361,25 @@
     var _createdTransitions = {};
     var _createdAnimations = {};
 
-    //make this private
-    TransitionStore.getTransitionById = function(transitionId){
+    TransitionStore.setTransitionDefinitions = function(definitionsJson){
+        _transitions = definitionsJson;
+    };
+
+    //Rename to reflect this is created from TangleUI Rects
+    TransitionStore.getTransition = function(transitionId){
         var transition = _createdTransitions[transitionId] || new RectangleTransition();
         var data = getTransitionDataForId(transitionId);
-        //console.log("TransitionStore.getTransitionById()", transitionId, data);
+        //console.log("TransitionStore.getTransition()", transitionId, data);
         transition.data = data;
         transition.setEasings(data["xEase"], data["yEase"], data["widthEase"], data["heightEase"]);
-        AppLayout.populateTransitionForLayoutRect(transition, data.layoutRectId, data.from, data.to);
+        populateTransitionForLayoutRect(transition, data.layoutRectId, data.from, data.to);
         transition.updateToNormal(0);
         _createdTransitions[transitionId] = transition;
         return transition;
     };
 
     TransitionStore.resizeTransition = function(transition){
-        AppLayout.populateTransitionForLayoutRect(transition, transition.data.layoutRectId, transition.data.from, transition.data.to);
+        populateTransitionForLayoutRect(transition, transition.data.layoutRectId, transition.data.from, transition.data.to);
     };
 
     TransitionStore.resizeChainTransition = function(chain){
@@ -479,29 +389,17 @@
         }
     };
 
-    TransitionStore.createTransitionAnimation = function(transitionId, updateCallback, completeCallback){
-        var transition  = this.getTransitionById(transitionId);
-        var animation = new RectangleTransitionAnimator();
-        var data = getTransitionDataForId(transitionId);
-        animation.setTransition(transition, data.duration, data.easing);
-        _createdAnimations[transitionId] = animation;
-        if(updateCallback){
-            animation.setUpdateCallback(updateCallback);
-        }
-        if(completeCallback){
-            animation.setCompleteCallback(completeCallback);
-        }
-        return animation;
-    };
-
     TransitionStore.getAnimationByTransitionId = function(transitionId, updateCallback, completeCallback){
-        var animation = _createdAnimations[transitionId] || this.createTransitionAnimation(transitionId);
+        var transition  = this.getTransition(transitionId);
+        var animation = _createdAnimations[transitionId] || new RectangleTransitionAnimator();
+        animation.setTransition(transition, transition.data.duration, transition.data.easing);
         if(updateCallback){
             animation.setUpdateCallback(updateCallback);
         }
         if(completeCallback){
             animation.setCompleteCallback(completeCallback);
         }
+        _createdAnimations[transitionId] = animation;
         return animation;
     };
 

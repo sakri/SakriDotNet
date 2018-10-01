@@ -477,12 +477,12 @@
         return canvas;
     };
 
-    CanvasUtil.resize = function(canvas, width, height){
+    CanvasUtil.setLayoutBounds = function(canvas, width, height){
         if(canvas.width !== width || canvas.height !== height){
             canvas.width = width;
             canvas.height = height;
         }
-        //console.log("CanvasUtil.resize()", canvas.width, canvas.height);
+        //console.log("CanvasUtil.setLayoutBounds()", canvas.width, canvas.height);
         var context = canvas.getContext("2d");
         context.clearRect(0, 0, width, height);
         return context;

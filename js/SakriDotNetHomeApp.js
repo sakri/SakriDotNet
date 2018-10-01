@@ -3,34 +3,30 @@
     //@appName is currently only used for analytics
     window.SakriDotNetHomeApp = function (appName, backButtonURL) {
 
-        //private properties
-        var _loader,
-            _menuCanvas,//TODO move to Menu
-            _menu,
-            _cardCanvasRenderer,
-            _cardHtmlRenderer = new CardHtmlRenderer(),
-            _menuButton;
-
-
-        //*****************************
-        //**********::PUBLIC API::*****
-        //*****************************
+        //Public API
 
         this.init = function () {
+            TangleUI.setLayoutDefinitions(SakriDotNetLayout);
+            TransitionStore.setTransitionDefinitions(SakriDotNetTransitions);
+            TangleUI.setLayoutBounds(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
-            AppData.backButtonURL = backButtonURL;
             AppData.startInteractionsHistory(10000, 6);
-            _cardCanvasRenderer = new CardCanvasRenderer(storyReadCompleteHandler);
             _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
             _loader.start();
             window.addEventListener("resize", windowResizeHandler);
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
         };
 
-        //************************
-        //**********::LOGIC::*****
-        //************************
+        //Private properties and methods
+
+        var _loader,
+            _menuCanvas,//TODO move to Menu
+            _menu,
+            _cardCanvasRenderer = new CardCanvasRenderer(),
+            _cardHtmlRenderer = new CardHtmlRenderer(),
+            _menuButton, _closeButton, _navigationButton,
+            _statsSource, _statsModule;
 
         var loadCompleteHandler = function(){
             _loader = null;
@@ -43,14 +39,18 @@
             document.body.innerHTML = "";
 
             _menuCanvas = CanvasUtil.createCanvas(document.body, appConfig.loaderCanvasZ);
-            CanvasUtil.resize(_menuCanvas, AppLayout.bounds.width, AppLayout.bounds.height);
+            CanvasUtil.setLayoutBounds(_menuCanvas, TangleUI.bounds.width, TangleUI.bounds.height);
             _menuCanvas.style.left = _menuCanvas.style.top = "0px";
 
-            _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCardHandler);
+            _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCard);
+
+            //only index.html contains Stats Module. This mechanism attempts to store/pass "visit progress" state between apps.
+            if(!backButtonURL && appConfig.visitStats){
+                AppData.updateFromVisitStatsUrlParam(appConfig.visitStats);
+            }
 
             //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
-            //find better solution for placeholder (avoids errors)
-            if(!AppData.showStatsModule()){
+            if(!backButtonURL){
                 _menuButton = new MenuButton(showStatsModule);
                 loadStatsModule();
             }else{
@@ -60,6 +60,7 @@
             commitWindowResize();
         };
 
+        //TODO: move to data once TangleUI is implemented
         var parseSectionsData = function () {
             var sectionNodes = document.body.querySelectorAll("section, article"),
                 dataList = [], data, section, node, i, story, originalImage;
@@ -89,7 +90,6 @@
             return dataList.reverse();//html order is displayed in inverse order in menu
         };
 
-        //must occur in separate frames due to getDataUrl(), also renderTitleImage() must happen prior to renderTabImage()
         var renderCardsCanvasAssets = function () {
             var i, cardData, showReadMore;
             for (i = 0; i < AppData.cards.length; i++){
@@ -98,34 +98,25 @@
                 showReadMore = i === AppData.cards.length - 1;//only card on top needs this (never visible for others)
                 _cardCanvasRenderer.createCardCanvasAssets(cardData, showReadMore);
             }
-
-            // via url to faq.html & portfolio.html, but not edited. The data is then passed back to index.html
-            //if naviating via the "home" button.
-            if(!AppData.showStatsModule() && appConfig.visitStats){
-                AppData.updateFromVisitStatsUrlParam(appConfig.visitStats);
-                appConfig.visitStats = undefined;//this blocks the stats from being reset on resize
-            }
-
             _menu.setData(AppData.cards);
         };
 
-        //************************************************
-        //**********::WINDOW RESIZE : responsive::********
-        //************************************************
+        //--------- Window resize (responsive) ---------------
 
-        //Calls to _menu redraw are limited, as it's an expensive operation.
+        //Avoids repeatedly running resize logic by calling commitWindowResize 300ms after last user resize action
         var _windowResizeTimeoutId = -1;
         var windowResizeHandler = function () {
             //TODO: should disable menu interactions
             clearTimeout(_windowResizeTimeoutId);
             if(!_loader){
-                _cardHtmlRenderer.forceClose();
+                _cardHtmlRenderer.close();
                 _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
             }
             _windowResizeTimeoutId = setTimeout(commitWindowResize, 300);//arbitrary number
         };
 
         var commitWindowResize = function () {
+            TangleUI.setLayoutBounds(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             AppData.storeInteraction();
             if(_loader){
@@ -135,18 +126,16 @@
             hideIframe();
             _windowResizeTimeoutId = -1;
 
-            console.log("App.commitResize()", AppLayout.bounds.toString());
-            _menuCanvas.width = AppLayout.bounds.width;
-            _menuCanvas.height = AppLayout.bounds.height;
+            console.log("App.commitResize()", TangleUI.bounds.toString());
+            _menuCanvas.width = TangleUI.bounds.width;
+            _menuCanvas.height = TangleUI.bounds.height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
             renderCardsCanvasAssets();
             setTimeout(showMenuButton, 400);
-            setTimeout(showNavigationButtons, 700, true);
+            setTimeout(showNavigationButton, 700, true);
         };
 
-        //*****************************************
-        //**********::USER INTERACTION::********
-        //*****************************************
+        //--------- User Interactions ---------------
 
         var keyPressHandler = function(event){
             _cardHtmlRenderer.isOpen() ? keyPressCardOpenHandler(event.keyCode) : keyPressCardsMenu(event.keyCode);
@@ -187,19 +176,8 @@
             _menuButton.addToPulse();
         };
 
-        //*********************************************
-        //**********::TO STATS MODULE BUTTON::********
-        //*********************************************
+        //--------- Stats Module --------------- (consider moving this code to a class)
 
-        var showMenuButton = function(){
-            _menuButton.start(appConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
-        };
-
-        //*********************************************
-        //**********::STATS MODULE::********
-        //*********************************************
-
-        var _statsSource, _statsModule, _closeIframeButton;
         var loadStatsModule = function(){
             if(_statsSource){
                 console.log("App.loadStatsModule() stats mod already loaded");
@@ -242,7 +220,7 @@
                 _statsModule.onload = function() {
                     console.log("_statsModule.onload()");
                     _statsModule.style.visibility = "visible";
-                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  closeIframeButtonClickHandler);
+                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  closeIframe);
                     _statsModule.contentWindow.showStats();
                 };
                 _statsModule.style.visibility = "hidden";
@@ -252,51 +230,32 @@
                 _statsModule.contentWindow.showStats(AppData.getAchievementNormal() === 1);
             }
             //TODO: watch out for resize calls?
-            _statsModule.style.width = AppLayout.bounds.width + "px";
-            _statsModule.style.height = AppLayout.bounds.height + "px";
+            _statsModule.style.width = TangleUI.bounds.width + "px";
+            _statsModule.style.height = TangleUI.bounds.height + "px";
         };
 
-        //TODO: refactor, very awkward...
-        var showStatsShareCallback = function(showCloseStatsButton){
-            _closeIframeButton = _closeIframeButton || new TabButton(closeIframeButtonClickHandler, appConfig.closeStatsButtonZ);
-            resizeCloseStatsModuleButton();
-            _closeIframeButton.show(showCloseStatsButton);
+        //TODO: refactor, bit awkward...
+        var showStatsShareCallback = function(value){
+            showCloseButton(value, closeIframe);
         };
 
-        var resizeCloseStatsModuleButton = function(){
-            var buttonHeight = (AppLayout.headerBounds.height * .7);//calculate every time for resizing
-            var buttonWidth = Math.round(buttonHeight * 2.4);
-            if(AppLayout.bounds.isPortrait()){
-                buttonHeight = (AppLayout.bounds.width / 10);//calculate every time for resizing
-                buttonWidth = Math.round(buttonHeight * 2.6);
-            }
-            var button = _closeIframeButton.init("X", buttonWidth, buttonHeight, 1.1, (AppLayout.bounds.width - buttonWidth * 1.25) / AppLayout.bounds.width);
-            button.style.position = "fixed";
-        };
-
-        var closeIframeButtonClickHandler = function(){
+        var closeIframe = function(){
             hideIframe();
             showMenuButton();
+            showNavigationButton(true);
         };
 
         var hideIframe = function(){
             if(_statsModule){
                 _statsModule.contentWindow.stopCelebrations();
                 _statsModule.style.display = "none";
-                _closeIframeButton.show(false);
+                showCloseButton(false);
                 _menuCanvas.style.display = "block";
             }
         };
 
-        var menuButtonClickHandler = function(){
-            if(backButtonURL){
-                window.location = backButtonURL + appConfig.visitStats ? "?visitStats=" + appConfig.visitStats : "";
-            }
-        };
 
-        //*********************************************
-        //**********::GOOGLE ANALYTICS EVENTS::********
-        //*********************************************
+        //--------- Google Analytics (TODO: move to class) ---------------
 
         var isLive = function(){
             return location.href.indexOf("localhost") === -1 && gtag;
@@ -316,29 +275,60 @@
             }
         };
 
-        //*****************************************
-        //**********::CARD HTML RENDERING::********
-        //*****************************************
+        //--------- BUTTONS ---------------
 
-        var showNavigationButtons = function(value){
-            if(backButtonURL){
-                _cardHtmlRenderer.showNavigationButton(value, menuButtonClickHandler);
+        //"To Stats Module Button" will become "menu button" later
+        var showMenuButton = function(){
+            _menuButton.start(appConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
+        };
+
+        //TODO: currently a "home button", will become a menu button?
+        var showNavigationButton = function(value){
+            if(!backButtonURL){
+                return;
             }
+            _navigationButton = _navigationButton || new TabButton();
+            if(value){
+                _navigationButton.init("home", document.body, appConfig.navigationButtonZ);
+                _navigationButton.show(400, navigationButtonClickHandler);
+                return;
+            }
+            _navigationButton.hide();
         };
 
-        var showCardHandler = function (index) {
+        var navigationButtonClickHandler = function(){
+            window.location = backButtonURL + (appConfig.visitStats ? "?visitStats=" + appConfig.visitStats : "");
+        };
+
+        var showCloseButton = function(value, callback){
+            _closeButton = _closeButton || new TabButton();
+            if(value){
+                _closeButton.init("X", document.body, appConfig.closeCardButtonZ, true);
+                _closeButton.show(400, callback);
+                return;
+            }
+            _closeButton.hide();
+        };
+
+        //--------- Card HTML rendering ---------------
+
+        var showCard = function (index) {
             var data = AppData.cards[index];
-            data.visited = true;
             tagShowCardEvent(data);
-            showNavigationButtons(false);
-            _menuButton.end();
-            _cardHtmlRenderer.renderCard(data, closeCardHandler);
+            showNavigationButton(false);
+            showCloseButton(true, closeCard);
+            _menuButton.end();//should this be hideMenuButton()?
+            _cardHtmlRenderer.open(data);
         };
 
-        var closeCardHandler = function () {
+        var closeCard = function(dispatchCallback){
+            AppData.storeInteraction();
+            _cardHtmlRenderer.close();
             _menu.deselectCard();
+            showCloseButton(false);
             showMenuButton();
-            setTimeout(showNavigationButtons, 700, true);//TODO: store intervalId and stop if?? resize??
+            showNavigationButton(true);
         };
+
     }
 }());

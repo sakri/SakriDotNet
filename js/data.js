@@ -66,7 +66,8 @@
     appConfig.cardHtmlZ = 130;
     appConfig.menuButtonZ = 190;
     appConfig.menuButtonPromptZ = 195;
-    appConfig.closeCardButtonZ = 250;
+    appConfig.navigationButtonZ = 250;
+    appConfig.closeCardButtonZ = 260;
     appConfig.closeStatsButtonZ = 300;
     appConfig.debugLayer = 500;
 
@@ -105,7 +106,6 @@
         _actionsPerMinuteIntervalId = -1;
 
     //Public API
-    AppData.backButtonURL = "";
     AppData.cards = [];//list of CardData
     AppData.userInteractions = 0;
     AppData.shareClick = false;
@@ -127,10 +127,6 @@
     AppData.minutesSinceStart = function(){
         var secs = AppData.secondsSinceStart();
         return Math.floor(secs / 60 + secs%60);
-    };
-
-    AppData.showStatsModule = function(){
-        return this.backButtonURL=="";
     };
 
     //TODO: move, belongs in it's own class

@@ -1,6 +1,6 @@
 /**
  * DEPENDENCIES:
- * MathUtil, Rectangle, AppLayout, Transition, sprites, DonutChart, SpeechBubble
+ * MathUtil, Rectangle, TanglUI, Transition, sprites, DonutChart, SpeechBubble
  */
 
 (function() {
@@ -17,7 +17,7 @@
             resize();
             _donut = _donut || new DonutChart("#FFFFFF", appConfig.themeColor, "#222222");
             _progressNormal = AppData.getAchievementNormal();
-            renderWithPie(AppLayout.getLayoutRectStateBounds("progressGraphic"));
+            renderWithPie(TangleUI.getRect("progressGraphic"));
             animateButtonIn();
         };
 
@@ -35,7 +35,7 @@
         this.addToPulse = function(){
             stopPromptSequence();
             incrementPulse();
-            renderWithPie(AppLayout.getLayoutRectStateBounds("progressGraphic"));
+            renderWithPie(TangleUI.getRect("progressGraphic"));
             startIdleTimer();
         };
 
@@ -67,10 +67,10 @@
         //==============:: Layout ::============================
         //======================================================
 
-        //no public resize() method, when app resizes this.start() is called
+        //no public setLayoutBounds() method, when app resizes this.start() is called
         var resize = function(){
-            //console.log("MenuButton.resize()", width, height);
-            var bounds = AppLayout.getLayoutRectStateBounds("menuButton");
+            //console.log("MenuButton.setLayoutBounds()", width, height);
+            var bounds = TangleUI.getRect("menuButton");
             resizeCanvas(bounds.width, bounds.height);//Also initializes bg colors, refactor
             calculateDynamicLayout();
             _bgRipple.init(_canvas, new Rectangle(0, 0,_canvas.width, _canvas.height), appConfig.themeColor, "#FFFFFF");
@@ -78,25 +78,25 @@
 
         var calculateDynamicLayout = function(){
             //set progress graphic bounds proportional to bitmap
-            var bounds = AppLayout.getLayoutRectStateBounds("progressGraphic");
+            var bounds = TangleUI.getRect("progressGraphic");
             var ss = SakriDotNetSpriteSheet.getSpriteSheetData("head");
             _avatarScale = Math.floor(bounds.height / ss.height);
             var adjustedBounds = new Rectangle(bounds.x, bounds.y);
             adjustedBounds.width = adjustedBounds.height = _avatarScale * ss.height;
             //console.log("calculateDynamicLayout()", bounds.toString(), adjustedBounds.toString());
-            AppLayout.adjustStateRect("progressGraphic", "default", adjustedBounds);
+            TangleUI.setRect("progressGraphic", "default", adjustedBounds);
 
             //needed for "to stats module" animation
-            bounds = AppLayout.getLayoutRectStateBounds("progressGraphic", "transitionFrom");
+            bounds = TangleUI.getRect("progressGraphic", "transitionFrom");
             _avatarBounds.update(bounds.x, adjustedBounds.y, adjustedBounds.width, adjustedBounds.height);
 
             //adjust speech bubble layout and transition
-            var menuBounds = AppLayout.getLayoutRectStateBounds("menuButton");
+            var menuBounds = TangleUI.getRect("menuButton");
             adjustedBounds.height = menuBounds.height * .5;
-            adjustedBounds.width = Math.min(AppLayout.bounds.width * .8, 600);//TODO: hardcoded number, needs better approach
-            adjustedBounds.x = AppLayout.bounds.width * .05;
+            adjustedBounds.width = Math.min(TangleUI.bounds.width * .8, 600);//TODO: hardcoded number, needs better approach
+            adjustedBounds.x = TangleUI.bounds.width * .05;
             adjustedBounds.y = menuBounds.y - adjustedBounds.height * .45;
-            AppLayout.adjustStateRect("speechBubble", "default", adjustedBounds);
+            TangleUI.setRect("speechBubble", "default", adjustedBounds);
         };
 
         var resizeCanvas = function(width, height){
@@ -106,9 +106,9 @@
                 _canvas.style.position = "fixed";
             }
             _canvas.style.display = "block";
-            _canvas.style.left = AppLayout.bounds.right() - width + "px";
-            _canvas.style.top = AppLayout.bounds.bottom() - height + "px";
-            _context = CanvasUtil.resize(_canvas, width, height);
+            _canvas.style.left = TangleUI.bounds.right() - width + "px";
+            _canvas.style.top = TangleUI.bounds.bottom() - height + "px";
+            _context = CanvasUtil.setLayoutBounds(_canvas, width, height);
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
@@ -139,13 +139,13 @@
         };
 
         var updateTransitionMenuButton = function(normal, rect){
-            var bounds = AppLayout.getLayoutRectStateBounds("menuButton");
+            var bounds = TangleUI.getRect("menuButton");
             TransitionCSSUtil.setTranslate(_canvas, rect.x - bounds.x, rect.y - bounds.y);
         };
 
         var renderAnimatingSpeechBubble = function(){
-            renderWithPixelGuy(AppLayout.getLayoutRectStateBounds("progressGraphic"));
-            var x = _animations.promptSequence.getRectangle().x - AppLayout.getLayoutRectStateBounds("speechBubble", "transitionTo").x;
+            renderWithPixelGuy(TangleUI.getRect("progressGraphic"));
+            var x = _animations.promptSequence.getRectangle().x - TangleUI.getRect("speechBubble", "transitionTo").x;
             TransitionCSSUtil.setTranslate(_speechBubble, x, 0);
         };
 
@@ -154,19 +154,19 @@
         var setNextSpeechBubble = function(){
             _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, appConfig.menuButtonPromptZ);//TODO hardcoded doc.body: should be  a parent arg
             _speechBubble.style.display = "block";
-            _speechBubbleBounds.updateToRect(AppLayout.getLayoutRectStateBounds("speechBubble"));
+            _speechBubbleBounds.updateToRect(TangleUI.getRect("speechBubble"));
             _speechBubbleBounds.width = SpeechBubble.update(_speechBubble, _getMessageFunction(_progressNormal), _speechBubbleBounds);
-            _speechBubbleBounds.x = Math.round(AppLayout.bounds.width * 1.1);
-            AppLayout.adjustStateRect("speechBubble", "transitionFrom", _speechBubbleBounds);
+            _speechBubbleBounds.x = Math.round(TangleUI.bounds.width * 1.1);
+            TangleUI.setRect("speechBubble", "transitionFrom", _speechBubbleBounds);
             _speechBubble.style.transform = "translate(" + _speechBubbleBounds.width * 2 + "px, 0px)";//get it off screen
-            var spacer = AppLayout.getLayoutRectStateBounds("progressGraphic").width * .5;
-            _speechBubbleBounds.x = Math.round(AppLayout.bounds.width - spacer - _speechBubbleBounds.width);
-            AppLayout.adjustStateRect("speechBubble", "transitionTo", _speechBubbleBounds);
+            var spacer = TangleUI.getRect("progressGraphic").width * .5;
+            _speechBubbleBounds.x = Math.round(TangleUI.bounds.width - spacer - _speechBubbleBounds.width);
+            TangleUI.setRect("speechBubble", "transitionTo", _speechBubbleBounds);
             _speechBubble.style.left = _speechBubbleBounds.x + "px";
             _speechBubble.style.top = _speechBubbleBounds.y + "px";
-            TransitionStore.getTransitionById("speechBubbleIn");//TODO: bit of a hack, getTransitionById resizes...
-            TransitionStore.getTransitionById("speechBubbleHover");
-            TransitionStore.getTransitionById("speechBubbleOut");
+            TransitionStore.getTransition("speechBubbleIn");//TODO: bit of a hack, getTransition resizes...
+            TransitionStore.getTransition("speechBubbleHover");
+            TransitionStore.getTransition("speechBubbleOut");
         };
 
         var hideSpeechBubble = function(){
@@ -236,14 +236,14 @@
                 console.log("MenuButton.playToStatsViewAnimation() transition active, skipping");
                 return;//already transitioning
             }
-            resizeCanvas(AppLayout.bounds.width, AppLayout.bounds.height);
+            resizeCanvas(TangleUI.bounds.width, TangleUI.bounds.height);
             _canvas.style.left = _canvas.style.top = "0px";
-            _bgRipple.init(_canvas, AppLayout.getLayoutRectStateBounds("menuButton"), appConfig.themeColor, "#FFFFFF");
+            _bgRipple.init(_canvas, TangleUI.getRect("menuButton"), appConfig.themeColor, "#FFFFFF");
             stopIdleTimer();
             hideSpeechBubble();
-            var bounds = AppLayout.getLayoutRectStateBounds("menuButton");
+            var bounds = TangleUI.getRect("menuButton");
             _avatarBounds.update(_avatarBounds.x + bounds.x, _avatarBounds.y + bounds.y, _avatarBounds.width, _avatarBounds.height);
-            AppLayout.adjustStateRect("menuButtonAvatarCenter", "transitionFrom", _avatarBounds);
+            TangleUI.setRect("menuButtonAvatarCenter", "transitionFrom", _avatarBounds);
 
             _animations.toStats1 = TransitionStore.getAnimationByTransitionId("pixelGuyToStatsModule1", renderToStatsAnimation, toStats1AnimationComplete);
             _animations.toStats1.play();
@@ -254,7 +254,7 @@
             if(showStatsModuleCallback){
                 showStatsModuleCallback();
             }
-            AppLayout.adjustStateRect("menuButtonAvatarZoomed", "default", _animations.toStats1.getRectangle());
+            TangleUI.setRect("menuButtonAvatarZoomed", "default", _animations.toStats1.getRectangle());
             _animations.toStats2 = TransitionStore.getAnimationByTransitionId("pixelGuyToStatsModule2", renderToStatsAnimation, stop);
             _animations.toStats2.play();
         };

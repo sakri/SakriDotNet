@@ -1,6 +1,6 @@
 /**
  * Created by Sakri Rosenstrom on 15-06-18
- * DEPENDENCIES : MathUtil, Rectangle, Sprites, UnitAnimator, AppLayout, Transition
+ * DEPENDENCIES : MathUtil, Rectangle, Sprites, UnitAnimator, TangleUI, Transition
  *
  * Contains:
  *
@@ -45,7 +45,7 @@
             playIntroAnimation();
         };
 
-        this.resize = function(){
+        this.setLayoutBounds = function(){
             resizeCanvas();
             calculateDynamicLayout();
             resizeTitle();
@@ -75,13 +75,13 @@
         var calculateDynamicLayout = function(){
             //adjust "pixel guy" layout bounds to spritesheet proportions
             var adjustedBounds = new Rectangle();
-            adjustedBounds.updateToRect(AppLayout.getLayoutRectStateBounds("loaderPixelGuy"));
+            adjustedBounds.updateToRect(TangleUI.getRect("loaderPixelGuy"));
             _pixelGuyScale = Math.floor(Math.min(adjustedBounds.width  / PixelGuyTypingSprite.unscaledWidth, adjustedBounds.height  / PixelGuyTypingSprite.unscaledHeight));
             adjustedBounds.width = PixelGuyTypingSprite.unscaledWidth * _pixelGuyScale;
             adjustedBounds.height = PixelGuyTypingSprite.unscaledHeight * _pixelGuyScale;
-            adjustedBounds.x = Math.round(AppLayout.bounds.centerX() - adjustedBounds.width * .5);
-            adjustedBounds.y = Math.round(AppLayout.bounds.centerY() - adjustedBounds.height * .5);
-            AppLayout.adjustStateRect("loaderPixelGuy", "default", adjustedBounds);
+            adjustedBounds.x = Math.round(TangleUI.bounds.centerX() - adjustedBounds.width * .5);
+            adjustedBounds.y = Math.round(TangleUI.bounds.centerY() - adjustedBounds.height * .5);
+            TangleUI.setRect("loaderPixelGuy", "default", adjustedBounds);
 
             //calculate circles bounds and emitter
             _circlesBounds.update(
@@ -95,27 +95,27 @@
             _circlesEmitter.y = Math.round(adjustedBounds.bottom() - adjustedBounds.height * .2);
 
             //adjust "title" bounds height to adjusted "pixel guy" dimensions
-            var titleBounds = AppLayout.getLayoutRectStateBounds("loaderTitle");
+            var titleBounds = TangleUI.getRect("loaderTitle");
             titleBounds.height = adjustedBounds.height * .6;
             adjustedBounds.updateToRect(titleBounds);
-            AppLayout.adjustStateRect("loaderTitle", "default", adjustedBounds);
+            TangleUI.setRect("loaderTitle", "default", adjustedBounds);
 
             //adjust "buttrock" bounds to spritesheet proportions
-            adjustedBounds.updateToRect(AppLayout.getLayoutRectStateBounds("loaderPixelGuy"));
+            adjustedBounds.updateToRect(TangleUI.getRect("loaderPixelGuy"));
             adjustedBounds.update(
                 Math.round(adjustedBounds.x + adjustedBounds.width * .5),
                 Math.round(adjustedBounds.y - adjustedBounds.height * .4),
                 ButtrockManager.unscaledWidth * _pixelGuyScale,
                 ButtrockManager.unscaledHeight * _pixelGuyScale
             );
-            if(adjustedBounds.right() > AppLayout.bounds.width){
-                adjustedBounds.x = AppLayout.bounds.width - adjustedBounds.width;
+            if(adjustedBounds.right() > TangleUI.bounds.width){
+                adjustedBounds.x = TangleUI.bounds.width - adjustedBounds.width;
             }
-            AppLayout.adjustStateRect("loaderButtrock", "default", adjustedBounds);
+            TangleUI.setRect("loaderButtrock", "default", adjustedBounds);
         };
 
         var resizeCanvas = function(){
-            _context = CanvasUtil.resize(_canvas, AppLayout.bounds.width, AppLayout.bounds.height);
+            _context = CanvasUtil.setLayoutBounds(_canvas, TangleUI.bounds.width, TangleUI.bounds.height);
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
@@ -133,7 +133,7 @@
         };
 
         var resizeTitle = function(){
-            var bounds = AppLayout.getLayoutRectStateBounds("loaderTitle");
+            var bounds = TangleUI.getRect("loaderTitle");
             _title.style.fontSize = Math.round(bounds.height * .7) + "px";
             _title.style.width = bounds.width + "px";
             _title.style.height = bounds.height + "px";
@@ -156,15 +156,15 @@
         };
 
         var playIntroAnimation = function(){
-            _animations.pixelGuy = TransitionStore.createTransitionAnimation("loaderPixelGuyIn");
-            _animations.title = TransitionStore.createTransitionAnimation("loaderTitleIn", updateTitleAnimation);
+            _animations.pixelGuy = TransitionStore.getAnimationByTransitionId("loaderPixelGuyIn");
+            _animations.title = TransitionStore.getAnimationByTransitionId("loaderTitleIn", updateTitleAnimation);
             _animations.pixelGuy.play();
             _animations.title.play();
         };
 
-        var updateTitleAnimation = function(){
-            TransitionCSSUtil.setTranslate(_title, 0,
-                _animations.title.getRectangle().y - AppLayout.getLayoutRectStateBounds("loaderTitle").y);
+        //Move to Transition.js .  CSSTransitionAnimation() or so
+        var updateTitleAnimation = function(normal, rect){
+            TransitionCSSUtil.setTranslate(_title, 0, rect.y - TangleUI.getRect("loaderTitle").y);
         };
 
         var render = function(normal){
@@ -181,9 +181,9 @@
         var playExitAnimation = function(callback){
             var bounds = _animations.pixelGuy.getRectangle();
             _circles.prepareExit(bounds.x, -bounds.centerY());
-            _animations.title = TransitionStore.getTransitionById("loaderTitleOut");
-            _animations.laptop = TransitionStore.getTransitionById("loaderLaptopOut");
-            _animations.buttrock = TransitionStore.getTransitionById("loaderButtrockOut");
+            _animations.title = TransitionStore.getTransition("loaderTitleOut");
+            _animations.laptop = TransitionStore.getTransition("loaderLaptopOut");
+            _animations.buttrock = TransitionStore.getTransition("loaderButtrockOut");
             _exitAnimator.start(1500, renderExiting, callback);
         };
 
@@ -207,7 +207,7 @@
         var renderEndSequenceTitle = function(normal) {
             if(normal > 0 && normal < 1){
                 _animations.title.updateToNormal(normal);
-                var bounds = AppLayout.getLayoutRectStateBounds("loaderTitle");
+                var bounds = TangleUI.getRect("loaderTitle");
                 var x = _animations.title.rectangle.x - bounds.x;
                 var y = _animations.title.rectangle.y - bounds.y;
                 _title.style.transform = "translate(" + x + "px, " + y + "px)";
@@ -240,8 +240,8 @@
             updateImagesLoad();
         };
 
-        this.resize = function(){
-            _loader.resize();
+        this.setLayoutBounds = function(){
+            _loader.setLayoutBounds();
         };
 
         var updateLoaderCircles = function(){
@@ -285,8 +285,8 @@
             updateProgress();
         };
 
-        this.resize = function(){
-            _loader.resize();
+        this.setLayoutBounds = function(){
+            _loader.setLayoutBounds();
         };
 
         var updateProgress = function(){

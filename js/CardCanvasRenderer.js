@@ -3,6 +3,29 @@
  * MathLib, Rectangle, CardLayout
  */
 
+//=============================================================
+//==============::Canvas Text Util::=================
+//=============================================================
+
+//TODO: grab canvas text code from bottom of CardCanvasRenderer, move to own js file
+(function() {
+
+    /*
+    var _textCanvas = document.createElement("canvas");
+    _textCanvas.width = 400;//arbitrary number, may need to adjust later?
+    _textCanvas.height = 400;
+    */
+    window.CanvasTextUtil = {};
+
+    //TODO: find way to extract canvas text style from html element.
+
+}());
+
+//===================================================
+//==============::CardCanvasRenderer::===============
+//===================================================
+
+
 
 (function() {
 
