@@ -1,13 +1,13 @@
-# source code of http://www.sakri.net
+# Source code of http://www.sakri.net
 
 Built with Vanilla.js and some html5 Canvas fun.
 
-## Also the development grounds of **TangleUI.js** :
+## Also the development grounds of **TangleUI.js**
 
 - A library targeted at Single Page Applications which require **Responsive** Layouts inside the **Html5 Canvas**
 - Separates basic layout and transition calculations from App and Component logic
 - Centralizes layout/transition definitions and calculations
-- Supports html elements whose position/transitions depend on Canvas contents. (Negate repetition in JS/CSS)
+- Supports html elements whose position/transitions depend on Canvas contents (Negate repetition in JS/CSS)
 - Contains minimal animation capabilities
   - is not intended as a replacement for animation libraries like https://greensock.com/
 - Expects layout and transition definitions in specified json format
