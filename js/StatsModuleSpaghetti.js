@@ -236,7 +236,7 @@ var updateLayout = function () {
     _ui.elements.appContainer.style.opacity = 1;
     AppLayout.updateLayout(window.innerWidth, window.innerHeight);
     _windowResizeTimeoutId = -1;
-    console.log("commitWindowResize() ", AppLayout.bounds.toString());
+    //console.log("commitWindowResize() ", AppLayout.bounds.toString());
     _appWidth = _maxAppWidth;
     _appHeight = Math.round(_maxAppWidth * .9);
     if(AppLayout.bounds.width > _maxAppWidth && AppLayout.bounds.height > _appHeight){
@@ -332,10 +332,16 @@ function setVLayoutContainerPositions(appWidth){
 //=========================================
 
 function shareClickHandler(){
-    var url = "https://twitter.com/share?url=http://www.sakri.net&text=You have not lived until you've spent xx:xx:xx on the http://www.sakri.net stats module! Plz share, he needs a job!";
     document.body.style.overflow = "hidden";
     _ui.elements.appContainer.style.opacity = .1;
     _ui.elements.sharePanel.style.display = "block";
+    if(_ui.elements.sharePanel.offsetHeight < 500){
+        //temporary hack befre statsModule Refactor
+        var listItems = _ui.elements.sharePanel.getElementsByTagName("li");
+        for(var i=2; i<listItems.length; i++){
+            listItems[i].style.display = "none";
+        }
+    }
     _unitAnimator.start(400, shareAppearUpdate, null, UnitEasing.easeOutSine);
     if(_showCoseButtonCallback){
         _showCoseButtonCallback(false);

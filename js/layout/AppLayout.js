@@ -5,6 +5,7 @@
 
  */
 
+//TODO: Replace with TangleUI implementation where possible, move rest to components?
 
 (function() {
 

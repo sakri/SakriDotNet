@@ -94,10 +94,10 @@
         var animateIn = function(duration){
             _button.style.display = "block";
             _transition.updateTargets(_fromBounds, _defaultBounds);
-            _transition.init();
+            _transition.init({duration:duration, easingFunction:UnitEasing.easeOutSine});
             //console.log("TabButton.animateIn()", duration, _transition.fromRect.toString(), _transition.toRect.toString(), _transition.rectangle.toString());
             _animator.setCallbacks(animationUpdate);
-            _animator.setTransition(_transition, duration, UnitEasing.easeOutSine);
+            _animator.setTransition(_transition);
             _animator.play();
         };
 
