@@ -1,69 +1,242 @@
 /**
- * Created by Sakri Rosenstrom on 24-08-18
+ * Created by Sakri Rosenstrom on 01-10-18
  * Dependencies : MathUtil
  *
-
+ *
+ * =======================
+ * ====:: TangleUI ::=====
+ * =======================
+ *
+ * Is targeted at Single Page Applications which require Responsive Layouts inside the Html5 Canvas.
+ * Separates basic layout and transition calculations from App and Component logic.
+ * Centralizes layout/transition definitions and calculations.
+ * Supports html elements whose position/transition depend on Canvas contents. (Negate repetition in JS/CSS)
+ * Contains minimal animation capabilities
+ *      - is not intended as a replacement for animation libraries like https://greensock.com/
+ * Expects layout and transition definitions in specified json format* (TODO: create spec, add link)
+ *      - layouts are defined as "percent value rectangles" relative to Landscape, Squarish and Vertical screen sizes
+ * Is queried for layout Rectangles, Transitions and Animations
+ *      - Apps call setLayoutBounds() at startup or resize, only default definitions are calculated
+ *      - remaining calculations are made per query, results are cached until next resize
+ *
  */
 
 
 (function() {
 
-    //positions are "absolute"
-    window.TangleUI = {};//object, no need to instantiate
+    window.TangleUI = {};//only one per app
+
+    //PUBIC API
 
     TangleUI.bounds = new Rectangle();
 
-    //rename to layoutDefinition, rectangleDefinitions, ???
-    TangleUI.rectangles = [];
-
     TangleUI.setLayoutDefinitions = function(JsonLayout){
-        this.rectangles = JsonLayout;
+        _layoutDefinitions = JsonLayout;
     };
 
     var _compareRect = new Rectangle();
     TangleUI.setLayoutBounds = function(x, y, width, height){
         _compareRect.update(x, y, width, height);
         if(this.bounds.equals(_compareRect)){
+            console.log("TangleUI.setLayoutBounds() skipping, bounds have not changed");
             return;
         }
         this.bounds.update(x, y, width, height);
-        updateLayoutRectangles();
+        _rectangles = {};
+        _parentRectLookup = {};
+        _rectCount = 0;
+        setLayoutName();
+        calculateDefaultLayoutRectangles(_layoutDefinitions, this.bounds);
         //this.debugLayout();
     };
 
     //api only exposes calculated layout Rectangle bounds
-    TangleUI.getRect = function(name, stateName){
-        var layoutRect = getLayoutRect(name);
-        return getLayoutRectStateBounds(layoutRect, stateName || "default");
+    TangleUI.getRect = function(definitionName, stateName){
+        return getRect(definitionName, stateName);
     };
 
     //adjustedRect contains calculated values (not normals)
-    //this adjustment is overridden when setLayoutBounds() is called, by defaults from layout json
+    //adjustment is overridden when setLayoutBounds() is called, by defaults from layout json
     //components must be notified when setLayoutBounds occurs and are responsible for repeating this adjustment prior to render.
-    TangleUI.setRect = function(layoutRectName, state, adjustedRect){
-        var layoutRect = getLayoutRect(layoutRectName);
-        var stateRect = getLayoutRectState(layoutRect, state);
-        var parentBounds = layoutRect.parent.default.bounds;
-        stateRect.x = adjustedRect.x / parentBounds.width;
-        stateRect.y = adjustedRect.y / parentBounds.height;
-        stateRect.width = adjustedRect.width / parentBounds.width;
-        stateRect.height = adjustedRect.height / parentBounds.height;
-        stateRect.bounds.updateToRect(adjustedRect);
-        stateRect.bounds.round();
-        return stateRect.bounds;
+    TangleUI.setRect = function(adjustedRect, definitionName, stateName){
+        return setRect(adjustedRect, definitionName, stateName);
     };
 
-    /*
-TangleUI.localToGlobal = function(layoutRectName){
-    var jsonRect = getLayoutRect(layoutRectName);
-    return localToGlobal(jsonRect, jsonRect.bounds);
-};
-
-    TangleUI.debugLayout = function(){
-        renderDebugLayoutRects();
-    };*/
 
     //PRIVATE PROPERTIES AND METHODS
+
+    var _layoutDefinitions;
+    var _rectCount = 0;
+    var _rectanglePool = [];
+    var _rectangles;
+    var _parentRectLookup;
+    var _layoutName = "horizontal";//used to select corresponding layout rect
+
+    var setLayoutName = function(){
+        if(TangleUI.bounds.isSquareish(.2)){
+            _layoutName = "square";
+        }else{
+            _layoutName = TangleUI.bounds.isLandscape() ? "landscape" : "portrait";
+        }
+    };
+
+    var isDefaultStateName = function(stateName){
+        return !stateName || stateName === "default";
+    };
+
+    //returns a calculated Rectangle instance (provided definitions are correctly set up)
+    var getRect = function(definitionName, stateName){
+        var id = getRectId(definitionName, stateName);
+        return _rectangles[id] || getStateRect(definitionName, stateName);//return cached value or create new
+    };
+
+    var getStateRect = function(definitionName, stateName){
+        var definition = getDefinitionObjectByName(_layoutDefinitions, definitionName);
+        if(!definition){
+            console.warn("TangleUI.getStateRect() Warning : provided definitionName : ", definitionName, " not found")
+        }
+        var rect = createRectFromDefinitionState(definition, definitionName, stateName);
+        //console.log("TangleUI.getStateRect() ", definitionName, stateName, rect.toString());
+        return rect;
+    };
+
+    var getBoundsForDefinitionRect = function(definitionName){
+        return _parentRectLookup[definitionName];//if this is null, something is not right in the definitions json
+    };
+
+    var setRect = function(adjustedRect, definitionName, stateName){
+        // TODO:  (rect is Rectangle) instanceOf ???
+        if(!adjustedRect.isSet){
+            console.warn("TangleUI.setRect() Warning : provided adjustedRect : ", adjustedRect, " is not a valid Rectangle");
+            return;
+        }
+        var bounds = getBoundsForDefinitionRect(definitionName);
+        var rect = getRect(definitionName, stateName);
+        rect.updateToRect(adjustedRect);
+        rect.round();
+        return rect;
+    };
+
+    var getRectId = function(definitionName, stateName){
+        return definitionName + (isDefaultStateName(stateName) ? "" : "_" + stateName);
+    };
+
+    //=============================== :: Rectangle "parsing" :: ================================
+
+    //recursive search through "definition rectangles", only called when fetching state rectangles
+    var getDefinitionObjectByName = function(rectDefinitionObject, definitionName){
+        var childName, childDefinitionObject;
+        for(childName in rectDefinitionObject){
+            childDefinitionObject = rectDefinitionObject[childName];
+            if(childName === definitionName){
+                return childDefinitionObject;
+            }
+            if(childDefinitionObject.children){
+                var rect = getDefinitionObjectByName(childDefinitionObject.children, definitionName);
+                if(rect){
+                    return rect;
+                }
+            }
+        }
+        return null;
+    };
+
+    //traverses recursively through all "definition rectangles"
+    //creates and calculates "defaults", adds to _rectangles
+    var calculateDefaultLayoutRectangles = function(rectDefinitionsObject, bounds){
+        var childName, childDefinitionObject, childDefaultBounds;
+        for(childName in rectDefinitionsObject){
+            childDefinitionObject = rectDefinitionsObject[childName];
+            _parentRectLookup[childName] = bounds;
+            childDefaultBounds = createRectFromDefinitionState(childDefinitionObject, childName, "default");
+            //console.log("TangleUI.calcRect()", childName, childDefaultBounds.toString());
+            if(childDefinitionObject.children){
+                calculateDefaultLayoutRectangles(childDefinitionObject.children, childDefaultBounds);
+            }
+        }
+    };
+
+    var getStateDefinitionObject = function(definitionObject, stateName){
+        var state = definitionObject[stateName || "default"];
+        if(!state){
+            console.warn("TangleUI.getStateDefinitionObject() state : ", stateName, " is not available in definitionObject : ", definitionObject ,". Please check TangleUI._layoutDefinitions");
+        }
+        return state;
+    };
+
+    var createRect = function(definitionName, stateName){
+        var rect, id = getRectId(definitionName, stateName);
+        if(_rectanglePool.length > _rectCount){
+            rect = _rectanglePool[_rectCount];
+        }else{
+            rect = new Rectangle();
+            _rectanglePool.push(rect);
+        }
+        rect.update();
+        _rectangles[id] = rect;
+        _rectCount++;
+        //console.log("createRect : ", id ,  _rectangles[id].toString());
+        return rect;
+    };
+
+
+    var createRectFromDefinitionState = function(definitionObject, definitionName, stateName){
+        //console.log("TangleUI.createRect()", definitionName, stateName);
+        var rect = createRect(definitionName, stateName);
+        var bounds = getBoundsForDefinitionRect(definitionName);
+        //console.log("create 1 , parent bounds : ", bounds.toString());
+        var stateDefinition = getStateDefinitionObject(definitionObject, stateName);
+        var orientationRect = stateDefinition["all"] || stateDefinition[_layoutName];
+        var numOrientationRectProps = getNumberOfPropertiesInOrientationRect(orientationRect);
+        //console.log("TangleUI.createRectFromDef()", bounds.toString(), stateDefinition, orientationRect, numOrientationRectProps);
+        var propName, value, loops = 0;
+        //this can be optimized, no need to loop through all values every time
+        //then again, a few conditionals might be faster than array manipulation in other solutions?
+        while(rect.getNumberOfSetItems() < numOrientationRectProps){
+            for(propName in rectNormalCalculator){
+                value = orientationRect[propName];
+                //console.log("update : ", propName, value, rect.toString());
+                if(!isNaN(value)){
+                    rectNormalCalculator[propName](rect, bounds, Number(value));//calls x(), y(), w, h, left() etc.
+                }else if(!isNaN(rect[value])){
+                    if(isRectangleProperty(propName)){
+                        rect[propName] = rect[value];//propName == "x", "y", "width" or "height"
+                    }else{
+                        positionCalculator[propName](rect, bounds, rect[value]);//propName == "left", "right", "top", "bottom", "centerX", "centerY"
+                    }
+                }
+            }
+            if(++loops > 3){
+                console.warn("TangleUI.setJsonRectBoundsToState() cannot calculate bounds for : ", definitionName, stateName,  orientationRect);
+                break;
+            }
+        }
+        if(!rect.isSet()){
+            if(isDefaultStateName(stateName)){
+                console.warn("TangleUI.setJsonRectBoundsToState() incomplete default stateDefinition calculation : ", definitionName, " : " ,  orientationRect, ", result: ",  rect.toString());
+            }else{
+                //console.log("create : replacing " + rect.toString() + " values from : ", getRect(definitionName).toString());
+                rect.replaceNullValuesFrom(getRect(definitionName));
+            }
+        }
+        rect.round();
+        //console.log("create 2 , rect : ", rect.toString());
+        return rect;
+    };
+
+    //TODO: move
+    var getNumberOfPropertiesInOrientationRect = function(rect){
+        var propCount = 0;
+        for(var prop in rect){
+            propCount += (positionCalculator[prop] ? 1: 0);
+        }
+        return propCount;
+    };
+
+    var isRectangleProperty = function(propName){
+        return propName === "x" || propName === "y" || propName === "width" || propName === "height";
+    };
+
 
     //positions are "local" to container bounds
     var rectNormalCalculator = {
@@ -146,118 +319,16 @@ TangleUI.localToGlobal = function(layoutRectName){
     };
 
 
-    var _layoutRectanglesLookup = {};
-    var _layoutName = "horizontal";//used to select corresponding layout rect
 
-    var getLayoutRect = function(layoutRectName){
-        var data = _layoutRectanglesLookup[layoutRectName];
-        if(!data){
-            console.warn("TangleUI.getLayoutRect() layoutRectName : ", layoutRectName, " is not available. Make sure updateLayout() has been called, or check TangleUI.rectangles");
-            return;
-        }
-        return data;
-    };
+    /*
+TangleUI.localToGlobal = function(layoutRectName){
+var jsonRect = getLayoutRect(layoutRectName);
+return localToGlobal(jsonRect, jsonRect.bounds);
+};
 
-    var getLayoutRectState = function(layoutRect, stateName){
-        var stateRect = layoutRect[stateName];
-        if(!stateRect){
-            console.warn("TangleUI.getLayoutRectState() state : ", stateName, " is not available in layoutRect : ", layoutRect.name ,". Please check TangleUI.rectangles");
-            return;
-        }
-        return stateRect;
-    };
-
-    var getLayoutRectStateBounds = function(layoutRect, state){
-        return getLayoutRectState(layoutRect, state).bounds;
-    };
-
-    var calculateStateRectangle = function(layoutRect, stateName){
-        var state = getLayoutRectState(layoutRect, stateName);
-        state.bounds = state.bounds || new Rectangle();
-        state.bounds.update();
-        var orientationRect = state["all"] || state[_layoutName];
-        var numOrientationRectProps = getNumberOfPropertiesInOrientationRect(orientationRect);
-        var propName, value, loops = 0;
-        //this can be optimized, no need to loop through all values every time
-        while(state.bounds.getNumberOfSetItems() < numOrientationRectProps){
-            for(propName in rectNormalCalculator){
-                value = orientationRect[propName];
-                //console.log("update : ", propName, value, rect.toString());
-                if(!isNaN(value)){
-                    rectNormalCalculator[propName](state.bounds, layoutRect.parent.default.bounds, Number(value));//calls x(), y(), w, h, left() etc.
-                }else if(!isNaN(state.bounds[value])){
-                    if(isRectangleProperty(propName)){
-                        state.bounds[propName] = state.bounds[value];//propName == "x", "y", "width" or "height"
-                    }else{
-                        positionCalculator[propName](state.bounds, layoutRect.parent.default.bounds, state.bounds[value]);//propName == "left", "right", "top", "bottom", "centerX", "centerY"
-                    }
-                }
-            }
-            if(++loops > 3){
-                console.warn("TangleUI.setJsonRectBoundsToState() cannot calculate bounds for : ", layoutRect.name, stateName,  orientationRect);
-                break;
-            }
-        }
-        if(state.bounds.isSet()){
-            return state.bounds;
-        }
-        if(stateName === "default"){
-            console.warn("TangleUI.setJsonRectBoundsToState() incomplete default state calculation : ", layoutRect.name, " : " ,  orientationRect, ", result: ",  rect.toString());
-            return;
-        }
-        state.bounds.replaceNullValuesFrom(layoutRect.default.bounds);
-        return state.bounds;
-    };
-
-    var updateLayoutRectangles = function(){
-        updateLayoutName();
-        _layoutRectanglesLookup = {};//not really necessary
-        TangleUI.default = {bounds : TangleUI.bounds};//little hack to enable traversal
-        traverseLayoutRectangles(TangleUI);//bit awkward to pass "self" as a global variable to private method?
-    };
-
-    //traverses recursively through all "layout rectangles", creates/updates bounds to "default"
-    var traverseLayoutRectangles = function(layoutRect){
-        var childLayoutRect, childName, stateName, calculatedBounds;
-        for(childName in layoutRect.rectangles){
-            childLayoutRect = layoutRect.rectangles[childName];
-            childLayoutRect.name = childName;//only used for debugging
-            childLayoutRect.parent = layoutRect;
-            _layoutRectanglesLookup[childName] = childLayoutRect;
-            for(stateName in childLayoutRect){
-                if(stateName !== "rectangles" && stateName !== "name" && stateName !== "parent"){
-                    calculatedBounds = calculateStateRectangle(childLayoutRect, stateName);
-                    calculatedBounds.round();
-                    //console.log("=====> Layout Traverse :\t", childName, ":" , stateName, "\t" , calculatedBounds.toString());
-                }
-            }
-            if(childLayoutRect.rectangles){
-                traverseLayoutRectangles(childLayoutRect);
-            }
-        }
-    };
-
-    var updateLayoutName = function(){
-        if(TangleUI.bounds.isSquareish(.2)){
-            _layoutName = "square";
-        }else{
-            _layoutName = TangleUI.bounds.isLandscape() ? "landscape" : "portrait";
-        }
-    };
-
-    var getNumberOfPropertiesInOrientationRect = function(rect){
-        if(isNaN(rect.orientationRectPropertyCount)){
-            rect.orientationRectPropertyCount = 0;
-            for(var prop in rect){
-                rect.orientationRectPropertyCount += (positionCalculator[prop] ? 1: 0);
-            }
-        }
-        return rect.orientationRectPropertyCount;
-    };
-
-    var isRectangleProperty = function(propName){
-        return propName === "x" || propName === "y" || propName === "width" || propName === "height";
-    };
+TangleUI.debugLayout = function(){
+    renderDebugLayoutRects();
+};*/
 
     //---------------:: DEBUGGING
 
@@ -284,7 +355,7 @@ TangleUI.localToGlobal = function(layoutRectName){
             rect =
             context.fillRect( + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
             //console.log("renderDebugLayoutRects()", childName, childLayoutRect.bounds.toString());
-            if(childLayoutRect.rectangles){
+            if(childLayoutRect._layoutDefinitions){
                 renderDebugLayoutRects(childLayoutRect, color);//recurse
             }
         }

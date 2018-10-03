@@ -40,7 +40,7 @@
                 _textMeasureSpan.style.whiteSpace = "nowrap";
                 _textMeasureSpan.style.fontSize = fontSize + "px";
                 _textMeasureSpan.innerHTML = string;
-                console.log("measureTextWidth() fs:", fontSize,  _textMeasureSpan.innerHTML , _textMeasureSpan.offsetWidth, "x6");
+                //console.log("measureTextWidth() fs:", fontSize,  _textMeasureSpan.innerHTML , _textMeasureSpan.offsetWidth, "x6");
                 _measuredWidth = _textMeasureSpan.offsetWidth;
                 _textMeasureSpan.innerHTML = "";
                 _button.removeChild(_textMeasureSpan);
@@ -71,7 +71,7 @@
             var fontSize = Math.round(_defaultBounds.height * .6);
             //console.log();
             _defaultBounds.width = measureTextWidth(value, fontSize) + _defaultBounds.height * 2;
-            console.log("TabButton.calculateLayout()", fontSize, _defaultBounds.width);
+            //console.log("TabButton.calculateLayout()", fontSize, _defaultBounds.width);
             var spacer = TangleUI.bounds.smallerSide() * .05;
 
             //not the most flexible solution, ok for now.

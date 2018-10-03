@@ -7,7 +7,7 @@
  *      - incomplete
  *
  *      InterpolationList:
- *      - greensock like list of "start/end" properties that can be inerpolated, update mechanism for list
+ *      - greensock like list of "start/end" properties (x,y,w,h only) that can be interpolated, update mechanism for list
  *
  *      RectangleTransition:
  *      - object with current Rectangle, fromRectangle and toRectangle properties, with update to normal mechanism
@@ -40,6 +40,7 @@
     };
 
     TransitionCSSUtil.getTranslateString = function(x, y){
+        //console.log("TransitionCSSUtil.getTranslateString()", x, y);
         return "translate(" + x + "px, " + y + "px)";
     };
 
@@ -77,6 +78,7 @@
 //==============::Interpolation List::=================
 //=============================================================
 
+//TODO: consider storing all interploations in one array, reference by index or id
 (function() {
 
     var _totalCreatedInterpolations = 0;
@@ -152,31 +154,26 @@
 
     window.RectangleTransition = function(){
 
+        this.data = undefined;//TODO: rethink this
         this.fromRect = new Rectangle();
         this.toRect = new Rectangle();
         this.rectangle = new Rectangle();
 
         var _interpolations = new InterpolationList();
-        var _xEase, _yEase, _widthEase, _heightEase;
 
         this.updateTargets = function(fromRect, toRect){
             this.fromRect.updateToRect(fromRect);
             this.toRect.updateToRect(toRect);
         };
 
-        this.setEasings = function(xEase, yEase, widthEase, heightEase){
-            _xEase = xEase;
-            _yEase = yEase;
-            _widthEase = widthEase;
-            _heightEase = heightEase;
-        };
-
-        this.init = function(){
+        //TODO: review "data" implementation (Custom Transitions need to be available outside TangleUI
+        this.init = function(data){
+            this.data = data || {duration:500};
             _interpolations.clear();
-            _interpolations.addInterpolation(this.rectangle, "x",       this.fromRect.x,         this.toRect.x,       _xEase);
-            _interpolations.addInterpolation(this.rectangle, "y",       this.fromRect.y,         this.toRect.y,       _yEase);
-            _interpolations.addInterpolation(this.rectangle, "width",   this.fromRect.width,     this.toRect.width,   _widthEase);
-            _interpolations.addInterpolation(this.rectangle, "height",  this.fromRect.height,    this.toRect.height,  _heightEase);
+            _interpolations.addInterpolation(this.rectangle, "x",       this.fromRect.x,         this.toRect.x,       this.data["xEase"]);
+            _interpolations.addInterpolation(this.rectangle, "y",       this.fromRect.y,         this.toRect.y,       this.data["yEase"]);
+            _interpolations.addInterpolation(this.rectangle, "width",   this.fromRect.width,     this.toRect.width,   this.data["widthEase"]);
+            _interpolations.addInterpolation(this.rectangle, "height",  this.fromRect.height,    this.toRect.height,  this.data["heightEase"]);
         };
 
         this.updateToNormal = function(normal){
@@ -192,219 +189,61 @@
 }());
 
 //=============================================================
-//==============::Rectangle Transition Animator::==============
+//==============::Transition Store::===========================
 //=============================================================
 
 (function() {
-
-    var blankCallback = function(){};
-
-    //Runs a transition, does not manipulate transition
-    window.RectangleTransitionAnimator = function(){
-
-        var _transition,
-            _animator = new UnitAnimator(),
-            _duration = 1000,
-            _easingFunction = undefined,
-            _updateCallback = blankCallback,
-            _completeCallback = blankCallback;
-
-        this.setTransition = function(transition, duration, easingFunction){
-            _transition = transition;
-            _duration = duration;
-            _easingFunction = easingFunction;
-        };
-
-        this.setCallbacks = function(updateCallback, completeCallback){
-            this.setUpdateCallback (updateCallback);
-            this.setCompleteCallback(completeCallback);
-        };
-
-        this.setUpdateCallback = function(updateCallback){
-            _updateCallback = updateCallback || blankCallback;
-        };
-
-        this.setCompleteCallback = function(completeCallback){
-            _completeCallback = completeCallback || blankCallback;
-        };
-
-        this.getTransition = function(){
-            return _transition;
-        };
-
-        this.getRectangle = function(){
-            return _transition.rectangle;
-        };
-
-        this.isAnimating = function(){
-            return _animator && _animator.isAnimating();
-        };
-
-        this.play = function(){
-            //update(0);
-            _animator.start(_duration, update, _completeCallback, _easingFunction);
-        };
-
-        this.playReverse = function(){
-            //update(1);
-            _animator.start(_duration, updateReverse, _completeCallback, _easingFunction);
-        };
-
-        this.stop = function(){
-            _animator.stop();
-        };
-
-        //private properties and methods
-
-        var update = function (normal) {
-            _transition.updateToNormal(normal);
-            _updateCallback(normal, _transition.rectangle);
-        };
-
-        var updateReverse = function (normal) {
-            _transition.updateToNormal(1- normal);
-            _updateCallback(normal, _transition.rectangle);
-        };
-
-    };
-
-}());
-
-//=============================================================
-//==========::Chained Rectangle Transition Animator::==========
-//=============================================================
-
-(function() {
-
-    var blankCallback = function(){};
-
-    window.ChainedRectangleTransitionAnimator = function(){
-
-        var _animations, _currentAnimation, _animationIndex, _completeCallback;
-
-        this.isAnimating = function(){
-            return _currentAnimation && _currentAnimation.isAnimating();
-        };
-
-        //TODO: expects a list of {transitionId:String, updateCallback:Function, completeCallback:Function}
-        this.setTransitions = function(animations){
-            _animations = animations;
-        };
-
-        //TODO: REMOVE, temporary hack to get TransitionStore resizing to work for ChainAnimtions
-        this.getAnimations = function(){
-            return _animations;
-        };
-
-        this.getRectangle = function(){
-            return _currentAnimation.getRectangle();
-        };
-
-        //_animations can have an updateCallback, but completeCallback will be overridden... this is unfortunate
-        this.play = function(completeCallback){
-            _completeCallback = completeCallback || blankCallback;
-            _animationIndex = -1;
-            playNextAnimation();
-        };
-
-        var playNextAnimation = function(){
-            var animObject = _animations[++_animationIndex];
-            _currentAnimation = TransitionStore.getAnimationByTransitionId(animObject.transitionId, animObject.updateCallback);
-            //console.log("ChainedRectangleTransitionAnimator.playNextAnimation()", _animationIndex);
-            _currentAnimation.setCompleteCallback(_animationIndex === _animations.length - 1 ? _completeCallback : playNextAnimation);
-            _currentAnimation.play();
-        };
-
-        //this.playReverse = function(updateCallback, completeCallback){};
-
-        this.stop = function(){
-            if(_currentAnimation){
-                _currentAnimation.stop();
-            }
-        };
-
-    };
-
-}());
-
-
-//=============================================================
-//==============::Transition STORE::===========================
-//=============================================================
-
-(function() {
-
-    //private static properties and methods
-
-    var _transitions = [];
-
-    var getTransitionDataForId = function(transitionId){
-        var data = _transitions[transitionId];
-        if(!data){
-            console.warn("RectangleTransitionAnimator constructor Warning : transition with id : ", transitionId ," unavailable. Please check transitions json");
-        }
-        return data;
-    };
-
-    var populateTransitionForLayoutRect = function(transition, layoutRectName, fromState, toState){
-        //console.log("TransitionStore.populateTransitionForLayoutRect()", layoutRectName, fromState, toState);
-        transition.fromRect = TangleUI.getRect(layoutRectName, fromState);
-        transition.toRect = TangleUI.getRect(layoutRectName, toState);
-        transition.init();
-    };
-
 
     window.TransitionStore = {};
 
     //Public API
 
-    var _createdTransitions = {};
-    var _createdAnimations = {};
-
     TransitionStore.setTransitionDefinitions = function(definitionsJson){
-        _transitions = definitionsJson;
+        _transitionDefinitions = definitionsJson;
     };
 
-    //Rename to reflect this is created from TangleUI Rects
+    //creates or updates returned transition
     TransitionStore.getTransition = function(transitionId){
         var transition = _createdTransitions[transitionId] || new RectangleTransition();
-        var data = getTransitionDataForId(transitionId);
         //console.log("TransitionStore.getTransition()", transitionId, data);
-        transition.data = data;
-        transition.setEasings(data["xEase"], data["yEase"], data["widthEase"], data["heightEase"]);
-        populateTransitionForLayoutRect(transition, data.layoutRectId, data.from, data.to);
-        transition.updateToNormal(0);
+        updateTransitionForLayoutDefinition(transition, getTransitionDataForId(transitionId));
         _createdTransitions[transitionId] = transition;
         return transition;
     };
 
-    TransitionStore.resizeTransition = function(transition){
-        populateTransitionForLayoutRect(transition, transition.data.layoutRectId, transition.data.from, transition.data.to);
+    //private properties and methods
+
+    var _transitionDefinitions = [],
+        _createdTransitions = {},
+        _stateRect;
+
+    var getTransitionDataForId = function(transitionId){
+        var data = _transitionDefinitions[transitionId];
+        if(!data){
+            console.warn("TransitionStore.getTransitionDataForId Warning : transition with id : ", transitionId ," unavailable. Please check transitions json");
+        }
+        return data;
     };
 
-    TransitionStore.resizeChainTransition = function(chain){
-        var transitions = chain.getAnimations();
-        for(var i=0; i<transitions.length; i++){
-            TransitionStore.resizeTransitionAnimation(transitions[i]);
+    var updateTransitionForLayoutDefinition = function(transition, data){
+        //console.log("TransitionStore.updateTransitionForLayoutDefinition()", data.from, data.to)
+        var updated = false;
+        _stateRect = TangleUI.getRect(data.layoutRectId, data.from);
+        if(!transition.fromRect.equals(_stateRect)){
+            transition.fromRect.updateToRect(_stateRect);
+            updated = true;
         }
+        _stateRect = TangleUI.getRect(data.layoutRectId, data.to);
+        if(!transition.toRect.equals(_stateRect)){
+            transition.toRect.updateToRect(_stateRect);
+            updated = true;
+        }
+        if(updated){
+            transition.init(data);//TODO: see comment about transition.data in init()
+            return true;
+        }
+        return false;
     };
 
-    TransitionStore.getAnimationByTransitionId = function(transitionId, updateCallback, completeCallback){
-        var transition  = this.getTransition(transitionId);
-        var animation = _createdAnimations[transitionId] || new RectangleTransitionAnimator();
-        animation.setTransition(transition, transition.data.duration, transition.data.easing);
-        if(updateCallback){
-            animation.setUpdateCallback(updateCallback);
-        }
-        if(completeCallback){
-            animation.setCompleteCallback(completeCallback);
-        }
-        _createdAnimations[transitionId] = animation;
-        return animation;
-    };
-
-    TransitionStore.resizeTransitionAnimation = function(animation){
-        this.resizeTransition(animation.getTransition());
-    };
 
 }());

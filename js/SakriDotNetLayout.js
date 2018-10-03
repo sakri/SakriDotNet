@@ -40,7 +40,7 @@ window.SakriDotNetLayout = {
         default: {
             all: {x:0, y:0, width:1, height:1}
         },
-        rectangles:{
+        children:{
             image : {
                 default: {
                     landscape: {x: .1, y: .1, width: .4, height: .8},
@@ -66,7 +66,7 @@ window.SakriDotNetLayout = {
         transitionFrom: {
             all: {x: 1.1, y:1.1}
         },
-        rectangles : {
+        children : {
             progressGraphic : {
                 default: {
                     all: {x: .33, y: .33, width: .65, height: .65}
@@ -100,7 +100,9 @@ window.SakriDotNetLayout = {
     },
     menuButtonAvatarZoomed: {
         default : {
-            all: {x: 0, y: 0, width: 1, height: 1}/* calculated by app, based on avatar dimensions*/
+            landscape: {centerX: .5, y: .25, width: "height", height: .5},
+            square: {x: .25, y: .25, width: .75, height: .75},
+            portrait: {x:.25, centerY: .5, width: .5, height: "width"}
         },
         transitionTo: {
             landscape:  {centerX: "width", centerY: "width", width: 2, height: "width"},

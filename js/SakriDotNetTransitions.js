@@ -1,5 +1,7 @@
-//Transition definitions json for use with TangleUI
-//references rectangle ids from SakriDotNetLayout.js
+/**
+ * Transition definitions json for use with TangleUI
+ * references rectangle ids from SakriDotNetLayout.js
+*/
 window.SakriDotNetTransitions = {
     /* LOADER */
     loaderTitleIn : {

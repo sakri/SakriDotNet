@@ -34,12 +34,15 @@
             _pulseColor = pulseColor;
         };
 
-        this.render = function(normal){
+        this.render = function(normal, clearBG){
 
             var i, fromNormal, toNormal, rippleNormal, radius;
 
             _context.save();
-            _context.clearRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height);
+            if(clearBG){
+                _context.clearRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height);
+            }
+
 
             //draw bg
             _context.beginPath();

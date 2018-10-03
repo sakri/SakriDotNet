@@ -546,7 +546,7 @@ function addConfetti(event){
 };
 
 function stopCelebrations(){
-    console.log("stopCelebrations()");
+    //console.log("stopCelebrations()");
     clearInterval(_confettiIntervalId);
     _confettiIntervalId = -1;
     if(_celebrateCanvas){

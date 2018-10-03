@@ -111,6 +111,13 @@
             if(!_loader){
                 _cardHtmlRenderer.close();
                 _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
+                _menuButton.stop();
+                if(_closeButton){
+                    _closeButton.stop();
+                }
+                if(_navigationButton){
+                    _navigationButton.stop();
+                }
             }
             _windowResizeTimeoutId = setTimeout(commitWindowResize, 300);//arbitrary number
         };
@@ -118,15 +125,13 @@
         var commitWindowResize = function () {
             TangleUI.setLayoutBounds(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
-            AppData.storeInteraction();
             if(_loader){
                 _loader.resize();
                 return;
             }
             hideIframe();
             _windowResizeTimeoutId = -1;
-
-            console.log("App.commitResize()", TangleUI.bounds.toString());
+            //console.log("App.commitResize()", TangleUI.bounds.toString());
             _menuCanvas.width = TangleUI.bounds.width;
             _menuCanvas.height = TangleUI.bounds.height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);

@@ -31,10 +31,10 @@
                 _outerRadius = _radius - _lineWidth * .5;
                 _innerRadius = Math.floor(_outerRadius * .6);//careful for mobile, can be very small!
                 _radian = MathUtil.PI2 * normal;
-                _centerX = bounds.x + _radius;
-                _centerY = bounds.y + _radius;
             }
             _bounds.updateToRect(bounds);
+            _centerX = _bounds.x + _radius;
+            _centerY = _bounds.y + _radius;
 
             context.save();
 

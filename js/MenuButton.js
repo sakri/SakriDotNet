@@ -17,7 +17,7 @@
             resize();
             _donut = _donut || new DonutChart("#FFFFFF", appConfig.themeColor, "#222222");
             _progressNormal = AppData.getAchievementNormal();
-            renderWithPie(TangleUI.getRect("progressGraphic"));
+            renderWithPie(0, TangleUI.getRect("progressGraphic"));
             animateButtonIn();
         };
 
@@ -35,7 +35,7 @@
         this.addToPulse = function(){
             stopPromptSequence();
             incrementPulse();
-            renderWithPie(TangleUI.getRect("progressGraphic"));
+            renderWithPie(0, TangleUI.getRect("progressGraphic"));
             startIdleTimer();
         };
 
@@ -43,6 +43,8 @@
 
         var  _donut,  _canvas, _context, _speechBubble,  _progressNormal = 0, _pulseNormal = 0, _getMessageFunction,
             _avatarScale, _bgRipple = new ToStatsButtonBackground(), _avatarBounds = new Rectangle(), _animations = {};
+
+        showStatsModuleCallback =  showStatsModuleCallback || function(){};
 
         var incrementPulse = function(){
             _pulseNormal += .02;
@@ -84,7 +86,7 @@
             var adjustedBounds = new Rectangle(bounds.x, bounds.y);
             adjustedBounds.width = adjustedBounds.height = _avatarScale * ss.height;
             //console.log("calculateDynamicLayout()", bounds.toString(), adjustedBounds.toString());
-            TangleUI.setRect("progressGraphic", "default", adjustedBounds);
+            TangleUI.setRect(adjustedBounds, "progressGraphic", "default");
 
             //needed for "to stats module" animation
             bounds = TangleUI.getRect("progressGraphic", "transitionFrom");
@@ -96,7 +98,7 @@
             adjustedBounds.width = Math.min(TangleUI.bounds.width * .8, 600);//TODO: hardcoded number, needs better approach
             adjustedBounds.x = TangleUI.bounds.width * .05;
             adjustedBounds.y = menuBounds.y - adjustedBounds.height * .45;
-            TangleUI.setRect("speechBubble", "default", adjustedBounds);
+            TangleUI.setRect(adjustedBounds, "speechBubble", "default");
         };
 
         var resizeCanvas = function(width, height){
@@ -116,26 +118,19 @@
         //==============:: Render ::=======================
         //======================================================
 
-        var renderWithPie = function(bounds){
-            //console.log("renderWithPie()", bounds.toString());
+        //Normal param is needed as these are used as animation update callbacks
+
+        var renderWithPie = function(normal, bounds){
             incrementPulse();
-            _bgRipple.render(_pulseNormal);
+            _bgRipple.render(_pulseNormal, true);
             _donut.render(_canvas, bounds, _progressNormal);
         };
 
-        var renderWithPixelGuy = function(bounds){
+        var renderWithPixelGuy = function(normal, bounds){
             incrementPulse();
-            _bgRipple.render(_pulseNormal);
+            _bgRipple.render(_pulseNormal, true);
             _avatarBounds.updateToRect(bounds);
             PixelGuyHeadSprite.renderAvatar(_context, _avatarBounds.x, _avatarBounds.y, _avatarScale, _progressNormal);
-        };
-
-        var renderAnimatingPie = function(normal, rect){
-            renderWithPie(rect);
-        };
-
-        var renderAnimatingPixelGuy = function(pixelGuy, rect){
-            renderWithPixelGuy(rect);
         };
 
         var updateTransitionMenuButton = function(normal, rect){
@@ -143,9 +138,10 @@
             TransitionCSSUtil.setTranslate(_canvas, rect.x - bounds.x, rect.y - bounds.y);
         };
 
-        var renderAnimatingSpeechBubble = function(){
-            renderWithPixelGuy(TangleUI.getRect("progressGraphic"));
-            var x = _animations.promptSequence.getRectangle().x - TangleUI.getRect("speechBubble", "transitionTo").x;
+        //TODO: move to Animation.js (css target or so)
+        var renderAnimatingSpeechBubble = function(normal, rect){
+            renderWithPixelGuy(0, TangleUI.getRect("progressGraphic"));
+            var x = rect.x - _speechBubbleBounds.x;
             TransitionCSSUtil.setTranslate(_speechBubble, x, 0);
         };
 
@@ -157,16 +153,14 @@
             _speechBubbleBounds.updateToRect(TangleUI.getRect("speechBubble"));
             _speechBubbleBounds.width = SpeechBubble.update(_speechBubble, _getMessageFunction(_progressNormal), _speechBubbleBounds);
             _speechBubbleBounds.x = Math.round(TangleUI.bounds.width * 1.1);
-            TangleUI.setRect("speechBubble", "transitionFrom", _speechBubbleBounds);
+            //TangleUI.setRect(_speechBubbleBounds, "speechBubble", "transitionFrom");
             _speechBubble.style.transform = "translate(" + _speechBubbleBounds.width * 2 + "px, 0px)";//get it off screen
             var spacer = TangleUI.getRect("progressGraphic").width * .5;
             _speechBubbleBounds.x = Math.round(TangleUI.bounds.width - spacer - _speechBubbleBounds.width);
-            TangleUI.setRect("speechBubble", "transitionTo", _speechBubbleBounds);
+            TangleUI.setRect(_speechBubbleBounds, "speechBubble", "transitionTo");
+            //_speechBubbleBounds = TangleUI.getRect("speechBubble");
             _speechBubble.style.left = _speechBubbleBounds.x + "px";
             _speechBubble.style.top = _speechBubbleBounds.y + "px";
-            TransitionStore.getTransition("speechBubbleIn");//TODO: bit of a hack, getTransition resizes...
-            TransitionStore.getTransition("speechBubbleHover");
-            TransitionStore.getTransition("speechBubbleOut");
         };
 
         var hideSpeechBubble = function(){
@@ -196,28 +190,28 @@
         //only one element is translated at any given moment.
 
         var animateButtonIn = function(){
-            _animations.button = TransitionStore.getAnimationByTransitionId("menuButtonIn", updateTransitionMenuButton, startIdleTimer);
+            _animations.button = AnimationStore.getAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, startIdleTimer);
             _animations.button.play();
         };
         var animateButtonOut = function(){
-            _animations.button = TransitionStore.getAnimationByTransitionId("menuButtonIn", updateTransitionMenuButton, stop);
+            _animations.button = AnimationStore.getAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, stop);
             _animations.button.playReverse();
         };
 
         var playPromptSequence = function(){
-            var transitions = [
-                {transitionId:"progressButtonOut", updateCallback : renderAnimatingPie},
-                {transitionId:"progressButtonIn", updateCallback : renderAnimatingPixelGuy},
-                {transitionId:"speechBubbleIn", updateCallback : renderAnimatingSpeechBubble},
-                {transitionId:"speechBubbleHover", updateCallback : renderAnimatingSpeechBubble},
-                {transitionId:"speechBubbleOut", updateCallback : renderAnimatingSpeechBubble},
-                {transitionId:"progressButtonOut", updateCallback : renderAnimatingPixelGuy},
-                {transitionId:"progressButtonIn", updateCallback : renderAnimatingPie}
-            ];
-            _animations.promptSequence = _animations.promptSequence || new ChainedRectangleTransitionAnimator();
-            _animations.promptSequence.setTransitions(transitions);
             setNextSpeechBubble();
-            _animations.promptSequence.play(startIdleTimer);
+            //TODO: should be able to recycle prompt1 and 2 for prompt6 and 7, also bubbleIn/out playReverse?
+            var animations = [
+                AnimationStore.getAnimation("prompt1", "progressButtonOut", renderWithPie),
+                AnimationStore.getAnimation("prompt2", "progressButtonIn", renderWithPixelGuy),
+                AnimationStore.getAnimation("prompt3", "speechBubbleIn", renderAnimatingSpeechBubble),
+                AnimationStore.getAnimation("prompt4", "speechBubbleHover", renderAnimatingSpeechBubble),
+                AnimationStore.getAnimation("prompt5", "speechBubbleOut", renderAnimatingSpeechBubble),
+                AnimationStore.getAnimation("prompt6", "progressButtonOut", renderWithPixelGuy),
+                AnimationStore.getAnimation("prompt7", "progressButtonIn", renderWithPie)
+            ];
+            _animations.promptSequence = AnimationStore.getChainedAnimation("promptSequence", animations, null, startIdleTimer);
+            _animations.promptSequence.play();
         };
 
         var stopPromptSequence = function(){
@@ -228,11 +222,9 @@
         };
 
         //--------TO STATS MODULE IN/OUT---------
-        //This is still very messy due to dynamic properties and showIframe callback
 
         var playToStatsViewAnimation = function(){
-            if( (_animations.toStats1 && _animations.toStats1.isAnimating()) ||
-                (_animations.toStats2 && _animations.toStats2.isAnimating()) ){
+            if(_animations.toStatsSequence && _animations.toStatsSequence.isAnimating()){
                 console.log("MenuButton.playToStatsViewAnimation() transition active, skipping");
                 return;//already transitioning
             }
@@ -241,22 +233,18 @@
             _bgRipple.init(_canvas, TangleUI.getRect("menuButton"), appConfig.themeColor, "#FFFFFF");
             stopIdleTimer();
             hideSpeechBubble();
+
+            //set dynamic start position
             var bounds = TangleUI.getRect("menuButton");
             _avatarBounds.update(_avatarBounds.x + bounds.x, _avatarBounds.y + bounds.y, _avatarBounds.width, _avatarBounds.height);
-            TangleUI.setRect("menuButtonAvatarCenter", "transitionFrom", _avatarBounds);
+            TangleUI.setRect(_avatarBounds, "menuButtonAvatarCenter", "transitionFrom");
 
-            _animations.toStats1 = TransitionStore.getAnimationByTransitionId("pixelGuyToStatsModule1", renderToStatsAnimation, toStats1AnimationComplete);
-            _animations.toStats1.play();
-        };
-
-        var toStats1AnimationComplete = function(){
-            console.log("MenuButton.toStats1AnimationComplete()");
-            if(showStatsModuleCallback){
-                showStatsModuleCallback();
-            }
-            TangleUI.setRect("menuButtonAvatarZoomed", "default", _animations.toStats1.getRectangle());
-            _animations.toStats2 = TransitionStore.getAnimationByTransitionId("pixelGuyToStatsModule2", renderToStatsAnimation, stop);
-            _animations.toStats2.play();
+            var animations = [
+                AnimationStore.getAnimation("toStats1", "pixelGuyToStatsModule1", null, showStatsModuleCallback),
+                AnimationStore.getAnimation("toStats2", "pixelGuyToStatsModule2", null)
+            ];
+            _animations.toStatsSequence = AnimationStore.getChainedAnimation("toStatsSequence", animations, renderToStatsAnimation, stop);
+            _animations.toStatsSequence.play();
         };
 
         var renderToStatsAnimation = function(normal, bounds){

@@ -12,21 +12,26 @@ module.exports = function(grunt) {
         /* app */
         'release/js/SakriDotNetConcat.js': [
             "./js/utils.js",
+            "./js/SakriDotNetLayout.js",
+            "./js/SakriDotNetTransitions.js",
+            "./js/TangleUI/TangleUI.js",
+            "./js/TangleUI/Transition.js",
+            "./js/TangleUI/Animation.js",
             "./js/layout/AppLayout.js",
-            "./js/layout/CardMenuLayout.js",
-            "./js/layout/CardContentLayout.js",
             "./js/data.js",
-            "./js/animation/Transition.js",
             "./js/sprites.js",
+            "./js/widget/LoaderCircles.js",
             "./js/SakriDotNetLoader.js",
             "./js/CanvasInteractionManager.js",
             "./js/DragManager.js",
+            "./js/widget/TabButton.js",
             "./js/CardCanvasRenderer.js",
             "./js/CardHtmlRenderer.js",
             "./js/CardsMenu.js",
             "./js/widget/DonutChart.js",
             "./js/widget/SpeechBubble.js",
             "./js/Card.js",
+            "./js/widget/ToStatsButtonBackground.js",
             "./js/MenuButton.js",
             "./js/SakriDotNetHomeApp.js"
         ],
@@ -35,10 +40,10 @@ module.exports = function(grunt) {
             "./js/utils.js",
             "./js/layout/AppLayout.js",
             "./js/data.js",
+            "./js/sprites.js",
             "./js/widget/LineChart.js",
             "./js/widget/PieChart.js",
             "./js/widget/PixelConfetti.js",
-            "./js/sprites.js",
             "./js/StatsModuleSpaghetti.js"
         ]
     };

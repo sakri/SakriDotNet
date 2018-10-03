@@ -45,7 +45,7 @@
             playIntroAnimation();
         };
 
-        this.setLayoutBounds = function(){
+        this.resize = function(){
             resizeCanvas();
             calculateDynamicLayout();
             resizeTitle();
@@ -81,7 +81,7 @@
             adjustedBounds.height = PixelGuyTypingSprite.unscaledHeight * _pixelGuyScale;
             adjustedBounds.x = Math.round(TangleUI.bounds.centerX() - adjustedBounds.width * .5);
             adjustedBounds.y = Math.round(TangleUI.bounds.centerY() - adjustedBounds.height * .5);
-            TangleUI.setRect("loaderPixelGuy", "default", adjustedBounds);
+            TangleUI.setRect(adjustedBounds, "loaderPixelGuy", "default");
 
             //calculate circles bounds and emitter
             _circlesBounds.update(
@@ -98,7 +98,7 @@
             var titleBounds = TangleUI.getRect("loaderTitle");
             titleBounds.height = adjustedBounds.height * .6;
             adjustedBounds.updateToRect(titleBounds);
-            TangleUI.setRect("loaderTitle", "default", adjustedBounds);
+            TangleUI.setRect(adjustedBounds, "loaderTitle", "default");
 
             //adjust "buttrock" bounds to spritesheet proportions
             adjustedBounds.updateToRect(TangleUI.getRect("loaderPixelGuy"));
@@ -111,7 +111,7 @@
             if(adjustedBounds.right() > TangleUI.bounds.width){
                 adjustedBounds.x = TangleUI.bounds.width - adjustedBounds.width;
             }
-            TangleUI.setRect("loaderButtrock", "default", adjustedBounds);
+            TangleUI.setRect(adjustedBounds, "loaderButtrock", "default");
         };
 
         var resizeCanvas = function(){
@@ -146,24 +146,25 @@
 
         var resizeAnimations = function(){
             if(_exitAnimator.isAnimating()){
-                TransitionStore.resizeTransition(_animations.title);
-                TransitionStore.resizeTransition(_animations.laptop);
-                TransitionStore.resizeTransition(_animations.buttrock);
+                _animations.title = TransitionStore.getTransition("loaderTitleOut");
+                _animations.laptop = TransitionStore.getTransition("loaderLaptopOut");
+                _animations.buttrock = TransitionStore.getTransition("loaderButtrockOut");
             }else{
-                TransitionStore.resizeTransitionAnimation(_animations.pixelGuy);
-                TransitionStore.resizeTransitionAnimation(_animations.title);
+                _animations.pixelGuy = AnimationStore.getAnimation("loaderPixelGuy", "loaderPixelGuyIn");
+                _animations.title = AnimationStore.getAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
             }
         };
 
         var playIntroAnimation = function(){
-            _animations.pixelGuy = TransitionStore.getAnimationByTransitionId("loaderPixelGuyIn");
-            _animations.title = TransitionStore.getAnimationByTransitionId("loaderTitleIn", updateTitleAnimation);
-            _animations.pixelGuy.play();
+            _animations.pixelGuy = AnimationStore.getAnimation("loaderPixelGuy", "loaderPixelGuyIn");
+            _animations.title = AnimationStore.getAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
             _animations.title.play();
+            _animations.pixelGuy.play();
         };
 
         //Move to Transition.js .  CSSTransitionAnimation() or so
         var updateTitleAnimation = function(normal, rect){
+            //console.log("Loader.updateTitleAnimation()", rect.y , TangleUI.getRect("loaderTitle").y);
             TransitionCSSUtil.setTranslate(_title, 0, rect.y - TangleUI.getRect("loaderTitle").y);
         };
 
@@ -240,8 +241,8 @@
             updateImagesLoad();
         };
 
-        this.setLayoutBounds = function(){
-            _loader.setLayoutBounds();
+        this.resize = function(){
+            _loader.resize();
         };
 
         var updateLoaderCircles = function(){
@@ -285,8 +286,8 @@
             updateProgress();
         };
 
-        this.setLayoutBounds = function(){
-            _loader.setLayoutBounds();
+        this.resize = function(){
+            _loader.resize();
         };
 
         var updateProgress = function(){

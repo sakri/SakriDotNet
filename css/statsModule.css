@@ -144,6 +144,11 @@ h1, h2, p{
     padding-left: 2%;
 }
 
+#shareContent li{
+    margin-bottom: 1.5em;
+}
+
+
 #shareContainer button{
     width: 100%;
     height: 100%;
