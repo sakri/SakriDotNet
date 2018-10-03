@@ -1,11 +1,12 @@
 /**
  * Created by Sakri Rosenstrom on 01-10-18
- * Dependencies : MathUtil
+ * Dependencies : utils.js
  *
  *
- * =======================
- * ====:: TangleUI ::=====
- * =======================
+ * =====================================================
+ * =================:: TangleUI ::======================
+ * ===== (mangle, rectangle, heh, it was all me) =======
+ * =====================================================
  *
  * Is targeted at Single Page Applications which require Responsive Layouts inside the Html5 Canvas.
  * Separates basic layout and transition calculations from App and Component logic.
