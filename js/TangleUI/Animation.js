@@ -10,7 +10,8 @@
  *      - support for palying a list or a sequence of RectangleTransitionAnimator animations
  *
  *      AnimationStore:
- *      - Contains data descriptions of R
+ *      - creates and stores animations and chainedAnimations
+ *      - can stop all running animations.
  *
  */
 
@@ -213,6 +214,15 @@
         animation.setAnimations(animations, updateCallback, completeCallback);
         _createdChainAnimations[chainedAnimationId] = animation;
         return animation;
+    };
+
+    AnimationStore.stopAllAnimations = function(){
+        for(var animation in _createdAnimations){
+            animation.stop();
+        }
+        for(var animation in _createdChainAnimations){
+            animation.stop();
+        }
     };
 
 }());

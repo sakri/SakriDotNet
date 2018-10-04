@@ -25,30 +25,17 @@
 
 (function() {
 
-    window.TangleUI = {};//only one per app
+    window.TangleUI = {};
 
     //PUBIC API
 
-    TangleUI.bounds = new Rectangle();
+    TangleUI.setWindowResizeCallbacks = function(resizeStartCallback, resizeCallback, resizeFreezeDuration){
+        setWindowResizeCallbacks(resizeStartCallback, resizeCallback, resizeFreezeDuration);
+    };
 
     TangleUI.setLayoutDefinitions = function(JsonLayout){
         _layoutDefinitions = JsonLayout;
-    };
-
-    var _compareRect = new Rectangle();
-    TangleUI.setLayoutBounds = function(x, y, width, height){
-        _compareRect.update(x, y, width, height);
-        if(this.bounds.equals(_compareRect)){
-            console.log("TangleUI.setLayoutBounds() skipping, bounds have not changed");
-            return;
-        }
-        this.bounds.update(x, y, width, height);
-        _rectangles = {};
-        _parentRectLookup = {};
-        _rectCount = 0;
-        setLayoutName();
-        calculateDefaultLayoutRectangles(_layoutDefinitions, this.bounds);
-        //this.debugLayout();
+        calculateLayout();
     };
 
     //api only exposes calculated layout Rectangle bounds
@@ -58,7 +45,8 @@
 
     //adjustedRect contains calculated values (not normals)
     //adjustment is overridden when setLayoutBounds() is called, by defaults from layout json
-    //components must be notified when setLayoutBounds occurs and are responsible for repeating this adjustment prior to render.
+    //components must be notified when setLayoutBounds occurs,
+    //and are responsible for repeating this adjustment prior to render.
     TangleUI.setRect = function(adjustedRect, definitionName, stateName){
         return setRect(adjustedRect, definitionName, stateName);
     };
@@ -66,27 +54,56 @@
 
     //PRIVATE PROPERTIES AND METHODS
 
-    var _layoutDefinitions;
-    var _rectCount = 0;
-    var _rectanglePool = [];
-    var _rectangles;
-    var _parentRectLookup;
-    var _layoutName = "horizontal";//used to select corresponding layout rect
+    var _bounds = new Rectangle(),
+        _layoutDefinitions, /*JSON*/
+        _rectCount = 0,
+        _rectanglePool = [],
+        _rectangles, /*Object*/
+        _parentRectLookup, /*Object*/
+        _layoutName = "horizontal", /*used to select corresponding layout rect*/
+        _registeredToWindowResize = false,
+        _resizeStartCallback = function(){},
+        _resizeCallback = function(){},
+        _resizeFreezeDuration,
+        _windowResizeTimeoutId = -1
 
-    var setLayoutName = function(){
-        if(TangleUI.bounds.isSquareish(.2)){
-            _layoutName = "square";
-        }else{
-            _layoutName = TangleUI.bounds.isLandscape() ? "landscape" : "portrait";
+    var setWindowResizeCallbacks = function(resizeStartCallback, resizeCallback, resizeFreezeDuration){
+        _registeredToWindowResize = false;
+        _resizeStartCallback = resizeStartCallback || function(){};
+        _resizeCallback = resizeCallback || function(){};
+        _resizeFreezeDuration = resizeFreezeDuration || 300;
+        window.addEventListener("resize", windowResizeHandler);
+    };
+
+    //Avoids repeatedly running resize logic by calling calculateLayout 300ms after last user resize action
+    var windowResizeHandler = function () {
+        if(_windowResizeTimeoutId == -1){
+            _resizeStartCallback();
         }
+        clearTimeout(_windowResizeTimeoutId);
+        _windowResizeTimeoutId = setTimeout(calculateLayout, _resizeFreezeDuration);//arbitrary number
     };
 
-    var isDefaultStateName = function(stateName){
-        return !stateName || stateName === "default";
+    var calculateLayout = function () {
+        //TODO: calculate x and y taking "max proportions" into account.
+        _bounds.update(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
+        _rectangles = {};
+        _parentRectLookup = {};
+        _rectCount = 0;
+        _layoutName = getLayoutName(_bounds);
+        calculateDefaultLayoutRectangles(_layoutDefinitions, _bounds);
+
+        _windowResizeTimeoutId = -1;
+        console.log("TangleUI.commitResize()", _bounds.toString());
+        _resizeCallback();
     };
+
 
     //returns a calculated Rectangle instance (provided definitions are correctly set up)
     var getRect = function(definitionName, stateName){
+        if(!definitionName){
+            return _bounds;
+        }
         var id = getRectId(definitionName, stateName);
         return _rectangles[id] || getStateRect(definitionName, stateName);//return cached value or create new
     };
@@ -116,10 +133,6 @@
         rect.updateToRect(adjustedRect);
         rect.round();
         return rect;
-    };
-
-    var getRectId = function(definitionName, stateName){
-        return definitionName + (isDefaultStateName(stateName) ? "" : "_" + stateName);
     };
 
     //=============================== :: Rectangle "parsing" :: ================================
@@ -180,7 +193,6 @@
         return rect;
     };
 
-
     var createRectFromDefinitionState = function(definitionObject, definitionName, stateName){
         //console.log("TangleUI.createRect()", definitionName, stateName);
         var rect = createRect(definitionName, stateName);
@@ -225,7 +237,68 @@
         return rect;
     };
 
-    //TODO: move
+
+
+    /*
+TangleUI.localToGlobal = function(layoutRectName){
+var jsonRect = getLayoutRect(layoutRectName);
+return localToGlobal(jsonRect, jsonRect.bounds);
+};
+
+TangleUI.debugLayout = function(){
+    renderDebugLayoutRects();
+};*/
+
+    //---------------:: DEBUGGING
+
+    /*
+    var _debugCanvas;
+    function getDebugCanvas(){
+        _debugCanvas = _debugCanvas || document.createElement("canvas");
+        _debugCanvas.width = TangleUI.bounds.width;
+        _debugCanvas.height = TangleUI.bounds.height;
+        _debugCanvas.style.position = "absolute";
+        _debugCanvas.style.zIndex = appConfig.debugLayer;
+        document.body.appendChild(_debugCanvas);
+        return _debugCanvas;
+    };
+
+
+    var renderDebugLayoutRects = function(layoutRect, color){
+        var canvas = getDebugCanvas();
+        var context = canvas.getContext("2d");//could be optimized, but this is a debug feature
+        var childLayoutRect, childName, rect;
+        for(childName in layoutRect.rectangles){
+            childLayoutRect = layoutRect.rectangles[childName];
+            context.fillStyle = color || MathUtil.getRandomRGBAColorString(.4);
+            rect =
+            context.fillRect( + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
+            //console.log("renderDebugLayoutRects()", childName, childLayoutRect.bounds.toString());
+            if(childLayoutRect._layoutDefinitions){
+                renderDebugLayoutRects(childLayoutRect, color);//recurse
+            }
+        }
+    };
+    */
+
+    var isDefaultStateName = function(stateName){
+        return !stateName || stateName === "default";
+    };
+
+    var getRectId = function(definitionName, stateName){
+        return definitionName + (isDefaultStateName(stateName) ? "" : "_" + stateName);
+    };
+
+    var getLayoutName = function(bounds){
+        var name = "";
+        if(bounds.isSquareish(.2)){
+            name = "square";
+        }else{
+            name = bounds.isLandscape() ? "landscape" : "portrait";
+        }
+        return name;
+    };
+
     var getNumberOfPropertiesInOrientationRect = function(rect){
         var propCount = 0;
         for(var prop in rect){
@@ -318,50 +391,5 @@
             rect.y = bounds.height * .5 - value * .5;
         }
     };
-
-
-
-    /*
-TangleUI.localToGlobal = function(layoutRectName){
-var jsonRect = getLayoutRect(layoutRectName);
-return localToGlobal(jsonRect, jsonRect.bounds);
-};
-
-TangleUI.debugLayout = function(){
-    renderDebugLayoutRects();
-};*/
-
-    //---------------:: DEBUGGING
-
-    /*
-    var _debugCanvas;
-    function getDebugCanvas(){
-        _debugCanvas = _debugCanvas || document.createElement("canvas");
-        _debugCanvas.width = TangleUI.bounds.width;
-        _debugCanvas.height = TangleUI.bounds.height;
-        _debugCanvas.style.position = "absolute";
-        _debugCanvas.style.zIndex = appConfig.debugLayer;
-        document.body.appendChild(_debugCanvas);
-        return _debugCanvas;
-    };
-
-
-    var renderDebugLayoutRects = function(layoutRect, color){
-        var canvas = getDebugCanvas();
-        var context = canvas.getContext("2d");//could be optimized, but this is a debug feature
-        var childLayoutRect, childName, rect;
-        for(childName in layoutRect.rectangles){
-            childLayoutRect = layoutRect.rectangles[childName];
-            context.fillStyle = color || MathUtil.getRandomRGBAColorString(.4);
-            rect =
-            context.fillRect( + childLayoutRect.bounds.x, jsonRect.bounds.y + childLayoutRect.bounds.y, childLayoutRect.bounds.width, childLayoutRect.bounds.height);
-            //console.log("renderDebugLayoutRects()", childName, childLayoutRect.bounds.toString());
-            if(childLayoutRect._layoutDefinitions){
-                renderDebugLayoutRects(childLayoutRect, color);//recurse
-            }
-        }
-    };
-    */
-
 
 }());

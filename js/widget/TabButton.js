@@ -67,17 +67,18 @@
 
         var calculateLayout = function(value, rightAlign){
             _defaultBounds.y = 0;
+            //TODO: remove reference to "menuButton" !!!
             _defaultBounds.height = Math.round(TangleUI.getRect("menuButton").height * .3);
             var fontSize = Math.round(_defaultBounds.height * .6);
             //console.log();
             _defaultBounds.width = measureTextWidth(value, fontSize) + _defaultBounds.height * 2;
             //console.log("TabButton.calculateLayout()", fontSize, _defaultBounds.width);
-            var spacer = TangleUI.bounds.smallerSide() * .05;
+            var spacer = TangleUI.getRect().smallerSide() * .05;
 
             //not the most flexible solution, ok for now.
             if(rightAlign){
-                _defaultBounds.x = Math.round(TangleUI.bounds.right() - spacer - _defaultBounds.width);
-                _fromBounds.x = Math.round(TangleUI.bounds.width * 1.05);
+                _defaultBounds.x = Math.round(TangleUI.getRect().right() - spacer - _defaultBounds.width);
+                _fromBounds.x = Math.round(TangleUI.getRect().width * 1.05);
             }else{
                 _defaultBounds.x = spacer;
                 _fromBounds.x = Math.round(_defaultBounds.width * -1.1);

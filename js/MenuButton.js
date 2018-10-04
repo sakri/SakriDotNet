@@ -62,7 +62,9 @@
                 _animations.promptSequence.stop();
             }
             hideSpeechBubble();
-            _canvas.style.display = "none";
+            if(_canvas){
+                _canvas.style.display = "none";
+            };
         };
 
         //======================================================
@@ -95,8 +97,8 @@
             //adjust speech bubble layout and transition
             var menuBounds = TangleUI.getRect("menuButton");
             adjustedBounds.height = menuBounds.height * .5;
-            adjustedBounds.width = Math.min(TangleUI.bounds.width * .8, 600);//TODO: hardcoded number, needs better approach
-            adjustedBounds.x = TangleUI.bounds.width * .05;
+            adjustedBounds.width = Math.min(TangleUI.getRect().width * .8, 600);//TODO: hardcoded number, needs better approach
+            adjustedBounds.x = TangleUI.getRect().width * .05;
             adjustedBounds.y = menuBounds.y - adjustedBounds.height * .45;
             TangleUI.setRect(adjustedBounds, "speechBubble", "default");
         };
@@ -108,8 +110,8 @@
                 _canvas.style.position = "fixed";
             }
             _canvas.style.display = "block";
-            _canvas.style.left = TangleUI.bounds.right() - width + "px";
-            _canvas.style.top = TangleUI.bounds.bottom() - height + "px";
+            _canvas.style.left = TangleUI.getRect().right() - width + "px";
+            _canvas.style.top = TangleUI.getRect().bottom() - height + "px";
             _context = CanvasUtil.setLayoutBounds(_canvas, width, height);
             CanvasUtil.enablePixelArtScaling(_context);
         };
@@ -152,11 +154,11 @@
             _speechBubble.style.display = "block";
             _speechBubbleBounds.updateToRect(TangleUI.getRect("speechBubble"));
             _speechBubbleBounds.width = SpeechBubble.update(_speechBubble, _getMessageFunction(_progressNormal), _speechBubbleBounds);
-            _speechBubbleBounds.x = Math.round(TangleUI.bounds.width * 1.1);
+            _speechBubbleBounds.x = Math.round(TangleUI.getRect().width * 1.1);
             //TangleUI.setRect(_speechBubbleBounds, "speechBubble", "transitionFrom");
             _speechBubble.style.transform = "translate(" + _speechBubbleBounds.width * 2 + "px, 0px)";//get it off screen
             var spacer = TangleUI.getRect("progressGraphic").width * .5;
-            _speechBubbleBounds.x = Math.round(TangleUI.bounds.width - spacer - _speechBubbleBounds.width);
+            _speechBubbleBounds.x = Math.round(TangleUI.getRect().width - spacer - _speechBubbleBounds.width);
             TangleUI.setRect(_speechBubbleBounds, "speechBubble", "transitionTo");
             //_speechBubbleBounds = TangleUI.getRect("speechBubble");
             _speechBubble.style.left = _speechBubbleBounds.x + "px";
@@ -228,7 +230,7 @@
                 console.log("MenuButton.playToStatsViewAnimation() transition active, skipping");
                 return;//already transitioning
             }
-            resizeCanvas(TangleUI.bounds.width, TangleUI.bounds.height);
+            resizeCanvas(TangleUI.getRect().width, TangleUI.getRect().height);
             _canvas.style.left = _canvas.style.top = "0px";
             _bgRipple.init(_canvas, TangleUI.getRect("menuButton"), appConfig.themeColor, "#FFFFFF");
             stopIdleTimer();

@@ -8,13 +8,12 @@
         this.init = function () {
             TangleUI.setLayoutDefinitions(SakriDotNetLayout);
             TransitionStore.setTransitionDefinitions(SakriDotNetTransitions);
-            TangleUI.setLayoutBounds(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
             AppData.startInteractionsHistory(10000, 6);
             _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
             _loader.start();
-            window.addEventListener("resize", windowResizeHandler);
+            TangleUI.setWindowResizeCallbacks(resizeStartHandler, resize);
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
         };
 
@@ -39,7 +38,7 @@
             document.body.innerHTML = "";
 
             _menuCanvas = CanvasUtil.createCanvas(document.body, appConfig.loaderCanvasZ);
-            CanvasUtil.setLayoutBounds(_menuCanvas, TangleUI.bounds.width, TangleUI.bounds.height);
+            CanvasUtil.setLayoutBounds(_menuCanvas, TangleUI.getRect().width, TangleUI.getRect().height);
             _menuCanvas.style.left = _menuCanvas.style.top = "0px";
 
             _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCard);
@@ -57,7 +56,7 @@
                 _menuButton = {};
                 _menuButton.start = _menuButton.end = _menuButton.stop = _menuButton.addToPulse = function(){};
             }
-            commitWindowResize();
+            resize();
         };
 
         //TODO: move to data once TangleUI is implemented
@@ -103,11 +102,7 @@
 
         //--------- Window resize (responsive) ---------------
 
-        //Avoids repeatedly running resize logic by calling commitWindowResize 300ms after last user resize action
-        var _windowResizeTimeoutId = -1;
-        var windowResizeHandler = function () {
-            //TODO: should disable menu interactions
-            clearTimeout(_windowResizeTimeoutId);
+        var resizeStartHandler = function () {
             if(!_loader){
                 _cardHtmlRenderer.close();
                 _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
@@ -119,21 +114,18 @@
                     _navigationButton.stop();
                 }
             }
-            _windowResizeTimeoutId = setTimeout(commitWindowResize, 300);//arbitrary number
+            //hide loader
         };
 
-        var commitWindowResize = function () {
-            TangleUI.setLayoutBounds(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
+        var resize = function () {
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             if(_loader){
                 _loader.resize();
                 return;
             }
             hideIframe();
-            _windowResizeTimeoutId = -1;
-            //console.log("App.commitResize()", TangleUI.bounds.toString());
-            _menuCanvas.width = TangleUI.bounds.width;
-            _menuCanvas.height = TangleUI.bounds.height;
+            _menuCanvas.width = TangleUI.getRect().width;
+            _menuCanvas.height = TangleUI.getRect().height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
             renderCardsCanvasAssets();
             setTimeout(showMenuButton, 400);
@@ -235,8 +227,8 @@
                 _statsModule.contentWindow.showStats(AppData.getAchievementNormal() === 1);
             }
             //TODO: watch out for resize calls?
-            _statsModule.style.width = TangleUI.bounds.width + "px";
-            _statsModule.style.height = TangleUI.bounds.height + "px";
+            _statsModule.style.width = TangleUI.getRect().width + "px";
+            _statsModule.style.height = TangleUI.getRect().height + "px";
         };
 
         //TODO: refactor, bit awkward...

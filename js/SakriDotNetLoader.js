@@ -79,8 +79,8 @@
             _pixelGuyScale = Math.floor(Math.min(adjustedBounds.width  / PixelGuyTypingSprite.unscaledWidth, adjustedBounds.height  / PixelGuyTypingSprite.unscaledHeight));
             adjustedBounds.width = PixelGuyTypingSprite.unscaledWidth * _pixelGuyScale;
             adjustedBounds.height = PixelGuyTypingSprite.unscaledHeight * _pixelGuyScale;
-            adjustedBounds.x = Math.round(TangleUI.bounds.centerX() - adjustedBounds.width * .5);
-            adjustedBounds.y = Math.round(TangleUI.bounds.centerY() - adjustedBounds.height * .5);
+            adjustedBounds.x = Math.round(TangleUI.getRect().centerX() - adjustedBounds.width * .5);
+            adjustedBounds.y = Math.round(TangleUI.getRect().centerY() - adjustedBounds.height * .5);
             TangleUI.setRect(adjustedBounds, "loaderPixelGuy", "default");
 
             //calculate circles bounds and emitter
@@ -108,14 +108,14 @@
                 ButtrockManager.unscaledWidth * _pixelGuyScale,
                 ButtrockManager.unscaledHeight * _pixelGuyScale
             );
-            if(adjustedBounds.right() > TangleUI.bounds.width){
-                adjustedBounds.x = TangleUI.bounds.width - adjustedBounds.width;
+            if(adjustedBounds.right() > TangleUI.getRect().width){
+                adjustedBounds.x = TangleUI.getRect().width - adjustedBounds.width;
             }
             TangleUI.setRect(adjustedBounds, "loaderButtrock", "default");
         };
 
         var resizeCanvas = function(){
-            _context = CanvasUtil.setLayoutBounds(_canvas, TangleUI.bounds.width, TangleUI.bounds.height);
+            _context = CanvasUtil.setLayoutBounds(_canvas, TangleUI.getRect().width, TangleUI.getRect().height);
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
