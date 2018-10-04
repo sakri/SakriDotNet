@@ -112,6 +112,7 @@
             _story.onscroll = function(){
                 if(!_data.storyReadComplete && _story.scrollTop / (_story.scrollHeight - _story.clientHeight) > .95){
                     _data.storyReadComplete = true;
+                    GoogleAnalyticsService.tagStoryReadCompleteHandler(data);
                     AppData.storeInteraction();
                 }
             };

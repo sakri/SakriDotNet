@@ -568,13 +568,6 @@ function stopCelebrations(){
 //**********::GOOGLE ANALYTICS EVENTS::********
 //*********************************************
 
-var tagShowStatsModule = function(){
-    if (gtag) {
-        //gtag('event', 'showSection', {'event_category': appName + ":" + data.title.substr(0, 20)});
-        gtag('event', 'showStatsModule', {'event_category' : "widget"});
-    }
-};
-
 var tagCelebrate = function(){
     if (gtag) {
         //gtag('event', 'showSection', {'event_category': appName + ":" + data.title.substr(0, 20)});

@@ -66,7 +66,7 @@
         };
 
         var calculateLayout = function(value, rightAlign){
-            _defaultBounds.y = 0;
+            _defaultBounds.y = -1;
             //TODO: remove reference to "menuButton" !!!
             _defaultBounds.height = Math.round(TangleUI.getRect("menuButton").height * .3);
             var fontSize = Math.round(_defaultBounds.height * .6);

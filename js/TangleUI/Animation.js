@@ -204,11 +204,6 @@
         return animation;
     };
 
-    //private properties and methods
-
-    var _createdAnimations = {};
-    var _createdChainAnimations = {};
-
     AnimationStore.getChainedAnimation = function(chainedAnimationId, animations, updateCallback, completeCallback){
         var animation = _createdChainAnimations[chainedAnimationId] || new ChainedRectangleTransitionAnimator();
         animation.setAnimations(animations, updateCallback, completeCallback);
@@ -224,5 +219,10 @@
             animation.stop();
         }
     };
+
+    //private properties and methods
+
+    var _createdAnimations = {};
+    var _createdChainAnimations = {};
 
 }());

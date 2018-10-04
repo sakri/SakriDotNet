@@ -8,6 +8,7 @@ module.exports = function(grunt) {
         './release/js/StatsModule.min.js' : './release/js/StatsModuleConcat.js'
     };
 
+    //TODO: these should be read/parsed from the html pages <script> tags instead of manual updates!
     var concatJSFiles = {
         /* app */
         'release/js/SakriDotNetConcat.js': [
@@ -18,6 +19,7 @@ module.exports = function(grunt) {
             "./js/TangleUI/Transition.js",
             "./js/TangleUI/Animation.js",
             "./js/layout/AppLayout.js",
+            "./js/service/GoogleAnalytics.js",
             "./js/data.js",
             "./js/sprites.js",
             "./js/widget/LoaderCircles.js",

@@ -24,8 +24,8 @@
             _menu,
             _cardCanvasRenderer = new CardCanvasRenderer(),
             _cardHtmlRenderer = new CardHtmlRenderer(),
-            _menuButton, _closeButton, _navigationButton,
-            _statsSource, _statsModule;
+            _closeButton, _navigationButton,
+            _menuButton, _statsModuleLoader;
 
         var loadCompleteHandler = function(){
             _loader = null;
@@ -51,7 +51,8 @@
             //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
             if(!backButtonURL){
                 _menuButton = new MenuButton(showStatsModule);
-                loadStatsModule();
+                _statsModuleLoader = new StatsModuleLoader();
+                _statsModuleLoader.load();
             }else{
                 _menuButton = {};
                 _menuButton.start = _menuButton.end = _menuButton.stop = _menuButton.addToPulse = function(){};
@@ -123,7 +124,7 @@
                 _loader.resize();
                 return;
             }
-            hideIframe();
+            hideStatsModule();
             _menuCanvas.width = TangleUI.getRect().width;
             _menuCanvas.height = TangleUI.getRect().height;
             CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
@@ -173,102 +174,29 @@
             _menuButton.addToPulse();
         };
 
-        //--------- Stats Module --------------- (consider moving this code to a class)
-
-        var loadStatsModule = function(){
-            if(_statsSource){
-                console.log("App.loadStatsModule() stats mod already loaded");
-                return;
-            }
-            var req = new XMLHttpRequest();
-            req.onreadystatechange = function () {
-                if (req.readyState !== 4 || req.status !== 200){
-                    return;
-                }
-                _statsSource = req.responseText;
-                console.log("stats mod loaded");
-            };
-            req.open("GET", "./statsModule.html");
-            req.send();
-        };
-
+        //--------- Stats Module --------------- 
+        
         var showStatsModule = function(){
-            if(!_statsSource){
-                console.log("App.showStatsModule() warning : module not loaded");
-                return;
-            }
-            AppData.statsVisited = true;
+            _statsModuleLoader.show(document.body, showStatsShareCallback, closeStatsModule);
             _menuCanvas.style.display = "none";
-            if(!_statsModule){
-                _statsModule = document.createElement("iframe");
-                _statsModule.style.position = "absolute";
-                _statsModule.style.width = "100%";
-                _statsModule.style.height = "100%";
-                _statsModule.style.position = "absolute";
-                _statsModule.style.margin = "0px";
-                _statsModule.style.zoom = "1";
-                _statsModule.style.padding = "0px";
-                _statsModule.style.borderWidth = "0px";
-                document.body.appendChild(_statsModule);
-                _statsModule.contentWindow.document.open();
-                _statsModule.contentWindow.document.write(_statsSource);
-                _statsModule.contentWindow.isEmbedded = true;
-                _statsModule.contentWindow.document.close();
-                _statsModule.onload = function() {
-                    console.log("_statsModule.onload()");
-                    _statsModule.style.visibility = "visible";
-                    _statsModule.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, isLive() ? gtag : null, showStatsShareCallback,  closeIframe);
-                    _statsModule.contentWindow.showStats();
-                };
-                _statsModule.style.visibility = "hidden";
-            }else{
-                _statsModule.style.display = "block";
-                _statsModule.contentWindow.updateWidgets();//should not be called from here?
-                _statsModule.contentWindow.showStats(AppData.getAchievementNormal() === 1);
-            }
-            //TODO: watch out for resize calls?
-            _statsModule.style.width = TangleUI.getRect().width + "px";
-            _statsModule.style.height = TangleUI.getRect().height + "px";
         };
-
-        //TODO: refactor, bit awkward...
+        
         var showStatsShareCallback = function(value){
-            showCloseButton(value, closeIframe);
+            showCloseButton(value, closeStatsModule);
         };
 
-        var closeIframe = function(){
-            hideIframe();
+        var closeStatsModule = function(){
+            hideStatsModule();
             showMenuButton();
             showNavigationButton(true);
+            _menuCanvas.style.display = "block";//TODO: Should animate drop again
         };
 
-        var hideIframe = function(){
-            if(_statsModule){
-                _statsModule.contentWindow.stopCelebrations();
-                _statsModule.style.display = "none";
+        //TODO: revisit, this is called when resize() and from closeStatsModule()
+        var hideStatsModule = function(){
+            if(AppData.statsVisited){
+                _statsModuleLoader.stop();
                 showCloseButton(false);
-                _menuCanvas.style.display = "block";
-            }
-        };
-
-
-        //--------- Google Analytics (TODO: move to class) ---------------
-
-        var isLive = function(){
-            return location.href.indexOf("localhost") === -1 && gtag;
-        };
-
-        var tagShowCardEvent = function(data){
-            if (isLive() && data.title) {
-                //gtag('event', 'showSection', {'event_category': appName + ":" + data.title.substr(0, 20)});
-                gtag('event', 'showCard', {'event_category': appName + "-" + data.title.substr(0, 20)});
-            }
-        };
-
-        var storyReadCompleteHandler = function(data){
-            if (isLive()) {
-                gtag('event', 'cardReadComplete', {'event_category': appName + "-" + data.title.substr(0, 20)});
-                data.storyReadComplete = true;
             }
         };
 
@@ -311,7 +239,8 @@
 
         var showCard = function (index) {
             var data = AppData.cards[index];
-            tagShowCardEvent(data);
+            GoogleAnalyticsService.tagShowCardEvent(data);
+            data.storyReadComplete = true;
             showNavigationButton(false);
             showCloseButton(true, closeCard);
             _menuButton.end();//should this be hideMenuButton()?
