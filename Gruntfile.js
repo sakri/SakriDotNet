@@ -19,6 +19,7 @@ module.exports = function(grunt) {
             "./js/TangleUI/Transition.js",
             "./js/TangleUI/Animation.js",
             "./js/layout/AppLayout.js",
+            "./js/service/HomeSectionsDataParser.js",
             "./js/service/GoogleAnalytics.js",
             "./js/data.js",
             "./js/sprites.js",
