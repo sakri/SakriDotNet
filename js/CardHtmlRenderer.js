@@ -98,7 +98,7 @@
             }
             _card = document.createElement("div");
             _card.classList.add("cardElement", "page");
-            _card.style.zIndex = appConfig.cardHtmlZ;
+            _card.style.zIndex = AppConfig.zIndexCardHtml;
             document.body.appendChild(_card);
 
             //IMAGE

@@ -11,7 +11,7 @@
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
             SakriDotNetSpriteSheet.init();
             AppData.startInteractionsHistory(10000, 6);
-            _loader = appConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
+            _loader = AppConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
             _loader.start();
             TangleUI.setWindowResizeCallbacks(resizeStartHandler, resize);
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
@@ -20,7 +20,6 @@
         //Private properties and methods
 
         var _loader,
-            _menuCanvas,//TODO move to Menu
             _menu,
             _cardCanvasRenderer = new CardCanvasRenderer(),
             _cardHtmlRenderer = new CardHtmlRenderer(),
@@ -34,18 +33,13 @@
             document.addEventListener('keyup', keyPressHandler);
             document.body.addEventListener("wheel", mouseWheelHandler, false);
 
-            AppData.cards = parseSectionsData();
-            document.body.innerHTML = "";
+            AppData.cards = HomeSectionsDataParser.parseSectionsData();
 
-            _menuCanvas = CanvasUtil.createCanvas(document.body, appConfig.loaderCanvasZ);
-            CanvasUtil.setLayoutBounds(_menuCanvas, TangleUI.getRect().width, TangleUI.getRect().height);
-            _menuCanvas.style.left = _menuCanvas.style.top = "0px";
-
-            _menu = new CardsMenu(_menuCanvas, cardsScrollUpdate, showCard);
+            _menu = new CardsMenu(document.body, AppConfig.zIndexLoaderCanvas, cardsScrollUpdate, showCard);
 
             //only index.html contains Stats Module. This mechanism attempts to store/pass "visit progress" state between apps.
-            if(!backButtonURL && appConfig.visitStats){
-                AppData.updateFromVisitStatsUrlParam(appConfig.visitStats);
+            if(!backButtonURL && AppConfig.visitStats){
+                AppData.updateFromVisitStatsUrlParam(AppConfig.visitStats);
             }
 
             //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
@@ -60,42 +54,13 @@
             resize();
         };
 
-        //TODO: move to data once TangleUI is implemented
-        var parseSectionsData = function () {
-            var sectionNodes = document.body.querySelectorAll("section, article"),
-                dataList = [], data, section, node, i, story, originalImage;
-            for (i = 0; i < sectionNodes.length; i++) {
-                section = sectionNodes[i];
-                node = section.querySelector(".sectionContent");
-                originalImage = node.querySelector("img");
-                data = {};
-                if (originalImage) {
-                    data.image = new Image();
-                    data.image.src = originalImage.src;
-                }
-                data.themeColor = appConfig.colorPalette[i % appConfig.colorPalette.length];
-                data.title = node.querySelector("h1").innerHTML.toLowerCase();
-                data.contentLayout = new CardContentLayout(
-                    data.image ? data.image.width : AppLayout.thumbDefaultBounds.width,
-                    data.image ? data.image.height : AppLayout.thumbDefaultBounds.height
-                );
-                data.headline = node.querySelector("p").innerHTML;
-                story = section.querySelector(".sectionExtendedContent");
-                data.story = story ? story.innerHTML : "";
-                data.link = node.querySelector("a");
-                data.visited = false;
-                data.storyReadComplete = false;
-                dataList[i] = data;
-            }
-            return dataList.reverse();//html order is displayed in inverse order in menu
-        };
-
+        //move to _cardCanvasRenderer
         var renderCardsCanvasAssets = function () {
-            var i, cardData, showReadMore;
+            var i, cardData, showReadMore, lastIndex = AppData.cards.length - 1;
             for (i = 0; i < AppData.cards.length; i++){
                 cardData = AppData.cards[i];
                 cardData.contentLayout.updateLayout();
-                showReadMore = i === AppData.cards.length - 1;//only card on top needs this (never visible for others)
+                showReadMore = i === lastIndex;//only card on top needs this (never visible for others)
                 _cardCanvasRenderer.createCardCanvasAssets(cardData, showReadMore);
             }
             _menu.setData(AppData.cards);
@@ -106,7 +71,7 @@
         var resizeStartHandler = function () {
             if(!_loader){
                 _cardHtmlRenderer.close();
-                _menuCanvas.height = _menuCanvas.width = 0;//clear canvas
+                _menu.resize(TangleUI.getRect());
                 _menuButton.stop();
                 if(_closeButton){
                     _closeButton.stop();
@@ -115,19 +80,17 @@
                     _navigationButton.stop();
                 }
             }
-            //hide loader
         };
 
         var resize = function () {
-            AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            var bounds = TangleUI.getRect();
+            AppLayout.updateLayout(bounds.width, bounds.height);
             if(_loader){
                 _loader.resize();
                 return;
             }
             hideStatsModule();
-            _menuCanvas.width = TangleUI.getRect().width;
-            _menuCanvas.height = TangleUI.getRect().height;
-            CardMenuLayout.updateLayout(_menuCanvas.width, _menuCanvas.height);
+            _menu.resize(bounds);
             renderCardsCanvasAssets();
             setTimeout(showMenuButton, 400);
             setTimeout(showNavigationButton, 700, true);
@@ -145,7 +108,7 @@
                 case 37://enter
                 case 46://delete
                 case 88://x
-                    _cardHtmlRenderer.forceClose(true);
+                    closeCard();
                     break;
             }
         };
@@ -178,18 +141,19 @@
         
         var showStatsModule = function(){
             _statsModuleLoader.show(document.body, showStatsShareCallback, closeStatsModule);
-            _menuCanvas.style.display = "none";
+            _menu.show(false);
         };
         
         var showStatsShareCallback = function(value){
-            showCloseButton(value, closeStatsModule);
+            showCloseButton(value, closeStatsModule);//would be cleaner with event
         };
 
+        //called by close button and when celebration is complete
         var closeStatsModule = function(){
             hideStatsModule();
             showMenuButton();
             showNavigationButton(true);
-            _menuCanvas.style.display = "block";//TODO: Should animate drop again
+            _menu.show(true);//TODO: Should animate drop again
         };
 
         //TODO: revisit, this is called when resize() and from closeStatsModule()
@@ -204,7 +168,7 @@
 
         //"To Stats Module Button" will become "menu button" later
         var showMenuButton = function(){
-            _menuButton.start(appConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
+            _menuButton.start(AppConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
         };
 
         //TODO: currently a "home button", will become a menu button?
@@ -214,7 +178,7 @@
             }
             _navigationButton = _navigationButton || new TabButton();
             if(value){
-                _navigationButton.init("home", document.body, appConfig.navigationButtonZ);
+                _navigationButton.init("home", document.body, AppConfig.zIndexNavigationButton);
                 _navigationButton.show(400, navigationButtonClickHandler);
                 return;
             }
@@ -222,13 +186,13 @@
         };
 
         var navigationButtonClickHandler = function(){
-            window.location = backButtonURL + (appConfig.visitStats ? "?visitStats=" + appConfig.visitStats : "");
+            window.location = backButtonURL + (AppConfig.visitStats ? "?visitStats=" + AppConfig.visitStats : "");
         };
 
         var showCloseButton = function(value, callback){
             _closeButton = _closeButton || new TabButton();
             if(value){
-                _closeButton.init("X", document.body, appConfig.closeCardButtonZ, true);
+                _closeButton.init("X", document.body, AppConfig.zIndexCloseButton, true);
                 _closeButton.show(400, callback);
                 return;
             }
@@ -247,7 +211,7 @@
             _cardHtmlRenderer.open(data);
         };
 
-        var closeCard = function(dispatchCallback){
+        var closeCard = function(){
             AppData.storeInteraction();
             _cardHtmlRenderer.close();
             _menu.deselectCard();

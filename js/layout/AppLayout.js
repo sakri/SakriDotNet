@@ -15,11 +15,12 @@
     AppLayout.bounds = new Rectangle();
     AppLayout.cardBounds = new Rectangle();
     AppLayout.headerBounds = new Rectangle();
+
     AppLayout.thumbDefaultBounds = new Rectangle();
     AppLayout.storyDefaultBounds = new Rectangle();
 
     AppLayout.updateLayout = function(width, height){
-        if(width==this.bounds.width && height==this.bounds.height){
+        if(width === this.bounds.width && height === this.bounds.height){
             return;
         }
         this.bounds.update(0, 0, width, height);
@@ -44,6 +45,8 @@
             this.storyDefaultBounds.height = this.cardBounds.bottom() - this.storyDefaultBounds.y - margin;
         }
         this.storyDefaultBounds.width -= this.cardBounds.x;
+        //REMOVE
+        CardMenuLayout.updateLayout(width, height);//Update to TangleUI
     };
 
 }());
@@ -57,22 +60,21 @@
 
     //positions are "absolute"
     window.CardMenuLayout = {};//object, no need to instantiate
-    CardMenuLayout.fullSizeCard = new Rectangle();
-    CardMenuLayout.fullSizeCardHeaderHeight = 0;
-    CardMenuLayout.fullYDragDistance = 0;
+    CardMenuLayout.fullYDragDistance = 0;//Move to CardsMenu
 
     CardMenuLayout.updateLayout = function(){
         calculateCardValues();
-        this.fullSizeCard.updateToRect(_fullSizeCard);
-        this.fullYDragDistance = Math.round(this.fullSizeCard.height * .5);
-        CardMenuLayout.fullSizeCardHeaderHeight = this.fullSizeCard.y - AppLayout.cardBounds.y;
+        this.fullYDragDistance = this.getFullYDragDistance();
+    };
+
+    CardMenuLayout.getFullYDragDistance = function(){
+        return Math.round(_fullSizeCard.height * .5);
     };
 
     //TODO: consider restricting updates to minimum normal changes (performance, or might become jerky?)
     CardMenuLayout.updateCardBoundsToScrollNormal = function(card, index, normal){
         var cardBounds = card.bounds;
         var tabBounds = card.tabBounds;
-        var hitBounds = card.hitBounds;
         if(index < 4){
             var radian = MathUtil.interpolate(normal, _cornerRadians[index], _cornerRadians[index + 1]);
             cardBounds.x = _rightCornerCenterX + Math.cos(radian) * _cornerRadius;
@@ -98,6 +100,7 @@
         _cornerRadians = [], _cardYs = [], _fullSizeCard = new Rectangle(),
         _tabMinWidth, _tabMinHeight, _tabMaxWidth, _tabMaxHeight;
 
+    //move to CardsMenu.calculateCustomLayout()
     var calculateCardValues = function(){
 
         _cornerRadians.length = 0;

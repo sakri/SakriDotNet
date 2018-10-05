@@ -241,8 +241,8 @@
 
     /*
 TangleUI.localToGlobal = function(layoutRectName){
-var jsonRect = getLayoutRect(layoutRectName);
-return localToGlobal(jsonRect, jsonRect.bounds);
+    var jsonRect = getLayoutRect(layoutRectName);
+    return localToGlobal(jsonRect, jsonRect.bounds);
 };
 
 TangleUI.debugLayout = function(){
@@ -258,7 +258,7 @@ TangleUI.debugLayout = function(){
         _debugCanvas.width = TangleUI.bounds.width;
         _debugCanvas.height = TangleUI.bounds.height;
         _debugCanvas.style.position = "absolute";
-        _debugCanvas.style.zIndex = appConfig.debugLayer;
+        _debugCanvas.style.zIndex = AppConfig.zIndexDebugLayer;
         document.body.appendChild(_debugCanvas);
         return _debugCanvas;
     };

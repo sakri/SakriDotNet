@@ -9,7 +9,7 @@
 
         var _bgColor = bgColor || "#FFFFFF";
 
-        this.lineColor = appConfig.themeColor;//make into parameter
+        this.lineColor = AppConfig.themeColor;//make into parameter
         this.hMargin = .1;
         this.vMargin = .05;
         this.lineWidth = 2;
@@ -72,7 +72,7 @@
             context.stroke();
             context.restore();
 
-            context.fillStyle = appConfig.themeColor;
+            context.fillStyle = AppConfig.themeColor;
             context.font="14px Helvetica,Arial,sans-serif";//TODO: This cannot be hardcoded!!!!
             context.textBaseline = "top";//top, bottom, middle, alphabetic, hanging
             context.fillText(String(maxValue), Math.round(canvas.width * .92) , Math.round(canvas.height * this.vMargin));

@@ -89,6 +89,7 @@
     <script src="js/TangleUI/Animation.js"></script>
     <script src="js/layout/AppLayout.js"></script>
     <script src="js/service/GoogleAnalytics.js"></script>
+    <script src="js/service/HomeSectionsDataParser.js"></script>
     <script src="js/data.js"></script>
     <script src="js/sprites.js"></script>
     <script src="js/widget/LoaderCircles.js"></script>
@@ -112,7 +113,7 @@
 
         function waitForIt(){
             if(document.body){
-                if(appConfig.checkNoJs()){
+                if(AppConfig.checkNoJs()){
                     return;
                 }
                 document.body.style.overflow = "hidden";

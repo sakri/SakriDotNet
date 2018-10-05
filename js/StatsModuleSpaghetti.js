@@ -115,9 +115,9 @@ function updateInteractionsCanvas(){
 
 var _badgeRendererBgIndex = 0;
 function getBadgeRenderer(message, progressNormal){
-    var bgColor = appConfig.colorPalette[_badgeRendererBgIndex];
+    var bgColor = AppConfig.colorPalette[_badgeRendererBgIndex];
     _badgeRendererBgIndex++;
-    _badgeRendererBgIndex %= appConfig.colorPalette.length;
+    _badgeRendererBgIndex %= AppConfig.colorPalette.length;
     var bg = '<div class="badgeRendererBg" style="width:100%;" ></div>';
     bg += '<div class="badgeRendererBg" style="width:' + Math.round(progressNormal * 100) + "%; background-color:" + bgColor + ';" ></div>';
     var label = "<p>" + message + (progressNormal==1 ? "!" : "") + "</p>";
@@ -300,7 +300,7 @@ function positionSharePanel(width){
     _ui.elements.sharePanel.style.height = sharePanelHeight + "px";
     _ui.elements.sharePanel.style.left = Math.round(AppLayout.bounds.centerX() - width * .5) + "px";
     _ui.elements.sharePanel.style.top = Math.round(AppLayout.bounds.centerY() - sharePanelHeight * .5) + "px";
-    _ui.elements.sharePanel.style.backgroundColor = appConfig.themeColor;
+    _ui.elements.sharePanel.style.backgroundColor = AppConfig.themeColor;
 }
 
 function absPositionContainer(container, xNormal, yNormal, widthNormal, heightNormal){
@@ -470,7 +470,7 @@ function startConfetti(){
         var confettiCanvasSize = 60;
         _confettiCanvas.width = _confettiCanvas.height = confettiCanvasSize;
 
-        var colors = appConfig.colorPalette.slice();
+        var colors = AppConfig.colorPalette.slice();
         colors.push("#FFFFFF", "#000000");
         _confetti = new PixelConfetti(colors, 1500, 4000, updateConfettiCallback);
     }
@@ -505,7 +505,7 @@ function startConfetti(){
     _confetti.updateCanvas(_confettiCanvas);
     _confettiIntervalId = setInterval(addConfetti, 200 + Math.floor(Math.random() * 400));
 
-    _celebrateContext.fillStyle = "#000000";//appConfig.themeColor;
+    _celebrateContext.fillStyle = "#000000";//AppConfig.themeColor;
     _celebrateContext.font = "bold " + Math.round(_bowdownBounds.height * .2) + "px Helvetica,Arial,sans-serif";
     _celebrateContext.textBaseline = "top";//top, bottom, middle, alphabetic, hanging
     _celebrateContext.textAlign = "center";

@@ -175,6 +175,7 @@
             }
 
         };
+
         var _visitedCheckBounds = new Rectangle();
     }
 }());

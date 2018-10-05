@@ -15,7 +15,7 @@
             };
             //console.log("MenuButton.start()");
             resize();
-            _donut = _donut || new DonutChart("#FFFFFF", appConfig.themeColor, "#222222");
+            _donut = _donut || new DonutChart("#FFFFFF", AppConfig.themeColor, "#222222");
             _progressNormal = AppData.getAchievementNormal();
             renderWithPie(0, TangleUI.getRect("progressGraphic"));
             animateButtonIn();
@@ -77,7 +77,7 @@
             var bounds = TangleUI.getRect("menuButton");
             resizeCanvas(bounds.width, bounds.height);//Also initializes bg colors, refactor
             calculateDynamicLayout();
-            _bgRipple.init(_canvas, new Rectangle(0, 0,_canvas.width, _canvas.height), appConfig.themeColor, "#FFFFFF");
+            _bgRipple.init(_canvas, new Rectangle(0, 0,_canvas.width, _canvas.height), AppConfig.themeColor, "#FFFFFF");
         };
 
         var calculateDynamicLayout = function(){
@@ -103,16 +103,16 @@
             TangleUI.setRect(adjustedBounds, "speechBubble", "default");
         };
 
+        var _resizeBounds = new Rectangle();
         var resizeCanvas = function(width, height){
             if(!_canvas){
-                _canvas = CanvasUtil.createCanvas(document.body, appConfig.menuButtonPromptZ);
+                _canvas = CanvasUtil.createCanvas(document.body, AppConfig.zIndexSpeechBubble);
                 _canvas.addEventListener("click", menuButtonClickHandler);
                 _canvas.style.position = "fixed";
             }
             _canvas.style.display = "block";
-            _canvas.style.left = TangleUI.getRect().right() - width + "px";
-            _canvas.style.top = TangleUI.getRect().bottom() - height + "px";
-            _context = CanvasUtil.setLayoutBounds(_canvas, width, height);
+            _resizeBounds.update(TangleUI.getRect().right() - width, TangleUI.getRect().bottom() - height, width, height);
+            _context = CanvasUtil.setLayoutBounds(_canvas, _resizeBounds);
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
@@ -150,7 +150,7 @@
         //Bit too much code required to dynamically update a transition...
         var _speechBubbleBounds = new Rectangle();
         var setNextSpeechBubble = function(){
-            _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, appConfig.menuButtonPromptZ);//TODO hardcoded doc.body: should be  a parent arg
+            _speechBubble = _speechBubble || SpeechBubble.createSpeechBubble(document.body, AppConfig.zIndexSpeechBubble);//TODO hardcoded doc.body: should be  a parent arg
             _speechBubble.style.display = "block";
             _speechBubbleBounds.updateToRect(TangleUI.getRect("speechBubble"));
             _speechBubbleBounds.width = SpeechBubble.update(_speechBubble, _getMessageFunction(_progressNormal), _speechBubbleBounds);
@@ -232,7 +232,7 @@
             }
             resizeCanvas(TangleUI.getRect().width, TangleUI.getRect().height);
             _canvas.style.left = _canvas.style.top = "0px";
-            _bgRipple.init(_canvas, TangleUI.getRect("menuButton"), appConfig.themeColor, "#FFFFFF");
+            _bgRipple.init(_canvas, TangleUI.getRect("menuButton"), AppConfig.themeColor, "#FFFFFF");
             stopIdleTimer();
             hideSpeechBubble();
 
@@ -250,7 +250,7 @@
         };
 
         var renderToStatsAnimation = function(normal, bounds){
-            _context.fillStyle = appConfig.appBgColor;
+            _context.fillStyle = AppConfig.appBgColor;
             _context.fillRect(0,0,_canvas.width, _canvas.height);
             incrementPulse();//consider moving into render()
             _bgRipple.render(_pulseNormal);

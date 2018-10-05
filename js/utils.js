@@ -477,14 +477,14 @@
         return canvas;
     };
 
-    CanvasUtil.setLayoutBounds = function(canvas, width, height){
-        if(canvas.width !== width || canvas.height !== height){
-            canvas.width = width;
-            canvas.height = height;
-        }
+    CanvasUtil.setLayoutBounds = function(canvas, bounds){
+        canvas.width = bounds.width;
+        canvas.height = bounds.height;
+        canvas.style.left =  bounds.x + "px";
+        canvas.style.top = bounds.y + "px";
         //console.log("CanvasUtil.setLayoutBounds()", canvas.width, canvas.height);
         var context = canvas.getContext("2d");
-        context.clearRect(0, 0, width, height);
+        context.clearRect(0, 0, bounds.width, bounds.height);//shouldn't be necessary
         return context;
     };
 

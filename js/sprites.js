@@ -6,7 +6,7 @@
 
     //preconfigured "handshakes" (repeated process when spritesheet is updated, consider optimization ideas)
     var _spriteSheetNames = ["head", "eyes", "mouth", "typingHand", "laptop", "buttrock", "bowdown", "yourStats"];//These match pixel art in _sourceImage
-    var _paletteColors = ["#222222", "#FFFFFF", appConfig.themeColor || "#AAAAAA", "#CCCCCC"];//TODO: MathUtil.lighten() darken() lightenHex()
+    var _paletteColors = ["#222222", "#FFFFFF", AppConfig.themeColor || "#AAAAAA", "#CCCCCC"];//TODO: MathUtil.lighten() darken() lightenHex()
 
     var _canvas = document.createElement("canvas"), _context, _spriteSheets = {};
 

@@ -5,17 +5,17 @@
 
 (function() {
 
-    window.appConfig = {};
-    appConfig.appBgColor = "#ededed";
-    appConfig.cardBgColor = "#ffffff";
-    appConfig.colorPalette = ["#049CD8", "#FBD000", "#E52521", "#43B047"];
-    appConfig.getRandomPaletteColor = function(){
+    window.AppConfig = {};
+    AppConfig.appBgColor = "#ededed";
+    AppConfig.cardBgColor = "#ffffff";
+    AppConfig.colorPalette = ["#049CD8", "#FBD000", "#E52521", "#43B047"];
+    AppConfig.getRandomPaletteColor = function(){
         return this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     };
-    appConfig.themeColor = appConfig.colorPalette[Math.floor(Math.random() * appConfig.colorPalette.length)];
+    AppConfig.themeColor = AppConfig.colorPalette[Math.floor(Math.random() * AppConfig.colorPalette.length)];
 
     var _nextPaletteColorIndex = 0;
-    appConfig.getNextPaletteColor = function(){
+    AppConfig.getNextPaletteColor = function(){
         var color = this.colorPalette[_nextPaletteColorIndex % this.colorPalette.length];
         _nextPaletteColorIndex++;
         return color;
@@ -30,7 +30,7 @@
         "Celebrate in 3-2-1..."
     ];
     //TODO: AppData shouldn't be accessed from here
-    appConfig.getMissionPromptMessage = function(missionProgressNormal){
+    AppConfig.getMissionPromptMessage = function(missionProgressNormal){
         return AppData.statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * missionProgressNormal)] : _promptMessages[0];
     };
     var _completedPromptMessages = [
@@ -39,37 +39,36 @@
             "Sharing is caring!",
             "I'm @sakri on twitter..."
         ];
-    appConfig.getMissionCompletedPromptMessage = function(missionProgressNormal){
+    AppConfig.getMissionCompletedPromptMessage = function(missionProgressNormal){
         return _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
     };
     //TODO: bindings could be stored as variables to avoid unnecessary instantiation, meh
-    appConfig.getPromptMessagesFunction = function(missionProgressNormal){
-        return missionProgressNormal==1 ? this.getMissionCompletedPromptMessage.bind(this) : appConfig.getMissionPromptMessage.bind(this);
+    AppConfig.getPromptMessagesFunction = function(missionProgressNormal){
+        return missionProgressNormal==1 ? this.getMissionCompletedPromptMessage.bind(this) : AppConfig.getMissionPromptMessage.bind(this);
     };
 
     var appParamsUrl = new URL(window.location.href);
-    appConfig.noJs = appParamsUrl.searchParams.get("noJs") == "true";
-    appConfig.loopLoader = appParamsUrl.searchParams.get("loopLoader") == "true";
-    appConfig.visitStats = appParamsUrl.searchParams.get("visitStats");//TODO: consider renaming to "visitStatsString" (more descriptive)
+    AppConfig.noJs = appParamsUrl.searchParams.get("noJs") == "true";
+    AppConfig.loopLoader = appParamsUrl.searchParams.get("loopLoader") == "true";
+    AppConfig.visitStats = appParamsUrl.searchParams.get("visitStats");//TODO: consider renaming to "visitStatsString" (more descriptive)
 
 
-    appConfig.checkNoJs = function(){
+    AppConfig.checkNoJs = function(){
         if(this.noJs){
             console.log("Parameter noJs set to true, displaying no javascript version.");
         }
         return this.noJs;
     };
 
-    //Z-index management (TODO: rename all starting with zIndex (zIndexLoaderCanvas etc.) or appConfig.zIndex.loaderCanvas
-    appConfig.loaderCanvasZ = 100;
-    appConfig.loaderTitleZ = 120;
-    appConfig.cardHtmlZ = 130;
-    appConfig.menuButtonZ = 190;
-    appConfig.menuButtonPromptZ = 195;
-    appConfig.navigationButtonZ = 250;
-    appConfig.closeCardButtonZ = 260;
-    appConfig.closeStatsButtonZ = 300;
-    appConfig.debugLayer = 500;
+    //Z-index management (TODO: rename all starting with zIndex (zIndexLoaderCanvas etc.) or AppConfig.zIndex.loaderCanvas
+    AppConfig.zIndexLoaderCanvas = 100;
+    AppConfig.zIndexLoaderTitle = 110;
+    AppConfig.zIndexCardHtml = 200;
+    AppConfig.zIndexMenuButton = 210;
+    AppConfig.zIndexSpeechBubble = 220;
+    AppConfig.zIndexNavigationButton = 300;
+    AppConfig.zIndexCloseButton = 310;
+    AppConfig.zIndexDebugLayer = 500;
 
 }());
 
@@ -79,7 +78,6 @@
     window.CardData = function(){
 
         this.image = "";
-        //this.originalImageWidth, Height
         this.themeColor = "#CCCCCC";
         this.title = "";
         this.contentLayout = undefined;//new CardContentLayout(origWidth, origHeight)
@@ -90,7 +88,6 @@
         //Card state related, maybe move
         this.visited = false;
         this.storyReadComplete = false;
-        //this.liked = false;
     };
 
 }());
@@ -106,7 +103,9 @@
         _actionsPerMinuteIntervalId = -1;
 
     //Public API
-    AppData.cards = [];//list of CardData
+    AppData.cards = [];//list of CardData, MOVE, the rest is related to StatsModule
+
+
     AppData.userInteractions = 0;
     AppData.shareClick = false;
     AppData.showStats = false;//TODO: implement fps counter
@@ -277,7 +276,7 @@
         var i, data, _dataList = [];
         for(i=0; i<totalCards; i++){
             data = new CardData();
-            data.themeColor = appConfig.getNextPaletteColor();
+            data.themeColor = AppConfig.getNextPaletteColor();
             data.title = i + " o'clock mock";
             data.headline = "Look at my card #" + i + ", my card #" + i + " is amazing. Give it a lick, it tastes just like raisins" ;
             if(Math.random() > .75){

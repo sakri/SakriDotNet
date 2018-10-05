@@ -37,9 +37,8 @@
         //PUBLIC API
 
         this.init = function(){
-            _canvas = CanvasUtil.createCanvas(document.body, appConfig.loaderCanvasZ);
+            _canvas = CanvasUtil.createCanvas(document.body, AppConfig.zIndexLoaderCanvas);
             resizeCanvas();
-            _canvas.style.left = _canvas.style.top = "0px";
             calculateDynamicLayout();
             createLoaderTitle();
             playIntroAnimation();
@@ -115,7 +114,7 @@
         };
 
         var resizeCanvas = function(){
-            _context = CanvasUtil.setLayoutBounds(_canvas, TangleUI.getRect().width, TangleUI.getRect().height);
+            _context = CanvasUtil.setLayoutBounds(_canvas, TangleUI.getRect());
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
@@ -126,7 +125,7 @@
             _title.style.overflow = "hidden";
             _title.style.textAlign = "center";
             _title.style.margin =  _title.style.padding =  _title.style.borderWidth = "0";
-            _title.style.zIndex = appConfig.loaderTitleZ;
+            _title.style.zIndex = AppConfig.zIndexLoaderTitle;
             resizeTitle();
             _title.innerHTML = "sakri.net";
             document.body.appendChild(_title);
@@ -169,7 +168,7 @@
         };
 
         var render = function(normal){
-            _context.fillStyle = appConfig.appBgColor;
+            _context.fillStyle = AppConfig.appBgColor;
             _context.fillRect(0, 0, _canvas.width, _canvas.height);
             var bounds = _animations.pixelGuy.getRectangle();
             PixelGuyTypingManager.render(_context, bounds.x, bounds.y, _pixelGuyScale, normal);
@@ -189,7 +188,7 @@
         };
 
         var renderExiting = function(normal){
-            _context.fillStyle = appConfig.appBgColor;
+            _context.fillStyle = AppConfig.appBgColor;
             _context.fillRect(0, 0, _canvas.width, _canvas.height);
             renderEndSequenceLaptop(MathUtil.smoothstep(normal, 0, .3));
             renderEndSequenceTitle(MathUtil.smoothstep(normal, .35, .7));
@@ -246,7 +245,7 @@
         };
 
         var updateLoaderCircles = function(){
-            _loader.updateCircles(appConfig.colorPalette, document.body.querySelectorAll("section, article").length);
+            _loader.updateCircles(AppConfig.colorPalette, document.body.querySelectorAll("section, article").length);
         };
 
         var updateImagesLoad = function(){
@@ -282,7 +281,7 @@
             _animNormal = 0;
             _callback = this.start.bind(this);
             _loader.init();
-            _loader.updateCircles(appConfig.colorPalette, Math.round(MathUtil.getRandomNumberInRange(4, 12)));
+            _loader.updateCircles(AppConfig.colorPalette, Math.round(MathUtil.getRandomNumberInRange(4, 12)));
             updateProgress();
         };
 

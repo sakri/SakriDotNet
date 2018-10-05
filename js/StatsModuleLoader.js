@@ -42,7 +42,7 @@
                 _iFrame.contentWindow.isEmbedded = true;
                 _iFrame.contentWindow.document.close();
                 _iFrame.onload = function() {
-                    console.log("_iFrame.onload()");
+                    //console.log("statsModule.onload()");
                     _iFrame.style.visibility = "visible";
                     _iFrame.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, GoogleAnalyticsService.isLive() ? gtag : null, openShareCallback,  closeCallback);
                     _iFrame.contentWindow.showStats();

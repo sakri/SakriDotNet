@@ -6,7 +6,7 @@
 
 (function() {
 
-    window.CardsMenu = function(canvas, scrollCallback, cardClickCallback){
+    window.CardsMenu = function(parent, zIndex, scrollCallback, cardClickCallback){
 
         var _canvas,
             _context,
@@ -30,10 +30,9 @@
             _cards[i] = new Card(i);
         }
 
-        _canvas = canvas;
-        _context = canvas.getContext("2d");
         _interactivityManager = new CanvasInteractionManager();
-        //callbacks are set below beneath function declarations, TODO: cleanup, look for better solution
+        _canvas = CanvasUtil.createCanvas(parent, zIndex);
+        //callbacks are set below beneath function declarations, TODO: cleanup, look for better solution 117
         _interactivityManager.setCanvas(_canvas);//meh
         _cardClickHandler = cardClickCallback;
 
@@ -53,6 +52,12 @@
             resetAccordion();
             render();
             playIntro();
+        };
+
+        this.resize = function(bounds){
+            _canvas.width = bounds.width;
+            _canvas.height = bounds.height;
+            _context = CanvasUtil.setLayoutBounds(_canvas, bounds);
         };
 
         this.deselectCard = function(){
@@ -75,7 +80,7 @@
 
         this.show = function(value){
             _canvas.style.display = value ? "block" : "none";
-        }
+        };
 
         //***********************************
         //*******::USER INTERACTIONS::*******
@@ -248,7 +253,7 @@
         //*************************
 
         var render = function(){
-            _context.fillStyle = appConfig.appBgColor;
+            _context.fillStyle = AppConfig.appBgColor;
             _context.fillRect(0, 0, _canvas.width, _canvas.height);
             var i, card;
             for(i=0; i<6; i++){
