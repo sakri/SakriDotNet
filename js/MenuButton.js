@@ -192,11 +192,11 @@
         //only one element is translated at any given moment.
 
         var animateButtonIn = function(){
-            _animations.button = AnimationStore.getAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, startIdleTimer);
+            _animations.button = AnimationStore.getTangleUIAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, startIdleTimer);
             _animations.button.play();
         };
         var animateButtonOut = function(){
-            _animations.button = AnimationStore.getAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, stop);
+            _animations.button = AnimationStore.getTangleUIAnimation("menuButton", "menuButtonIn", updateTransitionMenuButton, stop);
             _animations.button.playReverse();
         };
 
@@ -204,13 +204,13 @@
             setNextSpeechBubble();
             //TODO: should be able to recycle prompt1 and 2 for prompt6 and 7, also bubbleIn/out playReverse?
             var animations = [
-                AnimationStore.getAnimation("prompt1", "progressButtonOut", renderWithPie),
-                AnimationStore.getAnimation("prompt2", "progressButtonIn", renderWithPixelGuy),
-                AnimationStore.getAnimation("prompt3", "speechBubbleIn", renderAnimatingSpeechBubble),
-                AnimationStore.getAnimation("prompt4", "speechBubbleHover", renderAnimatingSpeechBubble),
-                AnimationStore.getAnimation("prompt5", "speechBubbleOut", renderAnimatingSpeechBubble),
-                AnimationStore.getAnimation("prompt6", "progressButtonOut", renderWithPixelGuy),
-                AnimationStore.getAnimation("prompt7", "progressButtonIn", renderWithPie)
+                AnimationStore.getTangleUIAnimation("prompt1", "progressButtonOut", renderWithPie),
+                AnimationStore.getTangleUIAnimation("prompt2", "progressButtonIn", renderWithPixelGuy),
+                AnimationStore.getTangleUIAnimation("prompt3", "speechBubbleIn", renderAnimatingSpeechBubble),
+                AnimationStore.getTangleUIAnimation("prompt4", "speechBubbleHover", renderAnimatingSpeechBubble),
+                AnimationStore.getTangleUIAnimation("prompt5", "speechBubbleOut", renderAnimatingSpeechBubble),
+                AnimationStore.getTangleUIAnimation("prompt6", "progressButtonOut", renderWithPixelGuy),
+                AnimationStore.getTangleUIAnimation("prompt7", "progressButtonIn", renderWithPie)
             ];
             _animations.promptSequence = AnimationStore.getChainedAnimation("promptSequence", animations, null, startIdleTimer);
             _animations.promptSequence.play();
@@ -242,8 +242,8 @@
             TangleUI.setRect(_avatarBounds, "menuButtonAvatarCenter", "transitionFrom");
 
             var animations = [
-                AnimationStore.getAnimation("toStats1", "pixelGuyToStatsModule1", null, showStatsModuleCallback),
-                AnimationStore.getAnimation("toStats2", "pixelGuyToStatsModule2", null)
+                AnimationStore.getTangleUIAnimation("toStats1", "pixelGuyToStatsModule1", null, showStatsModuleCallback),
+                AnimationStore.getTangleUIAnimation("toStats2", "pixelGuyToStatsModule2", null)
             ];
             _animations.toStatsSequence = AnimationStore.getChainedAnimation("toStatsSequence", animations, renderToStatsAnimation, stop);
             _animations.toStatsSequence.play();

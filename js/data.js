@@ -21,32 +21,6 @@
         return color;
     };
 
-    var _promptMessages = [
-        "Click me for your stats!",
-        "Doing great!",
-        "Steady rockin!",
-        "Like a Boss!!!",
-        "You on FIRE!!!11",
-        "Celebrate in 3-2-1..."
-    ];
-    //TODO: AppData shouldn't be accessed from here
-    AppConfig.getMissionPromptMessage = function(missionProgressNormal){
-        return AppData.statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * missionProgressNormal)] : _promptMessages[0];
-    };
-    var _completedPromptMessages = [
-            "Tell your friends!",
-            "Tell yo mama!",
-            "Sharing is caring!",
-            "I'm @sakri on twitter..."
-        ];
-    AppConfig.getMissionCompletedPromptMessage = function(missionProgressNormal){
-        return _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
-    };
-    //TODO: bindings could be stored as variables to avoid unnecessary instantiation, meh
-    AppConfig.getPromptMessagesFunction = function(missionProgressNormal){
-        return missionProgressNormal==1 ? this.getMissionCompletedPromptMessage.bind(this) : AppConfig.getMissionPromptMessage.bind(this);
-    };
-
     var appParamsUrl = new URL(window.location.href);
     AppConfig.noJs = appParamsUrl.searchParams.get("noJs") == "true";
     AppConfig.loopLoader = appParamsUrl.searchParams.get("loopLoader") == "true";
@@ -110,6 +84,7 @@
     AppData.shareClick = false;
     AppData.showStats = false;//TODO: implement fps counter
     AppData.statsVisited = false;
+    AppData.celebrated = false;
 
     AppData.setVisitStart = function(msAgo){
         _visitStart = new Date().getTime() - msAgo;
@@ -158,7 +133,30 @@
         this.interactionsHistory[AppData.interactionsHistory.length - 1]++;
     };
 
-
+    var _promptMessages = [
+        "Click me for your stats!",
+        "Doing great!",
+        "Steady rockin!",
+        "Like a Boss!!!",
+        "You on FIRE!!!11",
+        "Celebrate in 3-2-1..."
+    ];
+    //TODO: AppData shouldn't be accessed from here
+    AppData.getMissionPromptMessage = function(missionProgressNormal){
+        return this.statsVisited ? _promptMessages[Math.round((_promptMessages.length - 1) * missionProgressNormal)] : _promptMessages[0];
+    };
+    var _completedPromptMessages = [
+        "Tell your friends!",
+        "Tell yo mama!",
+        "Sharing is caring!",
+        "I'm @sakri on twitter..."
+    ];
+    AppData.getMissionCompletedPromptMessage = function(missionProgressNormal){
+        return _completedPromptMessages[Math.floor(Math.random() * _completedPromptMessages.length)];
+    };
+    AppData.getPromptMessagesFunction = function(){
+        return this.celebrated ? this.getMissionCompletedPromptMessage.bind(this) : this.getMissionPromptMessage.bind(this);
+    };
 
     AppData.numCardsVisited = function(){
         var visited = 0;
@@ -176,17 +174,19 @@
         return complete;
     };
 
-    AppData.getStatsOpenedEnoughCardsNormal = function(required){
-        required = required || 3;
-        return Math.min(AppData.numCardsVisited() / required, 1);//dangerous if there are less than "required" cards!
+    var _visitNumRequiredOpenCards = 3,
+        _visitNumRequiredArticles = 2,
+        _visitNumRequiredSeconds = 60,
+        _visitNumRequiredInteractions = 30;
+
+    AppData.getStatsOpenedEnoughCardsNormal = function(){
+        return Math.min(AppData.numCardsVisited() / _visitNumRequiredOpenCards, 1);//dangerous if there are less than "required" cards!
     };
-    AppData.getStatsReadEnoughArticlesNormal = function(required){
-        required = required || 2;
-        return Math.min(AppData.numCardsStoryReadComplete() / required, 1);//dangerous if there are less than "required" cards!
+    AppData.getStatsReadEnoughArticlesNormal = function(){
+        return Math.min(AppData.numCardsStoryReadComplete() / _visitNumRequiredArticles, 1);//dangerous if there are less than "required" cards!
     };
-    AppData.getStatsSpentEnoughTimeNormal = function(requiredSeconds){
-        requiredSeconds = requiredSeconds || 60;
-        return Math.min(AppData.secondsSinceStart() / requiredSeconds, 1);
+    AppData.getStatsSpentEnoughTimeNormal = function(){
+        return Math.min(AppData.secondsSinceStart() / _visitNumRequiredSeconds, 1);
     };
     AppData.getStatsOpenedAllCardsNormal = function(){
         return Math.min(AppData.numCardsVisited() / AppData.cards.length, 1);
@@ -194,9 +194,8 @@
     AppData.getStatsClickEnoughShareButtonsNormal = function(){
         return AppData.shareClick ? 1 : 0;
     };
-    AppData.getStatsEnoughInteractionsNormal = function(required){
-        required = required || 30;
-        return Math.min(AppData.userInteractions / required, 1);
+    AppData.getStatsEnoughInteractionsNormal = function(){
+        return Math.min(AppData.userInteractions / _visitNumRequiredInteractions, 1);
     };
 
     //TODO: this uses default values for the moment! Make sure ok
@@ -219,12 +218,15 @@
             articleReadString += card.storyReadComplete ? "1" : "0";
         }
         var param = parseInt(visitedString, 2) + "-" + parseInt(articleReadString, 2);//params 0 and 1
-        param += ("-" + Math.min(AppData.userInteractions, 25));//param 2
+        param += ("-" + Math.min(AppData.userInteractions, 30));//param 2
         param += ("-" + Math.min(AppData.secondsSinceStart(), 50));//param 3
         return "visitStats=" + param;
     };
 
     AppData.updateFromVisitStatsUrlParam = function(visitStatsString){
+        if(!visitStatsString){
+            return;
+        }
         console.log("AppData.updateFromVisitStatsUrlParam()", visitStatsString);
         if(visitStatsString.indexOf("-") == -1){
             console.log("AppData.updateFromVisitStatsUrlParam() Invalid param, missing dash");
@@ -266,7 +268,48 @@
     };
 
     //-------------TESTING
-    /*
+
+    AppData.addMockCardVisit = function(){
+        for(var i=0; i<this.cards.length; i++){
+            if(!this.cards[i].visited){
+                this.cards[i].visited = true;
+                break;
+            }
+        }
+    };
+
+    AppData.addMockReachedEndOfArticle = function(){
+        for(var i=0; i<this.cards.length; i++){
+            if(!this.cards[i].storyReadComplete){
+                this.cards[i].storyReadComplete = true;
+                break;
+            }
+        }
+    };
+
+    /* TODO: NOT WORKING */
+    AppData.addMockToVisitDurationMS = function(addMS){
+        this.setVisitStart(this.msSinceStart() + addMS);
+    };
+
+    AppData.addMockActions = function(numActions){
+        this.userInteractions += numActions;
+        this.interactionsHistory[AppData.interactionsHistory.length - 1]++;
+    };
+
+    AppData.completeMockVisit = function(){
+        while(this.getStatsOpenedAllCardsNormal() < 1){
+            this.addMockCardVisit();
+        }
+        while(this.getStatsReadEnoughArticlesNormal() < 1){
+            this.addMockReachedEndOfArticle();
+        }
+        this.addMockToVisitDurationMS(_visitNumRequiredSeconds * 1000);
+        this.shareClick = true;
+        this.addMockActions(_visitNumRequiredInteractions);
+    };
+
+    //TODO: move?
     AppData.setMockData = function(total){
         this.cards = this.generateMockData(total);
     };
@@ -306,6 +349,10 @@
         "My friend asked me if I wanted a frozen banana. I said 'No, but I want a regular banana later. So, yeah.'"
     ];
 
+    AppData.getMitchHedbergQuotes = function(){
+        return _mitchHedbergQuotes.slice();
+    };
+
     AppData.getRandomMitchHedbergQuote = function(){
         return _mitchHedbergQuotes[Math.floor(Math.random() * _mitchHedbergQuotes.length)];
     };
@@ -325,6 +372,6 @@
         console.log("   > duration : ", this.minutesSinceStart() + "m:" , this.secondsSinceStart(), "s",  "shareClick : ", this.shareClick , " interactions : ", this.userInteractions );
         console.log("   > actions per minute : " , this.interactionsHistory );
         return "";
-    };*/
+    };
 
 }());

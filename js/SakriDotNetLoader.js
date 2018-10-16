@@ -58,7 +58,7 @@
         };
 
         this.circlesIntroComplete = function(){
-            return !_animations.pixelGuy.isAnimating() && !_animations.title.isAnimating() && _circles.introComplete();
+            return !_animations.pixelGuy.isAnimating() && _animations.title && !_animations.title.isAnimating() && _circles.introComplete();
         };
 
         this.render = function(normal){
@@ -145,18 +145,18 @@
 
         var resizeAnimations = function(){
             if(_exitAnimator.isAnimating()){
-                _animations.title = TransitionStore.getTransition("loaderTitleOut");
-                _animations.laptop = TransitionStore.getTransition("loaderLaptopOut");
-                _animations.buttrock = TransitionStore.getTransition("loaderButtrockOut");
+                _animations.title = TransitionStore.getTangleUITransition("loaderTitleOut");
+                _animations.laptop = TransitionStore.getTangleUITransition("loaderLaptopOut");
+                _animations.buttrock = TransitionStore.getTangleUITransition("loaderButtrockOut");
             }else{
-                _animations.pixelGuy = AnimationStore.getAnimation("loaderPixelGuy", "loaderPixelGuyIn");
-                _animations.title = AnimationStore.getAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
+                _animations.pixelGuy = AnimationStore.getTangleUIAnimation("loaderPixelGuy", "loaderPixelGuyIn");
+                _animations.title = AnimationStore.getTangleUIAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
             }
         };
 
         var playIntroAnimation = function(){
-            _animations.pixelGuy = AnimationStore.getAnimation("loaderPixelGuy", "loaderPixelGuyIn");
-            _animations.title = AnimationStore.getAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
+            _animations.pixelGuy = AnimationStore.getTangleUIAnimation("loaderPixelGuy", "loaderPixelGuyIn");
+            _animations.title = AnimationStore.getTangleUIAnimation("loaderTitle","loaderTitleIn", updateTitleAnimation);
             _animations.title.play();
             _animations.pixelGuy.play();
         };
@@ -181,9 +181,9 @@
         var playExitAnimation = function(callback){
             var bounds = _animations.pixelGuy.getRectangle();
             _circles.prepareExit(bounds.x, -bounds.centerY());
-            _animations.title = TransitionStore.getTransition("loaderTitleOut");
-            _animations.laptop = TransitionStore.getTransition("loaderLaptopOut");
-            _animations.buttrock = TransitionStore.getTransition("loaderButtrockOut");
+            _animations.title = TransitionStore.getTangleUITransition("loaderTitleOut");
+            _animations.laptop = TransitionStore.getTangleUITransition("loaderLaptopOut");
+            _animations.buttrock = TransitionStore.getTangleUITransition("loaderButtrockOut");
             _exitAnimator.start(1500, renderExiting, callback);
         };
 

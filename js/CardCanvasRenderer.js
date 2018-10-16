@@ -158,7 +158,7 @@
                 _renderContext.fillStyle = data.themeColor;
                 _renderContext.font = getTextCanvasFontString(data.textFontSize);
                 _renderContext.textAlign = "left";
-                _renderContext.fillText("Read more...", 0, textBottom + data.textLineHeight, _renderCanvas.width);
+                _renderContext.fillText("Click to read more", 0, textBottom + data.textLineHeight, _renderCanvas.width);
             }
         };
 

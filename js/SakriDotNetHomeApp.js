@@ -37,13 +37,10 @@
 
             _menu = new CardsMenu(document.body, AppConfig.zIndexLoaderCanvas, cardsScrollUpdate, showCard);
 
-            //only index.html contains Stats Module. This mechanism attempts to store/pass "visit progress" state between apps.
-            if(!backButtonURL && AppConfig.visitStats){
-                AppData.updateFromVisitStatsUrlParam(AppConfig.visitStats);
-            }
-
+            //only index.html contains Stats Module.
             //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
             if(!backButtonURL){
+                AppData.updateFromVisitStatsUrlParam(AppConfig.visitStats);//manage "visit progress" between apps.
                 _menuButton = new MenuButton(showStatsModule);
                 _statsModuleLoader = new StatsModuleLoader();
                 _statsModuleLoader.load();
@@ -69,17 +66,20 @@
         //--------- Window resize (responsive) ---------------
 
         var resizeStartHandler = function () {
-            if(!_loader){
-                _cardHtmlRenderer.close();
-                _menu.resize(TangleUI.getRect());
-                _menuButton.stop();
-                if(_closeButton){
-                    _closeButton.stop();
-                }
-                if(_navigationButton){
-                    _navigationButton.stop();
-                }
+            if(_loader){
+                return;
             }
+
+            _cardHtmlRenderer.close();
+            _menu.resize(TangleUI.getRect());
+            _menuButton.stop();
+            if(_closeButton){
+                _closeButton.stop();
+            }
+            if(_navigationButton){
+                _navigationButton.stop();
+            }
+
         };
 
         var resize = function () {
@@ -92,7 +92,7 @@
             hideStatsModule();
             _menu.resize(bounds);
             renderCardsCanvasAssets();
-            setTimeout(showMenuButton, 400);
+            setTimeout(showMenuButton, 400);//shouldn't be on timeout, animation should have a delay
             setTimeout(showNavigationButton, 700, true);
         };
 
@@ -137,41 +137,12 @@
             _menuButton.addToPulse();
         };
 
-        //--------- Stats Module --------------- 
-        
-        var showStatsModule = function(){
-            _statsModuleLoader.show(document.body, showStatsShareCallback, closeStatsModule);
-            _menu.show(false);
-        };
-        
-        var showStatsShareCallback = function(value){
-            showCloseButton(value, closeStatsModule);//would be cleaner with event
-        };
-
-        //called by close button and when celebration is complete
-        var closeStatsModule = function(){
-            hideStatsModule();
-            showMenuButton();
-            showNavigationButton(true);
-            _menu.show(true);//TODO: Should animate drop again
-        };
-
-        //TODO: revisit, this is called when resize() and from closeStatsModule()
-        var hideStatsModule = function(){
-            if(AppData.statsVisited){
-                _statsModuleLoader.stop();
-                showCloseButton(false);
-            }
-        };
-
         //--------- BUTTONS ---------------
 
-        //"To Stats Module Button" will become "menu button" later
         var showMenuButton = function(){
-            _menuButton.start(AppConfig.getPromptMessagesFunction(AppData.getAchievementNormal()));
+            _menuButton.start(AppData.getPromptMessagesFunction());
         };
 
-        //TODO: currently a "home button", will become a menu button?
         var showNavigationButton = function(value){
             if(!backButtonURL){
                 return;
@@ -219,6 +190,30 @@
             showMenuButton();
             showNavigationButton(true);
         };
+
+        //--------- Stats Module ---------------
+
+        var showStatsModule = function(){
+            _statsModuleLoader.show(document.body, closeStatsModule);
+            _menu.show(false);
+        };
+
+        //called by close button and when celebration is complete
+        var closeStatsModule = function(){
+            hideStatsModule();
+            showMenuButton();
+            showNavigationButton(true);
+            _menu.show(true);//TODO: Should animate drop again
+        };
+
+        //TODO: revisit, this is called when resize() and from closeStatsModule()
+        //Stats Module should handle resize on its own.
+        var hideStatsModule = function(){
+            if(AppData.statsVisited){
+                _statsModuleLoader.stop();
+            }
+        };
+
 
     }
 }());

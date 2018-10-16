@@ -86,7 +86,7 @@
 
             var borderRadius = Math.round(_defaultBounds.height * .95);
             _button.style.borderRadius = "0px 0px " + borderRadius + "px " + borderRadius + "px";
-            TransitionCSSUtil.showElement(_button, true, _defaultBounds);
+            TransitionCSSUtil.showElement(_button, _defaultBounds);
             _button.style.fontSize = fontSize + "px";
             _button.innerHTML = value;
             _button.style.display = "none";

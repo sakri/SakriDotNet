@@ -17,11 +17,11 @@
                 _statsSource = req.responseText;
                 console.log("stats module loaded");
             };
-            req.open("GET", "./statsModule.html");
+            req.open("GET", "./statsModule2.html");
             req.send();
         };
 
-        this.show = function(parent, openShareCallback, closeCallback){
+        this.show = function(parent, closeCallback){
             if(!_statsSource){
                 console.log("App.showStatsModule() warning : module not loaded");
                 return;
@@ -44,14 +44,12 @@
                 _iFrame.onload = function() {
                     //console.log("statsModule.onload()");
                     _iFrame.style.visibility = "visible";
-                    _iFrame.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet, GoogleAnalyticsService.isLive() ? gtag : null, openShareCallback,  closeCallback);
-                    _iFrame.contentWindow.showStats();
+                    _iFrame.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet,  closeCallback);
                 };
                 _iFrame.style.visibility = "hidden";
             }else{
                 _iFrame.style.display = "block";
-                _iFrame.contentWindow.updateWidgets();//should not be called from here?
-                _iFrame.contentWindow.showStats(AppData.getAchievementNormal() === 1);
+                _iFrame.contentWindow.app.update();
             }
             GoogleAnalyticsService.tagShowStatsModule();
             AppData.statsVisited = true;
@@ -65,7 +63,7 @@
         };
 
         this.stop = function(){
-            _iFrame.contentWindow.stopCelebrations();//rename to something more general like :  stop()
+            _iFrame.contentWindow.app.stop();
             _iFrame.style.display = "none";
         };
 

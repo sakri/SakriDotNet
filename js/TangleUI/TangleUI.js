@@ -33,7 +33,10 @@
         setWindowResizeCallbacks(resizeStartCallback, resizeCallback, resizeFreezeDuration);
     };
 
-    TangleUI.setLayoutDefinitions = function(JsonLayout){
+    TangleUI.setLayoutDefinitions = function(JsonLayout, maxLandscapeAspectRatio, maxPortraitAspectRatio){
+        //defaults are high, in case of extreme aspect ratios, update accordingly
+        _maxLandscapeAspectRatio = maxLandscapeAspectRatio || 4;//width cannot be > (height * _maxLandscapeAspectRatio)
+        _maxPortraitAspectRatio = maxPortraitAspectRatio || 4;//height cannot be > (width * _maxPortraitAspectRatio)
         _layoutDefinitions = JsonLayout;
         calculateLayout();
     };
@@ -50,11 +53,15 @@
     TangleUI.setRect = function(adjustedRect, definitionName, stateName){
         return setRect(adjustedRect, definitionName, stateName);
     };
+    TangleUI.getLayoutName = function(){
+        return _layoutName;
+    };
+
 
 
     //PRIVATE PROPERTIES AND METHODS
 
-    var _bounds = new Rectangle(),
+    var _bounds = new Rectangle(), _windowBounds = new Rectangle(),
         _layoutDefinitions, /*JSON*/
         _rectCount = 0,
         _rectanglePool = [],
@@ -65,7 +72,9 @@
         _resizeStartCallback = function(){},
         _resizeCallback = function(){},
         _resizeFreezeDuration,
-        _windowResizeTimeoutId = -1
+        _windowResizeTimeoutId = -1,
+        _maxLandscapeAspectRatio,
+        _maxPortraitAspectRatio;
 
     var setWindowResizeCallbacks = function(resizeStartCallback, resizeCallback, resizeFreezeDuration){
         _registeredToWindowResize = false;
@@ -85,8 +94,22 @@
     };
 
     var calculateLayout = function () {
-        //TODO: calculate x and y taking "max proportions" into account.
-        _bounds.update(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
+        _windowBounds.update(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
+        _bounds.updateToRect(_windowBounds);
+        var aspectRatioLimit;
+        if(_bounds.isLandscape()){
+            aspectRatioLimit = Math.round(_maxLandscapeAspectRatio * _bounds.height);
+            if(aspectRatioLimit < _bounds.width){
+                _bounds.x = Math.round(_bounds.centerX() - aspectRatioLimit * .5);
+                _bounds.width = aspectRatioLimit;
+            }
+        }else{
+            aspectRatioLimit = Math.round(_maxPortraitAspectRatio * _bounds.width);
+            if(aspectRatioLimit < _bounds.height){
+                _bounds.y = Math.round(_bounds.centerY() - aspectRatioLimit * .5);
+                _bounds.height = aspectRatioLimit;
+            }
+        }
         _rectangles = {};
         _parentRectLookup = {};
         _rectCount = 0;
@@ -103,6 +126,9 @@
     var getRect = function(definitionName, stateName){
         if(!definitionName){
             return _bounds;
+        }
+        if(definitionName=="window"){
+            return _windowBounds;
         }
         var id = getRectId(definitionName, stateName);
         return _rectangles[id] || getStateRect(definitionName, stateName);//return cached value or create new
@@ -161,7 +187,7 @@
         var childName, childDefinitionObject, childDefaultBounds;
         for(childName in rectDefinitionsObject){
             childDefinitionObject = rectDefinitionsObject[childName];
-            _parentRectLookup[childName] = bounds;
+            _parentRectLookup[childName] = childDefinitionObject.default.globalPosition ? _windowBounds : bounds;
             childDefaultBounds = createRectFromDefinitionState(childDefinitionObject, childName, "default");
             //console.log("TangleUI.calcRect()", childName, childDefaultBounds.toString());
             if(childDefinitionObject.children){

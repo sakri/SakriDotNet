@@ -116,7 +116,7 @@ section{
     background-color: #007cae;
 }
 
-/*WARNING : Duplicated in widget.css!!!*/
+/* WARNING : Duplicated in statsModule.css! TODO: create separate file for shared code! */
 .cardCloseButton{
     position : absolute;
     background-color: #FFFFFF;
@@ -130,6 +130,10 @@ section{
 .cardCloseButton:hover {
     color:#FFFFFF;
     background-color: #00acee;
+}
+
+.cardCloseButton:focus{
+    outline: none;
 }
 
 .unselectable{

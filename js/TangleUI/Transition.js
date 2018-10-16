@@ -55,17 +55,17 @@
         target.style.transform = this.getTranslateStringFromRect(rect);
     };
 
-
     TransitionCSSUtil.getTranslateStringFromRect = function(rect){
         return "translate(" + rect.x + "px, " + rect.y + "px)";
     };
 
-    TransitionCSSUtil.showElement = function(element, value, bounds){
-        if(!value){
-            element.style.visibility = "hidden";
+    //TODO: move, is useful without Transitions.
+    TransitionCSSUtil.showElement = function(element, bounds){
+        if(!bounds){
+            element.style.display = "none";//used to toggle visibility. TangleUI managed items use display:block, so no issue
             return;
         }
-        element.style.visibility = "visible";
+        element.style.display = "block";
         element.style.left = Math.round(bounds.x) + "px";
         element.style.top = Math.round(bounds.y) + "px";
         element.style.width = Math.round(bounds.width) + "px";
@@ -166,7 +166,6 @@
             this.toRect.updateToRect(toRect);
         };
 
-        //TODO: review "data" implementation (Custom Transitions need to be available outside TangleUI
         this.init = function(data){
             this.data = data || {duration:500};
             _interpolations.clear();
@@ -203,10 +202,20 @@
     };
 
     //creates or updates returned transition
-    TransitionStore.getTransition = function(transitionId){
+    TransitionStore.getTangleUITransition = function(transitionId){
+        var definitionRect = _transitionDefinitions[transitionId];
+        return this.getTransition(
+            transitionId,
+            TangleUI.getRect(definitionRect.layoutRectId, definitionRect.from),
+            TangleUI.getRect(definitionRect.layoutRectId, definitionRect.to),
+            definitionRect
+        );
+    };
+
+    //returns either a new Transition, or an updated cached instance.
+    TransitionStore.getTransition = function(transitionId , fromRect, toRect, data){
         var transition = _createdTransitions[transitionId] || new RectangleTransition();
-        //console.log("TransitionStore.getTransition()", transitionId, data);
-        updateTransitionForLayoutDefinition(transition, getTransitionDataForId(transitionId));
+        updateTransition(transition, fromRect, toRect, data);
         _createdTransitions[transitionId] = transition;
         return transition;
     };
@@ -225,21 +234,18 @@
         return data;
     };
 
-    var updateTransitionForLayoutDefinition = function(transition, data){
-        //console.log("TransitionStore.updateTransitionForLayoutDefinition()", data.from, data.to)
+    var updateTransition = function(transition, fromRect, toRect, data){
         var updated = false;
-        _stateRect = TangleUI.getRect(data.layoutRectId, data.from);
-        if(!transition.fromRect.equals(_stateRect)){
-            transition.fromRect.updateToRect(_stateRect);
+        if(!transition.fromRect.equals(fromRect)){
+            transition.fromRect.updateToRect(fromRect);
             updated = true;
         }
-        _stateRect = TangleUI.getRect(data.layoutRectId, data.to);
-        if(!transition.toRect.equals(_stateRect)){
-            transition.toRect.updateToRect(_stateRect);
+        if(!transition.toRect.equals(toRect)){
+            transition.toRect.updateToRect(toRect);
             updated = true;
         }
         if(updated){
-            transition.init(data);//TODO: see comment about transition.data in init()
+            transition.init(data);//{data{} must contain : duration, optional : xEase, yEase, widthEase, heightEase}
             return true;
         }
         return false;

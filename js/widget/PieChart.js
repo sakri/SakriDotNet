@@ -12,9 +12,10 @@
         var _bgColor = bgColor || "#FFFFFF";
 
         //TODO: hardcoded dependency on AppData, move to param
-        this.render = function(canvas){
-            if(!canvas || !AppData.cards || !AppData.cards.length){
-                console.log("PieChart.render() skipping, invalid parameters");
+        this.render = function(canvas, cards){
+            cards = cards || AppData.cards;
+            if(!canvas || !cards || !cards.length){
+                console.log("PieChart.render() skipping, invalid parameters", cards, canvas);
                 return;
             }
             var context = canvas.getContext("2d");
@@ -28,9 +29,9 @@
             var i, data, radian1, radian2, x1, y1, rgb,
                 center = Math.round(canvas.width * .5),
                 innerRadius = center * .05, reducedRadius = center * .95, innerRadian, innerX, innerY;
-            for(i=0; i<AppData.cards.length ; i++){
+            for(i=0; i<cards.length ; i++){
                 context.beginPath();
-                data = AppData.cards[i];
+                data = cards[i];
                 if(!data.themeColorLight){
                     rgb = MathUtil.hexToRgb(data.themeColor);
                     data.themeColorLight = "rgba(" + rgb.r + " ," + rgb.g + " ," + rgb.b + ", .3)";
