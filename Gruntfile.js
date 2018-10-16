@@ -40,12 +40,21 @@ module.exports = function(grunt) {
         ],
         /* stats view app */
         'release/js/StatsModuleConcat.js': [
-            "./js/utils.js",
+            "./js/TangleUI/TangleUI.js",
+            "./js/TangleUI/Transition.js",
+            ".js/TangleUI/Animation.js",
+            ".js/statsModule/StatsModuleTangleUIRects.js",
+            "./js/statsModule/StatsModuleTangleUITransitions.js",
             "./js/data.js",
-            "./js/sprites.js",
             "./js/widget/LineChart.js",
             "./js/widget/PieChart.js",
-            "./js/widget/PixelConfetti.js"
+            "./js/widget/ProgressBarList.js",
+            "./js/widget/TabButton.js",
+            "./js/widget/PixelConfetti.js",
+            "./js/widget/CelebrationsAnimation.js",
+            "./js/sprites.js",
+            "./js/external/textFit.js",
+            "./js/statsModule/statsModule.js"
         ]
     };
 
