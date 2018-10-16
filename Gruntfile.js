@@ -41,13 +41,11 @@ module.exports = function(grunt) {
         /* stats view app */
         'release/js/StatsModuleConcat.js': [
             "./js/utils.js",
-            "./js/layout/AppLayout.js",
             "./js/data.js",
             "./js/sprites.js",
             "./js/widget/LineChart.js",
             "./js/widget/PieChart.js",
-            "./js/widget/PixelConfetti.js",
-            "./js/StatsModuleSpaghetti.js"
+            "./js/widget/PixelConfetti.js"
         ]
     };
 

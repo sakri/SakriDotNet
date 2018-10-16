@@ -17,7 +17,7 @@
                 _statsSource = req.responseText;
                 console.log("stats module loaded");
             };
-            req.open("GET", "./statsModule2.html");
+            req.open("GET", "./statsModule.html");
             req.send();
         };
 
