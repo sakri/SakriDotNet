@@ -1,11 +1,11 @@
 (function() {
 
-    //@appName is currently only used for analytics
     window.SakriDotNetHomeApp = function (appName, backButtonURL) {
 
         //Public API
 
         this.init = function () {
+            GoogleAnalyticsService.appName = appName;//@appName is currently only used for analytics
             TangleUI.setLayoutDefinitions(SakriDotNetLayout);
             TransitionStore.setTransitionDefinitions(SakriDotNetTransitions);
             AppLayout.updateLayout(document.documentElement.clientWidth, document.documentElement.clientHeight);

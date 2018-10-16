@@ -109,7 +109,7 @@ var getCloseButton = function(label, rightAlign){
         _animation,
         _inData = {duration:300, easing:UnitEasing.easeOutSine},
         _outData = {duration:300, easing:UnitEasing.easeInSine};
-    console.log("getCloseButton() instance count : ", _closeButtonInstanceCount, label, rightAlign);
+    //console.log("getCloseButton() instance count : ", _closeButtonInstanceCount, label, rightAlign);
     return {
         props: [],
         data: function () {
@@ -214,7 +214,7 @@ Vue.component('avatar-renderer', {
         render : function(progressNormal){
             var canvas = this.$refs.avatarCanvas, bounds = TangleUI.getRect(this.id);
             CanvasUtil.enablePixelArtScaling(CanvasUtil.setLayoutBounds(canvas, bounds));
-            console.log(this.id, "avatar render : ", canvas.width, canvas.height, bounds.width, bounds.height);
+            //console.log(this.id, "avatar render : ", canvas.width, canvas.height, bounds.width, bounds.height);
             var scale = Math.floor(Math.min(bounds.width / PixelGuyHeadSprite.unscaledWidth, bounds.height/ PixelGuyHeadSprite.unscaledHeight) );
             var x = bounds.width * .5 - (scale * PixelGuyHeadSprite.unscaledWidth * .5);
             PixelGuyHeadSprite.renderAvatar(canvas.getContext("2d"), Math.floor(x), 0, scale, progressNormal);
@@ -303,7 +303,7 @@ Vue.component('tangle-fit-text', {
             var container = this.$refs.fitTextContainer;
             //container.innerHTML = this.label;
             var rect = container.id == "" ? null :  TangleUI.getRect(container.id);
-            console.log("render text id : ", container.id, rect.toString(), this.textFitProps);
+            //console.log("render text id : ", container.id, rect.toString(), this.textFitProps);
             TransitionCSSUtil.showElement(container, rect);
             textFit(container, this.textFitProps);
             /*
@@ -412,12 +412,14 @@ var initApp = function(standalone, closeModuleCallback){
                 this.updatePanelTitle(this.$refs.badgesTitle, titleFontSize,  TangleUI.getRect("badgesTitle"));
                 this.$refs.closeButton.resize();
                 this.$refs.shareButton.style.backgroundColor = AppConfig.themeColor;
-                this.$refs.testControllers.style.position = TangleUI.getRect().isPortrait() ? "fixed" : "absolute";
+                if(standalone){
+                    this.$refs.testControllers.style.position = TangleUI.getRect().isPortrait() ? "fixed" : "absolute";
+                }
                 this.update();
             },
             update : function(){
                 var progressNormal = AppData.getAchievementNormal();
-                console.log("app.update()", ++this.updateCount);
+                //console.log("app.update()", ++this.updateCount);
                 app.clicksTitle = "Clicks History";
                 app.visitsTitle = "Cards overview";
                 app.badgesTitle = "Achievements: " + Math.round(progressNormal * 100)+ "%";
@@ -428,7 +430,7 @@ var initApp = function(standalone, closeModuleCallback){
                 this.$refs.badgesList.render(this.badgesData);
             },
             stop : function(){
-                console.log("app.stop()");
+                //console.log("app.stop()");
                 this.$refs.sharePanel.stop();
             },
             updatePanelTitle : function(title, titleFontSize,  rect){
@@ -488,7 +490,6 @@ var initApp = function(standalone, closeModuleCallback){
                 if(standalone){
                     window.location.href = "./index.html";
                 }else{
-                    console.log("closing ", closeModuleCallback);
                     if (closeModuleCallback){
                         closeModuleCallback();
                     }

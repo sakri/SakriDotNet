@@ -36,14 +36,16 @@ module.exports = function(grunt) {
             "./js/Card.js",
             "./js/widget/ToStatsButtonBackground.js",
             "./js/MenuButton.js",
+            "./js/StatsModuleLoader.js",
             "./js/SakriDotNetHomeApp.js"
         ],
         /* stats view app */
         'release/js/StatsModuleConcat.js': [
+            "./js/utils.js",
             "./js/TangleUI/TangleUI.js",
             "./js/TangleUI/Transition.js",
-            ".js/TangleUI/Animation.js",
-            ".js/statsModule/StatsModuleTangleUIRects.js",
+            "./js/TangleUI/Animation.js",
+            "./js/statsModule/StatsModuleTangleUIRects.js",
             "./js/statsModule/StatsModuleTangleUITransitions.js",
             "./js/data.js",
             "./js/widget/LineChart.js",
