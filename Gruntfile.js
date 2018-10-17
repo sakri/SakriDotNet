@@ -13,8 +13,8 @@ module.exports = function(grunt) {
         /* app */
         'release/js/SakriDotNetConcat.js': [
             "./js/utils.js",
-            "./js/SakriDotNetLayout.js",
-            "./js/SakriDotNetTransitions.js",
+            "./js/layout/SakriDotNetLayout.js",
+            "./js/layout/SakriDotNetTransitions.js",
             "./js/TangleUI/TangleUI.js",
             "./js/TangleUI/Transition.js",
             "./js/TangleUI/Animation.js",

@@ -17,7 +17,7 @@ window.SakriDotNetLayout = {
         default: {
             landscape: {x: .35, y: .35, width: .3, height: .3},
             square: {x: .15, y: .42, width: .85, height: .25},
-            portrait: {x: .05, y: .4, width: .9, height: .2}
+            portrait: {x: .15, y: .4, width: .75, height: .2}
         },
         transitionFrom: {
             all: {y: 1.05}

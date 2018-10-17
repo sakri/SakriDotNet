@@ -36,11 +36,11 @@
 
         //PUBLIC API
 
-        this.init = function(){
+        this.init = function(label){
             _canvas = CanvasUtil.createCanvas(document.body, AppConfig.zIndexLoaderCanvas);
             resizeCanvas();
             calculateDynamicLayout();
-            createLoaderTitle();
+            createLoaderTitle(label);
             playIntroAnimation();
         };
 
@@ -118,7 +118,7 @@
             CanvasUtil.enablePixelArtScaling(_context);
         };
 
-        var createLoaderTitle = function(){
+        var createLoaderTitle = function(label){
             _title = document.createElement("h1");
             _title.style.color = "#222222";//needs to match dark pixels in sprites.js
             _title.style.position = "absolute";
@@ -127,7 +127,7 @@
             _title.style.margin =  _title.style.padding =  _title.style.borderWidth = "0";
             _title.style.zIndex = AppConfig.zIndexLoaderTitle;
             resizeTitle();
-            _title.innerHTML = "sakri.net";
+            _title.innerHTML = label;
             document.body.appendChild(_title);
         };
 
@@ -234,8 +234,8 @@
 
         var _loader = new SakriDotNetLoader(), _images;
 
-        this.start = function(){
-            _loader.init();
+        this.start = function(label){
+            _loader.init(label);
             updateLoaderCircles();
             updateImagesLoad();
         };
@@ -277,10 +277,10 @@
 
         var _loader = new SakriDotNetLoader(), _animNormal, _callback;
 
-        this.start = function(){
+        this.start = function(label){
             _animNormal = 0;
             _callback = this.start.bind(this);
-            _loader.init();
+            _loader.init(label);
             _loader.updateCircles(AppConfig.colorPalette, Math.round(MathUtil.getRandomNumberInRange(4, 12)));
             updateProgress();
         };

@@ -85,7 +85,7 @@ var getSharePanel = function(){
             },
             showQuote : function(){
                 var quote = this.quotes[this.quoteIndex % this.quotes.length];
-                this.$refs.sharePanelExamplesContainer.style.fontSize = Math.round(TangleUI.getRect("sharePanelExamplesContainer").height / 5.3) + "px";
+                this.$refs.sharePanelExamplesContainer.style.fontSize = Math.round(TangleUI.getRect("sharePanelExamplesContainer").height / 6) + "px";
                 this.$refs.sharePanelExamplesContainer.innerHTML = '"' + quote + '"';
             },
             nextQuote : function(){

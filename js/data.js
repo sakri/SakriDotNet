@@ -79,6 +79,18 @@
     //Public API
     AppData.cards = [];//list of CardData, MOVE, the rest is related to StatsModule
 
+    AppData.getLoaderLabel = function(appName){
+        var label = "sakri.net";
+        switch (appName){
+            case "faq":
+                label = "f.a.q.";
+                break;
+            case "folio":
+                label = "portfolio";
+                break;
+        }
+        return label;
+    };
 
     AppData.userInteractions = 0;
     AppData.shareClick = false;
@@ -219,7 +231,7 @@
         }
         var param = parseInt(visitedString, 2) + "-" + parseInt(articleReadString, 2);//params 0 and 1
         param += ("-" + Math.min(AppData.userInteractions, 30));//param 2
-        param += ("-" + Math.min(AppData.secondsSinceStart(), 50));//param 3
+        param += ("-" + Math.min(AppData.secondsSinceStart(), 60));//param 3
         return "visitStats=" + param;
     };
 

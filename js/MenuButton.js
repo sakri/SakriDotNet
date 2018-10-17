@@ -201,6 +201,7 @@
         };
 
         var playPromptSequence = function(){
+            _progressNormal = AppData.getAchievementNormal();
             setNextSpeechBubble();
             //TODO: should be able to recycle prompt1 and 2 for prompt6 and 7, also bubbleIn/out playReverse?
             var animations = [

@@ -12,7 +12,7 @@
             SakriDotNetSpriteSheet.init();
             AppData.startInteractionsHistory(10000, 6);
             _loader = AppConfig.loopLoader ? new SakriDotNetLoaderTestController() : new SakriDotNetLoaderController(loadCompleteHandler);
-            _loader.start();
+            _loader.start(AppData.getLoaderLabel(appName));
             TangleUI.setWindowResizeCallbacks(resizeStartHandler, resize);
             console.log("App.init()", AppData.msSinceStart(), "ms since script start");
         };
@@ -79,7 +79,7 @@
             if(_navigationButton){
                 _navigationButton.stop();
             }
-
+            hideStatsModule();
         };
 
         var resize = function () {
@@ -89,10 +89,10 @@
                 _loader.resize();
                 return;
             }
-            hideStatsModule();
             _menu.resize(bounds);
+            _menu.show(true);
             renderCardsCanvasAssets();
-            setTimeout(showMenuButton, 400);//shouldn't be on timeout, animation should have a delay
+            setTimeout(showMenuButton, 400);//TODO: remove timeout (delay in anim), or at least keep id and clearTimeout()
             setTimeout(showNavigationButton, 700, true);
         };
 
@@ -175,7 +175,6 @@
         var showCard = function (index) {
             var data = AppData.cards[index];
             GoogleAnalyticsService.tagShowCardEvent(data);
-            data.storyReadComplete = true;
             showNavigationButton(false);
             showCloseButton(true, closeCard);
             _menuButton.end();//should this be hideMenuButton()?
@@ -203,7 +202,7 @@
             hideStatsModule();
             showMenuButton();
             showNavigationButton(true);
-            _menu.show(true);//TODO: Should animate drop again
+            _menu.show(true);//TODO: Should animate drop again?
         };
 
         //TODO: revisit, this is called when resize() and from closeStatsModule()
