@@ -13,6 +13,8 @@
  */
 /*global define:true, document:true, window:true, HTMLElement:true*/
 
+//https://github.com/STRML/textFit/blob/master/textFit.js
+
 (function(root, factory) {
     "use strict";
 

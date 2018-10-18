@@ -54,6 +54,7 @@
             data.tabTitleImage = createImageFromRenderCanvas(data.tabTitleImage);
         };
 
+        //var thumbnailImageResize
         this.createCardThumbnailImage = function(data){
             if(!data.image){
                 return;
@@ -62,6 +63,7 @@
                 Math.ceil(data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width),
                 Math.ceil(data.contentLayout.thumbBounds.height * AppLayout.cardBounds.width)
             );
+            console.log("createCardThumbnailImage()", data.image.width, data.image.height, _renderCanvas.width, _renderCanvas.height);
             _renderContext.drawImage(data.image, 0, 0, _renderCanvas.width, _renderCanvas.height);
             data.thumbnailImage = createImageFromRenderCanvas(data.thumbnailImage);
         };

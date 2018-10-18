@@ -2,62 +2,34 @@ module.exports = function(grunt) {
 
     grunt.log.write(' --BUILDING : sakri.net');
 
-    //TODO: script should read the html page, grab js/css files then min/concat, instead of maintaining the list twice!
+    var getAppJSFilePaths = function(sourceHtmlFile){
+        var replaceStartTag = "<!-- javascript sources -->";
+        var replaceEndTag = "<!-- init -->";
+
+        if(!sourceHtmlFile){
+            grunt.log.writeln("getHomeJSFiles() Error : invalid parameter sourceHtmlFile : " +  sourceHtmlFile);
+            return;
+        }
+
+        var sourceContents = grunt.file.read(sourceHtmlFile);
+        var parts = sourceContents.split(replaceStartTag);
+        var scriptsString = parts[1].split(replaceEndTag)[0];
+        var scriptTags = scriptsString.split("<script src=\"");
+        var scriptPaths = [];
+        for(var i = 0; i< scriptTags.length; i++){
+            scriptPaths[i] = scriptTags[i].split("\"></script>")[0];
+        }
+        return scriptPaths;
+    };
+
     var minifyJsFiles = {
         './release/js/SakriDotNet.min.js' : './release/js/SakriDotNetConcat.js',
         './release/js/StatsModule.min.js' : './release/js/StatsModuleConcat.js'
     };
 
-    //TODO: these should be read/parsed from the html pages <script> tags instead of manual updates!
     var concatJSFiles = {
-        /* app */
-        'release/js/SakriDotNetConcat.js': [
-            "./js/utils.js",
-            "./js/layout/SakriDotNetLayout.js",
-            "./js/layout/SakriDotNetTransitions.js",
-            "./js/TangleUI/TangleUI.js",
-            "./js/TangleUI/Transition.js",
-            "./js/TangleUI/Animation.js",
-            "./js/layout/AppLayout.js",
-            "./js/service/HomeSectionsDataParser.js",
-            "./js/service/GoogleAnalytics.js",
-            "./js/data.js",
-            "./js/sprites.js",
-            "./js/widget/LoaderCircles.js",
-            "./js/SakriDotNetLoader.js",
-            "./js/CanvasInteractionManager.js",
-            "./js/DragManager.js",
-            "./js/widget/TabButton.js",
-            "./js/CardCanvasRenderer.js",
-            "./js/CardHtmlRenderer.js",
-            "./js/CardsMenu.js",
-            "./js/widget/DonutChart.js",
-            "./js/widget/SpeechBubble.js",
-            "./js/Card.js",
-            "./js/widget/ToStatsButtonBackground.js",
-            "./js/MenuButton.js",
-            "./js/StatsModuleLoader.js",
-            "./js/SakriDotNetHomeApp.js"
-        ],
-        /* stats view app */
-        'release/js/StatsModuleConcat.js': [
-            "./js/utils.js",
-            "./js/TangleUI/TangleUI.js",
-            "./js/TangleUI/Transition.js",
-            "./js/TangleUI/Animation.js",
-            "./js/statsModule/StatsModuleTangleUIRects.js",
-            "./js/statsModule/StatsModuleTangleUITransitions.js",
-            "./js/data.js",
-            "./js/widget/LineChart.js",
-            "./js/widget/PieChart.js",
-            "./js/widget/ProgressBarList.js",
-            "./js/widget/TabButton.js",
-            "./js/widget/PixelConfetti.js",
-            "./js/widget/CelebrationsAnimation.js",
-            "./js/sprites.js",
-            "./js/external/textFit.js",
-            "./js/statsModule/statsModule.js"
-        ]
+        'release/js/SakriDotNetConcat.js' : getAppJSFilePaths("index.html"),
+        'release/js/StatsModuleConcat.js' : getAppJSFilePaths("statsModule.html")
     };
 
     var minifyCssFiles = {
@@ -130,6 +102,7 @@ npm install grunt-contrib-uglify --save-dev
 
         if(!sourceHtmlFile || !minifiedJSFile || !releaseHtmlFile){
             grunt.log.writeln("embedMinifiedScript Error : invalid parameter(s)");
+            return;
         }
 
         var sourceContents = grunt.file.read(sourceHtmlFile);
@@ -151,6 +124,7 @@ npm install grunt-contrib-uglify --save-dev
 
         if(!htmlFile || !minifiedCssFile){
             grunt.log.writeln("embedMinifiedCss Error : invalid parameter(s)");
+            return;
         }
 
         var sourceContents = grunt.file.read(htmlFile);

@@ -16,10 +16,9 @@
 
     //TODO: add comment. Why such a long function (manages single spritesheet image). Consider adding GridMath to utils.js?
     SakriDotNetSpriteSheet.init = function(){
-
+        //console.log("SakriDotNetSpriteSheet.init, img.width : ", _sourceImage.width , " , img.height", _sourceImage.height);
         _canvas.width = _sourceImage.width;
         _canvas.height = _sourceImage.height;
-        //console.log("SakriDotNetSpriteSheet.setSourceImage, image.width : ", image.width , " , image.height", image.height);
         _context = _canvas.getContext("2d");
         _context.drawImage(_sourceImage, 0, 0, _canvas.width, _canvas.height);
         var imgData = _context.getImageData(0, 0, _canvas.width, _canvas.height);
