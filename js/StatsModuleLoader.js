@@ -44,7 +44,7 @@
                 _iFrame.onload = function() {
                     //console.log("statsModule.onload()");
                     _iFrame.style.visibility = "visible";
-                    _iFrame.contentWindow.initFromApp(AppData, SakriDotNetSpriteSheet,  closeCallback);
+                    _iFrame.contentWindow.initFromApp(AppConfig, AppData, SakriDotNetSpriteSheet,  closeCallback);
                 };
                 _iFrame.style.visibility = "hidden";
             }else{

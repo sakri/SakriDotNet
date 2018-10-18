@@ -370,9 +370,10 @@ var initStandalone = function(){
 };
 
 //TODO: move to events?
-var initFromApp = function(data, sprites, closeModuleCallback){
-    //override with data from home page, if inside iframe. A bit slightly very hackish... :D
+var initFromApp = function(config, data, sprites, closeModuleCallback){
+    //override with objects from home page, if inside iframe. meh.
     console.log("StatsModule.initFromApp()");
+    window.AppConfig = config;
     window.AppData = data;
     window.SakriDotNetSpriteSheet = sprites;
     initApp(false, closeModuleCallback);
