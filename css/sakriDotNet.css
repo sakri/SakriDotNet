@@ -143,3 +143,10 @@ section{
     -moz-user-select: none;
     -ms-user-select: none;
 }
+
+.statsModuleIFrame{
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 0;
+}

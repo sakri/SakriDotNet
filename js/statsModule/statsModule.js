@@ -116,7 +116,23 @@ var initApp = function(standalone, closeModuleCallback){
             resizeStart : function(){
                 this.$refs.appContainer.style.display = "none";
             },
+            forceResize : function(width, height){
+                if(this.standalone){
+                    return;
+                }
+                //Very very hackish, I tried https://benmarshall.me/responsive-iframes/ but it showed me no love :(
+                document.body.style.width = width + "px";
+                document.body.style.height = height + "px";
+                document.body.style.visibility = "hidden";
+                requestAnimationFrame(this.forceResizeStep2);
+            },
+            forceResizeStep2 : function(width, height){
+                TangleUI.forceResize();
+                this.resize();
+                document.body.style.visibility = "visible";
+            },
             resize : function(){
+                //console.log("StatsModule.app.resize()", TangleUI.getRect().toString());
                 TransitionCSSUtil.showElement(this.$refs.appContainer, TangleUI.getRect());
                 this.setOverflows();
                 var clicksTitleBounds = TangleUI.getRect("clicksTitle");
@@ -129,7 +145,9 @@ var initApp = function(standalone, closeModuleCallback){
                 if(standalone){
                     this.$refs.testControllers.style.position = TangleUI.getRect().isPortrait() ? "fixed" : "absolute";
                 }
-                this.update();
+                //requestAnimationFrame(this.update);
+                //this.update();
+                this.addClick();//data must be modified for directives to fire (TangleUI components need this)
             },
             update : function(){
                 var progressNormal = AppData.getAchievementNormal();

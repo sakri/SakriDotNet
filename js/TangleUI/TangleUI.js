@@ -56,6 +56,9 @@
     TangleUI.getLayoutName = function(){
         return _layoutName;
     };
+    TangleUI.forceResize = function(){
+        calculateLayout();
+    };
 
 
 
@@ -114,6 +117,7 @@
         _parentRectLookup = {};
         _rectCount = 0;
         _layoutName = getLayoutName(_bounds);
+        console.log("TangleUI.calculateLayout() name : ", _layoutName);
         calculateDefaultLayoutRectangles(_layoutDefinitions, _bounds);
 
         _windowResizeTimeoutId = -1;

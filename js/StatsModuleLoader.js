@@ -28,14 +28,9 @@
             }
             if(!_iFrame){
                 _iFrame = document.createElement("iframe");
-                _iFrame.style.position = "absolute";
-                _iFrame.style.width = "100%";
-                _iFrame.style.height = "100%";
-                _iFrame.style.position = "absolute";
-                _iFrame.style.margin = "0px";
-                _iFrame.style.zoom = "1";
-                _iFrame.style.padding = "0px";
-                _iFrame.style.borderWidth = "0px";
+                _iFrame.style.width = TangleUI.getRect().width + "px";
+                _iFrame.style.height = TangleUI.getRect().height + "px";
+                _iFrame.classList.add("statsModuleIFrame");
                 parent.appendChild(_iFrame);
                 _iFrame.contentWindow.document.open();
                 _iFrame.contentWindow.document.write(_statsSource);
@@ -47,19 +42,20 @@
                     _iFrame.contentWindow.initFromApp(AppConfig, AppData, SakriDotNetSpriteSheet,  closeCallback);
                 };
                 _iFrame.style.visibility = "hidden";
+                this.resize();
             }else{
+                this.resize();
+                _iFrame.contentWindow.app.forceResize(TangleUI.getRect().width, TangleUI.getRect().height);
                 _iFrame.style.display = "block";
-                _iFrame.contentWindow.app.update();
             }
             GoogleAnalyticsService.tagShowStatsModule();
             AppData.statsVisited = true;
-            this.resize();
         };
 
         this.resize = function(){
             _iFrame.style.width = TangleUI.getRect().width + "px";
             _iFrame.style.height = TangleUI.getRect().height + "px";
-            //TODO: currently resize closes Stats Module, shouldn't happen
+            //console.log("statsModLoader resize()", _iFrame.style.width, _iFrame.style.height);
         };
 
         this.stop = function(){
