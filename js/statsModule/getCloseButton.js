@@ -49,6 +49,9 @@ var getCloseButton = function(label, rightAlign){
                 TransitionCSSUtil.showElement(this.$refs.closeButton);
             },
             calculateLayout : function(){
+                //TODO: this is being called twice : mounted() then resize()
+                //console.log("closeButton.calculateLayout() ", TangleUI.getRect().smallerSide() * .1);
+                _defaultRect.height = _fromRect.height = Math.min(Math.round(TangleUI.getRect().smallerSide() * .1), 45);
                 var fontSize = Math.round(_defaultRect.height * .6);
                 _defaultRect.width = _fromRect.width = HtmlUtil.measureTextWidth(label, fontSize, document.body) + _defaultRect.height * 2;
                 //console.log("TabButton.calculateLayout()", fontSize, _defaultRect.width);

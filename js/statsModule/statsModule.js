@@ -133,7 +133,7 @@ var initApp = function(standalone, closeModuleCallback){
             },
             update : function(){
                 var progressNormal = AppData.getAchievementNormal();
-                //console.log("app.update()", ++this.updateCount);
+                console.log("app.update()", ++this.updateCount);
                 app.clicksTitle = "Clicks History";
                 app.visitsTitle = "Cards overview";
                 app.badgesTitle = "Achievements: " + Math.round(progressNormal * 100)+ "%";
@@ -142,6 +142,7 @@ var initApp = function(standalone, closeModuleCallback){
                 this.$refs.badgesAvatar.render(progressNormal);
                 this.updateBadgesData();
                 this.$refs.badgesList.render(this.badgesData);
+                this.$refs.sharePanel.updateLayout();
             },
             stop : function(){
                 //console.log("app.stop()");

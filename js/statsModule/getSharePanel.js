@@ -7,15 +7,16 @@ var getSharePanel = function(){
         data: function () {
             return {
                 quotes:[],
-                quoteIndex:0
+                quoteIndex:0,
+                showing:false
             }
         },
-        template : TemplateGrabber.getTemplate("sharePanelTemplate"),
+        template : TemplateGrabber.getTemplate("sharePanel"),
         mounted : function(){
-            this.$refs.sharePanelTemplate.style.position = "absolute";
-            this.$refs.sharePanelTemplate.style.visibility = "visible";
-            this.$refs.sharePanelTemplate.style.display = "none";
-            this.$refs.sharePanelTemplate.style.backgroundColor = AppConfig.themeColor;
+            this.$refs.sharePanel.style.position = "absolute";
+            this.$refs.sharePanel.style.visibility = "visible";
+            this.$refs.sharePanel.style.display = "none";
+            this.$refs.sharePanel.style.backgroundColor = AppConfig.themeColor;
             this.$refs.sharePanelCloseButton.style.color = AppConfig.themeColor;
             var listItems = this.$refs.sharePanelExamplesContainer.getElementsByTagName("li");
             for(var i=0; i< listItems.length; i++){
@@ -26,28 +27,33 @@ var getSharePanel = function(){
                 this.quotes.push(mitchQuotes[i] + " - M. Hedberg");
             }
             this.$refs.sharePanelExamplesContainer.innerHTML = "";
-            this.$refs.sharePanelAvatar.render(.4);
-            this.showQuote();
-            this.quoteIndex++;
         },
         methods : {
             showPanel : function(){
-                var panel = this.$refs.sharePanelTemplate;
-                var panelRect = TangleUI.getRect("sharePanel");
-                //var windowRect = TangleUI.getRect("window");
-                //fromRect.x =
-                //TangleUI.setRect(fromRect, "sharePanel", "transitionFrom");
-                TransitionCSSUtil.showElement(panel, TangleUI.getRect("sharePanel"));
-                DomElementTransitionAnimationStore.playTangleUIAnimation("sharePanel","sharePanelIn", panel);
+                this.showing = true;
+                this.updateLayout();
+                this.nextQuote();
+                DomElementTransitionAnimationStore.playTangleUIAnimation("sharePanel","sharePanelIn", this.$refs.sharePanel);
             },
             hidePanel : function(){
+                this.showing = false;
                 AppData.shareClick = true;
-                var panel = this.$refs.sharePanelTemplate;
+                var panel = this.$refs.sharePanel;
                 TransitionCSSUtil.showElement(panel, TangleUI.getRect("sharePanel", "transitionTo"));
                 DomElementTransitionAnimationStore.playTangleUIAnimation("sharePanel","sharePanelOut", panel, this.$root.hideShare);
             },
             updateLayout : function(){
-
+                var panel = this.$refs.sharePanel;
+                var panelRect = TangleUI.getRect("sharePanel");
+                TransitionCSSUtil.showElement(panel, TangleUI.getRect("sharePanel"));
+                this.$refs.sharePanelTitle.render();
+                this.$refs.sharePanelSubTitle.render();
+                this.$refs.sharePanelAvatar.render(.4);
+                this.showQuote();
+                TransitionCSSUtil.showElement(this.$refs.sharePanelExamplesContainer, TangleUI.getRect("sharePanelExamplesContainer"));
+                TransitionCSSUtil.showElement(this.$refs.sharePanelNextButton, TangleUI.getRect("sharePanelNextButton"));
+                TransitionCSSUtil.showElement(this.$refs.sharePanelCloseButton, TangleUI.getRect("sharePanelCloseButton"));
+                panel.style.display = this.showing ? "block" : "none";
             },
             showQuote : function(){
                 var quote = this.quotes[this.quoteIndex % this.quotes.length];
@@ -61,7 +67,7 @@ var getSharePanel = function(){
                 this.$root.tagShareQuote();
             },
             stop : function(){
-                TransitionCSSUtil.showElement(this.$refs.sharePanelTemplate);
+                TransitionCSSUtil.showElement(this.$refs.sharePanel);
             }
         }
     };

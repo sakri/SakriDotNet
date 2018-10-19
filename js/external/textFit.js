@@ -14,6 +14,7 @@
 /*global define:true, document:true, window:true, HTMLElement:true*/
 
 //https://github.com/STRML/textFit/blob/master/textFit.js
+//added setWidth and setHeight, for some reason dimension calculations were not working on reprocess. Could be a vue thing?
 
 (function(root, factory) {
     "use strict";
@@ -40,6 +41,8 @@
         detectMultiLine: true, // disable to turn off automatic multi-line sensing
         minFontSize: 6,
         maxFontSize: 80,
+        setWidth:0,
+        setHeight:0,
         reProcess: true, // if true, textFit will re-process already-fit nodes. Set to 'false' for better performance
         widthOnly: false, // if true, textFit will fit text to element width, regardless of text height
         alignVertWithFlexbox: false, // if true, textFit will use flexbox for vertical alignment
@@ -97,8 +100,8 @@
 
         // Get element data.
         originalHTML = el.innerHTML;
-        originalWidth = innerWidth(el);
-        originalHeight = innerHeight(el);
+        originalWidth =  settings.setWidth || innerWidth(el);
+        originalHeight =  settings.setHeight || innerHeight(el);
 
         // Don't process if we can't find box dimensions
         if (!originalWidth || (!settings.widthOnly && !originalHeight)) {

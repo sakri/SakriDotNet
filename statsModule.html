@@ -103,13 +103,11 @@
     <script src="./js/widget/CelebrationsAnimation.js"></script>
     <script src="./js/sprites.js"></script>
     <script src="./js/external/textFit.js"></script>
-
     <script src="./js/statsModule/TemplateGrabber.js"></script>
     <script src="./js/statsModule/TangleFitText.js"></script>
     <script src="./js/statsModule/getSharePanel.js"></script>
     <script src="./js/statsModule/getCloseButton.js"></script>
     <script src="./js/statsModule/CanvasVueComponents.js"></script>
-
     <script src="./js/statsModule/statsModule.js"></script>
 
     <!-- init -->
@@ -174,13 +172,12 @@
         </div>
     </div>
 
-    <!-- Mostly a test, move back into app div -->
+    <!-- Mostly a test, move back into app div, see getSharePanel.js comment for why v-tangle-directive is not used -->
 
-    <div id="sharePanelTemplate" ref="sharePanelTemplate" style="visibility: hidden;">
-        <tangle-fit-text id="sharePanelTitle" class="shareTitle disabledText">How kind of you!</tangle-fit-text>
-        <!--<p id="sharePanelSubTitle" class="TangleUIelem shareTitle" v-tangle-layout>Copy + Paste into Twitter, FB, forehead etc. and Share Share Share!</p>-->
-        <tangle-fit-text id="sharePanelSubTitle"  class="shareSubTitle disabledText" multiline="true" >Copy + Paste into Twitter, FB, forehead etc. and Share Share Share!</tangle-fit-text>
-        <div ref="sharePanelExamplesContainer" id="sharePanelExamplesContainer" class="TangleUIelem" v-tangle-layout>
+    <div id="sharePanel" ref="sharePanel" style="visibility: hidden;" >
+        <tangle-fit-text ref="sharePanelTitle" id="sharePanelTitle" class="shareTitle disabledText">How kind of you!</tangle-fit-text>
+        <tangle-fit-text ref="sharePanelSubTitle" id="sharePanelSubTitle" class="shareSubTitle disabledText" multiline="true">Copy + Paste into Twitter, FB, forehead etc. and Share Share Share!</tangle-fit-text>
+        <div ref="sharePanelExamplesContainer" id="sharePanelExamplesContainer" class="TangleUIelem">
             <ul>
                 <li>You simply haven't LIVED until you've completed the https://www.sakri.net stats module</li>
                 <li>Once you go @sakri, you never go backri! https://www.sakri.net</li>
@@ -189,8 +186,8 @@
             </ul>
         </div>
         <avatar-renderer ref="sharePanelAvatar" id="sharePanelAvatar" ></avatar-renderer>
-        <button ref="sharePanelNextButton" id="sharePanelNextButton" class="TangleUIelem" v-tangle-layout v-on:click.stop="nextQuote">Next Idea &rarr;</button>
-        <button ref="sharePanelCloseButton" id="sharePanelCloseButton" class="TangleUIelem" v-tangle-layout v-on:click.stop="hidePanel">close</button>
+        <button ref="sharePanelNextButton" id="sharePanelNextButton" class="TangleUIelem" v-on:click.stop="nextQuote">Next Idea &rarr;</button>
+        <button ref="sharePanelCloseButton" id="sharePanelCloseButton" class="TangleUIelem" v-on:click.stop="hidePanel">close</button>
 
     </div>
 

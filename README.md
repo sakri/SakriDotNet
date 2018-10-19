@@ -21,9 +21,9 @@ I will move it to a repo (and available via node) once I have completed and test
 
 Take a look : [TangleUI](https://github.com/sakri/SakriDotNet/tree/master/js/TangleUI)
 
-Layout definitions : [SakriDotNetLayout](https://github.com/sakri/SakriDotNet/blob/master/js/SakriDotNetLayout.js)
+Layout definitions : [SakriDotNetLayout](https://github.com/sakri/SakriDotNet/blob/master/js/SakriDotNetTangleUIRects.js)
 
-Transitions definitions : [SakriDotNetTransitions](https://github.com/sakri/SakriDotNet/blob/master/js/SakriDotNetTransitions.js)
+Transitions definitions : [SakriDotNetTransitions](https://github.com/sakri/SakriDotNet/blob/master/js/SakriDotNetTangleUITransitions.js)
 
 You can currently see implementations in SakriDotNetHomeApp.js, SakriDotNetLoader.js and MenuButton.js
 
