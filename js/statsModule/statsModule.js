@@ -145,8 +145,6 @@ var initApp = function(standalone, closeModuleCallback){
                 if(standalone){
                     this.$refs.testControllers.style.position = TangleUI.getRect().isPortrait() ? "fixed" : "absolute";
                 }
-                //requestAnimationFrame(this.update);
-                //this.update();
                 this.addClick();//data must be modified for directives to fire (TangleUI components need this)
             },
             update : function(){
@@ -155,12 +153,17 @@ var initApp = function(standalone, closeModuleCallback){
                 app.clicksTitle = "Clicks History";
                 app.visitsTitle = "Cards overview";
                 app.badgesTitle = "Achievements: " + Math.round(progressNormal * 100)+ "%";
-                this.$refs.clicksHistoryChart.render();
-                this.$refs.visitPieChart.render();
                 this.$refs.badgesAvatar.render(progressNormal);
                 this.updateBadgesData();
                 this.$refs.badgesList.render(this.badgesData);
                 this.$refs.sharePanel.updateLayout();
+                requestAnimationFrame(this.updateComponents);
+            },
+            updateComponents : function(){
+                //hack, to support tangle-layout directive, otherwise render happens before resize and charts are cleared
+                this.$refs.clicksHistoryChart.render();
+                this.$refs.visitPieChart.render(AppData.cards);
+
             },
             stop : function(){
                 //console.log("app.stop()");

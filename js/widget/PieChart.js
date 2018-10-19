@@ -1,6 +1,6 @@
 /**
  * DEPENDENCIES:
- * utils MathLib, Rectangle, AppData (not good)
+ * utils MathLib, Rectangle
  */
 
 
@@ -11,13 +11,12 @@
 
         var _bgColor = bgColor || "#FFFFFF";
 
-        //TODO: hardcoded dependency on AppData, move to param
         this.render = function(canvas, cards){
-            cards = cards || AppData.cards;
             if(!canvas || !cards || !cards.length){
                 console.log("PieChart.render() skipping, invalid parameters", cards, canvas);
                 return;
             }
+            console.log("PieChart render()", cards.length, canvas.width, canvas.height);
             var context = canvas.getContext("2d");
             //context.clearRect(0, 0, canvas.width, canvas.height);
             context.fillStyle = _bgColor;
@@ -44,8 +43,8 @@
                     context.strokeStyle = data.themeColorLight;
                 }
 
-                radian1 = i / AppData.cards.length * MathUtil.PI2;
-                radian2 = (i + 1) / AppData.cards.length * MathUtil.PI2;
+                radian1 = i / cards.length * MathUtil.PI2;
+                radian2 = (i + 1) / cards.length * MathUtil.PI2;
                 innerRadian = radian1 + (radian2 - radian1) * .5;
                 innerX = center + Math.cos(innerRadian) * innerRadius;
                 innerY = center + Math.sin(innerRadian) * innerRadius;

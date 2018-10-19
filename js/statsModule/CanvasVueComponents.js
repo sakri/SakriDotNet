@@ -22,8 +22,8 @@ Vue.component('visits-pie-chart', {
     },
     template: '<canvas ref="pieCanvas" class="TangleUIelem"></canvas>',
     methods:{
-        render : function(){
-            this.pieChart.render(this.$refs.pieCanvas);
+        render : function(cards){
+            this.pieChart.render(this.$refs.pieCanvas, cards);
         }
     }
 });
