@@ -16,7 +16,7 @@
                 console.log("PieChart.render() skipping, invalid parameters", cards, canvas);
                 return;
             }
-            console.log("PieChart render()", cards.length, canvas.width, canvas.height);
+            //console.log("PieChart render()", cards.length, canvas.width, canvas.height);
             var context = canvas.getContext("2d");
             //context.clearRect(0, 0, canvas.width, canvas.height);
             context.fillStyle = _bgColor;

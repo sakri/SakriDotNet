@@ -117,11 +117,11 @@
         _parentRectLookup = {};
         _rectCount = 0;
         _layoutName = getLayoutName(_bounds);
-        console.log("TangleUI.calculateLayout() name : ", _layoutName);
+        //console.log("TangleUI.calculateLayout() name : ", _layoutName);
         calculateDefaultLayoutRectangles(_layoutDefinitions, _bounds);
 
         _windowResizeTimeoutId = -1;
-        console.log("TangleUI.commitResize()", _bounds.toString());
+        //console.log("TangleUI.commitResize()", _bounds.toString());
         _resizeCallback();
     };
 

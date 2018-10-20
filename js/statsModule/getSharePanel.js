@@ -8,12 +8,13 @@ var getSharePanel = function(){
             return {
                 quotes:[],
                 quoteIndex:0,
-                showing:false
+                showing:false,
+                lastSharePanelWidth:0
             }
         },
         template : TemplateGrabber.getTemplate("sharePanel"),
         mounted : function(){
-            this.$refs.sharePanel.style.position = "absolute";
+            this.$refs.sharePanel.style.position = "fixed";
             this.$refs.sharePanel.style.visibility = "visible";
             this.$refs.sharePanel.style.display = "none";
             this.$refs.sharePanel.style.backgroundColor = AppConfig.themeColor;
@@ -42,7 +43,27 @@ var getSharePanel = function(){
                 TransitionCSSUtil.showElement(panel, TangleUI.getRect("sharePanel", "transitionTo"));
                 DomElementTransitionAnimationStore.playTangleUIAnimation("sharePanel","sharePanelOut", panel, this.$root.hideShare);
             },
+            updateToFixedPostition : function(){
+                var defaultRect = TangleUI.getRect("sharePanel");
+                if(this.lastSharePanelWidth != defaultRect.width){
+                    var bounds = TangleUI.getRect();
+
+                    var defaultRect = TangleUI.getRect("sharePanel");
+                    defaultRect.x = bounds.x + defaultRect.x;
+                    TangleUI.setRect(defaultRect, "sharePanel");
+
+                    var fromRect = TangleUI.getRect("sharePanel", "transitionFrom");
+                    fromRect.x = bounds.x + fromRect.x;
+                    TangleUI.setRect(fromRect, "sharePanel", "transitionFrom");
+
+                    var toRect = TangleUI.getRect("sharePanel", "transitionTo");
+                    toRect.x = defaultRect.width * -1.1;
+                    TangleUI.setRect(toRect, "sharePanel", "transitionTo");
+                    this.lastSharePanelWidth = defaultRect.width;
+                }
+            },
             updateLayout : function(){
+                this.updateToFixedPostition();
                 var panel = this.$refs.sharePanel;
                 var panelRect = TangleUI.getRect("sharePanel");
                 TransitionCSSUtil.showElement(panel, TangleUI.getRect("sharePanel"));

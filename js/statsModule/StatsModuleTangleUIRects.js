@@ -82,10 +82,10 @@ window.StatsModuleTangUIRects = {
             portrait: {x: .03, y: .05, width: .89, height: .9}
         },
         transitionFrom : {
-            all: {x: 1.5}
+            all: {x: 1.01}
         },
         transitionTo : {
-            all: {x: -1.5}
+            all: {x: -1.01}
         },
         children : {
             sharePanelTitle:{

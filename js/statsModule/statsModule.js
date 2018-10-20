@@ -81,6 +81,7 @@ var initStandalone = function(){
     SakriDotNetSpriteSheet.init();
     initApp(true);
     TangleUI.setWindowResizeCallbacks(app.resizeStart, app.resize, 100);
+    document.getElementById("testControllers").style.display = "block";
 };
 
 var initFromApp = function(config, data, sprites, closeModuleCallback){
@@ -142,14 +143,11 @@ var initApp = function(standalone, closeModuleCallback){
                 this.updatePanelTitle(this.$refs.badgesTitle, titleFontSize,  TangleUI.getRect("badgesTitle"));
                 this.$refs.closeButton.resize();
                 this.$refs.shareButton.style.backgroundColor = AppConfig.themeColor;
-                if(standalone){
-                    this.$refs.testControllers.style.position = TangleUI.getRect().isPortrait() ? "fixed" : "absolute";
-                }
                 this.addClick();//data must be modified for directives to fire (TangleUI components need this)
             },
             update : function(){
                 var progressNormal = AppData.getAchievementNormal();
-                console.log("app.update()", ++this.updateCount);
+                //console.log("app.update()", ++this.updateCount);
                 app.clicksTitle = "Clicks History";
                 app.visitsTitle = "Cards overview";
                 app.badgesTitle = "Achievements: " + Math.round(progressNormal * 100)+ "%";

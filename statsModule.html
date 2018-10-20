@@ -47,7 +47,7 @@
     <meta name="description" content="vue.js app built as an excuse to add custom data viz Html5 Canvas widgets to sakri.net. Also a \"testing ground\" for my side project TangleUI : Responsive layouts for Canvas widgets. Go ahead, resize to your hearts delight!" />
     <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, vue, vuejs, front end, frontend, developer, freelance, creative, creative coder, coder, programmer,  brussels, belgium, workshops" />
     <!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />-->
-    <meta name="viewport" content="initial-scale=1, minimum-scale=1.0, maximum-scale=1, user-scalable=0" />
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0" />
 
     <title>Sakri Dot net Visit Stats Module</title>
 
@@ -160,7 +160,7 @@
         <share-panel ref="sharePanel" class="statsContainer" ></share-panel>
 
         <close-button ref="closeButton"></close-button>
-
+    <!--
         <div ref="testControllers" id="testControllers" v-if="standalone">
             <span>
                 <button v-on:click.stop="addMockCardVisit">add visit</button>
@@ -169,7 +169,7 @@
                 <button v-on:click.stop="addMockActions(10)">add 10 actions</button>
                 <button v-on:click.stop="celebrateVictory">celebrate!</button>
             </span>
-        </div>
+        </div> -->
     </div>
 
     <!-- Mostly a test, move back into app div, see getSharePanel.js comment for why v-tangle-directive is not used -->
@@ -189,6 +189,16 @@
         <button ref="sharePanelNextButton" id="sharePanelNextButton" class="TangleUIelem" v-on:click.stop="nextQuote">Next Idea &rarr;</button>
         <button ref="sharePanelCloseButton" id="sharePanelCloseButton" class="TangleUIelem" v-on:click.stop="hidePanel">close</button>
 
+    </div>
+
+    <div id="testControllers">
+            <span>
+                <button onclick="app.addMockCardVisit()">add visit</button>
+                <button onclick="app.addMockReachedEndOfArticle()">add end of article</button>
+                <button onclick="app.addMockToVisitDurationMS(10)">add 10 secs to visit</button>
+                <button onclick="app.addMockActions(10)">add 10 actions</button>
+                <button onclick="app.celebrateVictory()">celebrate!</button>
+            </span>
     </div>
 
 </body>
