@@ -74,6 +74,7 @@ npm install grunt-contrib-copy --save-dev
 npm install grunt-contrib-concat --save-dev
 npm install grunt-contrib-cssmin --save-dev
 npm install grunt-contrib-uglify --save-dev
+npm install libxmljs --save-dev
      */
 
     //================ SITE SPECIFIC CUSTOM TASKS ==========================
@@ -83,6 +84,8 @@ npm install grunt-contrib-uglify --save-dev
             grunt.file.delete("./release");
         }
         grunt.file.mkdir("./release");
+        grunt.file.mkdir("./release/faq");
+        grunt.file.mkdir("./release/portfolio");
         grunt.file.copy("./css/", "./release/css/");
         grunt.file.copy("./js/", "./release/js/");
     };
@@ -139,6 +142,138 @@ npm install grunt-contrib-uglify --save-dev
     grunt.registerTask('embedMinifiedCss', 'Inserts or replaces minified css in a file', embedMinifiedCss);
 
 
+
+    var getHtmlPathsFromSiteMap = function(xmlString, excludedFiles, prependPath){
+        prependPath = prependPath || "";
+        var paths = [];
+        var urls = xmlString.split("<url>"), i, url;
+        //grunt.log.writeln("getHtmlPathsFromSiteMap() urls.length : " + urls.length);
+        for(i=1; i<urls.length; i++){
+            url = urls[i].split("<loc>")[1];
+            url = url.split("</loc>")[0];
+            url = url.split("/");
+            url = url[url.length - 1];
+            if(!excludedFiles || excludedFiles.indexOf(url)==-1){
+                paths.push(prependPath + url);
+            }
+        }
+        return paths;
+    };
+
+    var createNavigationString = function(path, urls){
+        var nav = '\n\t<nav>';
+        nav += '\n\t\t<a href="https://www.sakri.net/index.html">home</a>';
+        nav += '\n\t\t<a href="https://www.sakri.net/portfolio.html">portfolio</a>';
+        nav += '\n\t\t<a href="https://www.sakri.net/faq.html">faq</a>';
+        var i, link;
+        for(i=0; i<urls.length; i++){
+            link = urls[i].split(".")[0];
+            if(link.indexOf("_") > -1){
+                link = link.split("_").join(" ");
+            }
+            nav += '\n\t\t<a href="' + path + urls[i] + '">' + link + '</a>';
+        }
+        nav += '\n\t</nav>\n';
+        return nav;
+    };
+
+    var getGeneratedFilesHead = function(headTemplatePath){
+        var head = grunt.file.read(headTemplatePath);
+        head = head.split("<head>")[1];
+        return head.split("</head>")[0];
+    };
+
+    var setGeneratedFileMetaData = function(file, templateString){
+        var title = file.split("<title>")[1].split("</title>")[0];
+        templateString = templateString.split("<title></title>").join("<title>" + title + "</title>");
+        return file.split("<head>")[0] + templateString + file.split("</head>")[1];
+    };
+
+    var generateFilesFromSitemap = function(path, excludedFiles){
+        grunt.log.writeln("generateFilesFromSitemap() path: " + path );
+        var siteMap = grunt.file.read("./" + path + "sitemap.xml");
+        grunt.file.write("./release/" + path + "sitemap.xml", siteMap);
+        var urls = getHtmlPathsFromSiteMap(siteMap, excludedFiles);
+        var nav = createNavigationString("./", urls);
+        var metadata = getGeneratedFilesHead("./assets/metadata.html");
+        var i, file;
+        for(var i=0; i<urls.length; i++){
+            file = grunt.file.read("./" + path + urls[i]);
+            file = file.split("<body>").join("<body>" + nav);
+            file = setGeneratedFileMetaData(file, metadata);
+            grunt.file.write("./release/" + path + urls[i], file);
+        }
+    };
+
+    //was gonna npm install libxmljs --save-dev, but sitemap parsing is very simple
+
+    //needs to be done for home files, faq and portfolio
+    var generateHtmlFiles = function(){
+        var sitemapIndex = grunt.file.read("./sitemap_index.xml");
+        grunt.file.write("./release/sitemap_index.xml", sitemapIndex);
+        generateFilesFromSitemap("", ["faq.html", "index.html", "portfolio.html"]);
+        generateFilesFromSitemap("faq/");
+        generateFilesFromSitemap("portfolio/");
+    };
+
+    grunt.registerTask('generateHtmlFiles', 'generates static html content files', generateHtmlFiles);
+
+
+
+    var getBodyAnchorNameFromFile = function(fileName){
+        if(fileName.indexOf("/index.html") > -1){
+            return fileName.split("/")[0];
+        }
+        if(fileName.indexOf("/") > -1){
+            fileName = fileName.split("/")[1];
+        }
+        return fileName.split(".html")[0];
+    };
+
+    var updateAppContents = function(appFileName, files, title, siteLinks){
+        grunt.log.writeln("updateAppContents() file: " + appFileName );
+        var appFile = grunt.file.read("./release/" + appFileName);
+        var i, filePath, fileContents, bodyAnchor,
+            bodyContent = "\n\t<h1>" + title + "</h1>\n",
+            nav = "\n\t<nav>", siteLink;
+        if(siteLinks){
+            for(i=0; i<siteLinks.length; i++){
+                siteLink = siteLinks[i];
+                nav += '\n\t\t<a href="https://www.sakri.net/' + siteLink.link + '">' + siteLink.title + '</a>';
+            }
+        }
+        for(i=0; i<files.length; i++){
+            filePath = files[i];
+            bodyAnchor = getBodyAnchorNameFromFile(filePath);
+            nav += '\n\t\t<a href="#' + bodyAnchor + '">' + bodyAnchor.split("_").join(" ") + '</a>';
+            bodyContent += '\n\t<section id="' + bodyAnchor + '">\n';
+            fileContents = grunt.file.read(filePath);
+            bodyContent += fileContents.split("<body>")[1].split("</body>")[0];
+            bodyContent += '\n\t</section>\n';
+        }
+        nav += "\n\t</nav>\n";
+        bodyContent = nav + bodyContent;
+        var topBun = appFile.split("<body>")[0] + "<body>";
+        var bottomBun = "</body>" + appFile.split("</body>")[1];
+        grunt.file.write("./release/" + appFileName, topBun + bodyContent + bottomBun);
+    };
+
+    //needs to be done for home files, faq and portfolio
+    var updateAppsContents = function(){
+        var files = ["about.html", "services.html", "portfolio/index.html", "contact.html", "faq/index.html", "workshops.html"]
+        updateAppContents("index.html", files, "Sakri Rosenstrom");
+        updateAppContents("indexWithSource.html", files, "Sakri Rosenstrom");
+        files = getHtmlPathsFromSiteMap(grunt.file.read("./faq/sitemap.xml"), null, "faq/");
+        files.shift();//remove index (could be better)
+        updateAppContents("faq.html", files, "Frequently Asked Questions", [{title:"home", link:"index.html"}, {title:"portfolio", link:"portfolio.html"}]);
+        files = getHtmlPathsFromSiteMap(grunt.file.read("./portfolio/sitemap.xml"), null, "portfolio/");
+        files.shift();//remove index (could be better)
+        updateAppContents("portfolio.html", files, "Portfolio", [{title:"home", link:"index.html"}, {title:"faq", link:"faq.html"}]);
+    };
+
+    grunt.registerTask('updateAppsContents', 'update apps contents static html content files', updateAppsContents);
+
+
     //================ SET DEFAULT TASK ==========================
 
     grunt.registerTask('default', [
@@ -159,7 +294,10 @@ npm install grunt-contrib-uglify --save-dev
 
         'copyToRelease:./index.html:./release/indexWithSource.html',
         'copyToRelease:./css/sakriDotNet.css:./release/css/sakriDotNet.css',
-        'copyToRelease:./css/statsModule.css:./release/css/statsModule.css'
+        'copyToRelease:./css/statsModule.css:./release/css/statsModule.css',
+
+        'generateHtmlFiles:null',
+        'updateAppsContents:null'
     ]);
 
 };

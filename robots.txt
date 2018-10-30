@@ -1,0 +1,6 @@
+User-agent: *
+Disallow:
+Sitemap: https://www.sakri.net/sitemap.xml
+Sitemap: https://www.sakri.net/faq/sitemap.xml
+Sitemap: https://www.sakri.net/portfolio/sitemap.xml
+Sitemap: https://www.sakri.net/sitemap_index.xml

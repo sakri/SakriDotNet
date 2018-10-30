@@ -1,0 +1,36 @@
+html, body{
+    margin: 0px;
+    padding: 0px;
+    font-family: Helvetica,Arial,sans-serif;
+    background-color: #ededed;
+    font-size: 1.5em;
+}
+
+.sectionContent img{
+    width : 100%;
+}
+
+.sectionExtendedContent span{
+    display:block;
+    padding-top: 1.5em;
+}
+
+.sectionExtendedContent a{
+    font-weight:bold;
+}
+
+.sectionExtendedContent a:link {
+    color: #049CD8;/* unvisited link */
+}
+
+.sectionExtendedContent a:visited {
+    color: #E52521;/* visited link */
+}
+
+.sectionExtendedContent a:hover {
+    color: #43B047;/* mouse over link */
+}
+
+.sectionExtendedContent a:active {
+    color: #FBD000;/* selected link */
+}

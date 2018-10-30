@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <sitemap>
+        <loc>https://www.sakri.net/sitemap.xml</loc>
+        <!--<lastmod>2018-10-01T18:23:17+00:00</lastmod>-->
+        <lastmod>2018-10-30</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://www.sakri.net/faq/sitemap.xml</loc>
+        <lastmod>2018-10-30</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://www.sakri.net/portfolio/sitemap.xml</loc>
+        <lastmod>2018-10-30</lastmod>
+    </sitemap>
+
+</sitemapindex>
