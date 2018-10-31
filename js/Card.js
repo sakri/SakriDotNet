@@ -15,11 +15,14 @@
 
         //PRIVATE VARIABLES
         var _debugColor = "rgba(255, 0, 0, .3)";
-        var _hasContent = false;
 
         this.hasContent = function(){
-            return _hasContent;
+            return _data!=null;
         };
+
+        this.getData = function(){
+            return _data;
+        }
 
         //TODO: Should be moved to some "animations" class
         this.interpolateToAnimationBounds = function (normal) {
@@ -49,43 +52,43 @@
         //*************************
 
         var _tabLabelBounds = new Rectangle();
+        var _data;
         this.render = function (context, data, renderCardContents) {
-            if (!data) {
-                _hasContent = false;
+            _data = data;
+            if (!_data) {
                 return;
             }
-            _hasContent = true;
 
-            renderCardBG(context, data, this.bounds, this.tabBounds);
+            renderCardBG(context, _data, this.bounds, this.tabBounds);
 
             var bounds;
-            if (data.tabTitleImage) {
+            if (_data.tabTitleImage) {
                 _tabLabelBounds.x = Math.round(this.tabBounds.x + this.tabBounds.height * 1.2);
                 _tabLabelBounds.width = Math.round(this.tabBounds.width - this.tabBounds.height * 2);//data.tabTitleImage.width
-                _tabLabelBounds.height = (_tabLabelBounds.width / data.tabTitleImage.width) * data.tabTitleImage.height;
+                _tabLabelBounds.height = (_tabLabelBounds.width / _data.tabTitleImage.width) * _data.tabTitleImage.height;
                 _tabLabelBounds.y = this.bounds.y + this.tabBounds.height / 2 - _tabLabelBounds.height/2;
 
-                context.drawImage(data.tabTitleImage, _tabLabelBounds.x, _tabLabelBounds.y, _tabLabelBounds.width, _tabLabelBounds.height);
+                context.drawImage(_data.tabTitleImage, _tabLabelBounds.x, _tabLabelBounds.y, _tabLabelBounds.width, _tabLabelBounds.height);
             }
 
             if(!renderCardContents){
                 return;
             }
 
-            if (data.thumbnailImage) {
-                bounds = data.contentLayout.thumbBounds;
+            if (_data.thumbnailImage) {
+                bounds = _data.contentLayout.thumbBounds;
                 //console.log("Card.render() rendering image", bounds.toString());
-                context.drawImage(data.thumbnailImage,
+                context.drawImage(_data.thumbnailImage,
                     this.bounds.x + Math.round(bounds.x * this.bounds.width),
                     this.bounds.y + Math.round(bounds.y * this.bounds.height),
                     Math.round(bounds.width * this.bounds.width),
                     Math.round(bounds.height * this.bounds.height));
             }
 
-            if (data.storyImage) {
+            if (_data.storyImage) {
                 //console.log("Card.render() rendering story : ", data.contentLayout.storyBounds.toString());
-                bounds = data.contentLayout.storyBounds;
-                context.drawImage(data.storyImage,
+                bounds = _data.contentLayout.storyBounds;
+                context.drawImage(_data.storyImage,
                     this.bounds.x + Math.round(bounds.x * this.bounds.width),
                     this.bounds.y + Math.round(bounds.y * this.bounds.height),
                     Math.round(bounds.width * this.bounds.width),

@@ -35,8 +35,8 @@
 
             AppData.cards = HomeSectionsDataParser.parseSectionsData();
 
-            _menu = new CardsMenu(document.body, AppConfig.zIndexLoaderCanvas, cardsScrollUpdate, showCard);
-
+            _menu = new CardsMenu(document.body, AppConfig.zIndexLoaderCanvas, cardsScrollUpdate, showCard, hashChangeHandler);
+            window.addEventListener("hashchange", hashChangeHandler);
             //only index.html contains Stats Module.
             //todo : ideally there would be a subclass of HomeApp, HomeAppWithStats() or so.
             if(!backButtonURL){
@@ -108,7 +108,7 @@
                 case 37://enter
                 case 46://delete
                 case 88://x
-                    closeCard();
+                    closeCardButtonClick();
                     break;
             }
         };
@@ -170,19 +170,45 @@
             _closeButton.hide();
         };
 
+        //--------- Hash changes ---------------
+
+        //Called at startup to handle url "deep link", when anchors with "deep links" are clicked
+        //and on menu.ready() (after intro, after close)
+        var hashChangeHandler = function(event){
+            var hash = decodeURIComponent(location.hash);
+            if(!hash || hash.length < 2){
+                location.hash = "";
+                return;
+            }
+            hash = hash.split("#")[1].split("_").join(" ").toLowerCase();
+            if(_cardHtmlRenderer.isOpen()){
+                if(!_cardHtmlRenderer.matchesHash(hash)){
+                    closeCard();
+                }
+                return;
+            }
+            _menu.processDeepLinkFromTitle(hash);
+        };
+
         //--------- Card HTML rendering ---------------
 
         var showCard = function (index) {
             var data = AppData.cards[index];
             GoogleAnalyticsService.tagShowCardEvent(data);
             showNavigationButton(false);
-            showCloseButton(true, closeCard);
+            showCloseButton(true, closeCardButtonClick);
             _menuButton.end();//should this be hideMenuButton()?
             _cardHtmlRenderer.open(data);
+            location.hash = "#" + data.title.split(" ").join("_").toLowerCase();
+        };
+
+        var closeCardButtonClick = function(){
+            AppData.storeInteraction();
+            closeCard();
+            location.hash = "";
         };
 
         var closeCard = function(){
-            AppData.storeInteraction();
             _cardHtmlRenderer.close();
             _menu.deselectCard();
             showCloseButton(false);

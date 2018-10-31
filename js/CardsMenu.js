@@ -6,13 +6,15 @@
 
 (function() {
 
-    window.CardsMenu = function(parent, zIndex, scrollCallback, cardClickCallback){
+    window.CardsMenu = function(parent, zIndex, scrollCallback, cardClickCallback, readyCallback){
 
         var _canvas,
             _context,
 
             _cards = [],
             _data = [],
+            _nullStartItems = 4,
+            _nullEndItems = 1,
             _dataIndex = 0,
             _scrollNormal = 0,
 
@@ -80,6 +82,10 @@
 
         this.show = function(value){
             _canvas.style.display = value ? "block" : "none";
+        };
+
+        this.processDeepLinkFromTitle = function(title){
+            handleDeepLink(title);
         };
 
         //***********************************
@@ -244,8 +250,64 @@
             if(_yScrollTarget || _overDrag || _dragXOffset){
                 window.requestAnimationFrame(updateDragEase);
             }else{
-                AppData.storeInteraction();//a drag is complete
+                AppData.storeInteraction();//a drag is complete TODO: remove AppData dependency
+                _interactivityManager.unlockInteraction();//interaction can be locked prior to an "automated" scroll, ex) deeplinking
+                autoMatedScrollComplete();
+                autoMatedScrollComplete = blankCall;
             }
+        };
+
+        var blankCall = function(){};
+        var autoMatedScrollComplete = function(){};
+        var _deepLinkIndex = -1;
+
+        var scrollToIndex = function(index){
+            //console.log("scrollToIndex() _dataIndex : ", _dataIndex, ", index : ", index, ", data.length : ", _data.length, ", _yScrollTarget: ", _yScrollTarget);
+            _deepLinkIndex = index - _nullStartItems;
+            if(Math.max(_deepLinkIndex , _dataIndex) - Math.min(_deepLinkIndex , _dataIndex) < 2){
+                console.log("scrollToIndex() close enough, no need to scroll");
+                return false;
+            }
+            _yScrollTarget = _dataIndex - _deepLinkIndex;
+            //console.log("scrollToIndex() _yScrollTarget: ", _yScrollTarget);
+            updateDragEase();
+            _interactivityManager.lockInteraction();//careful...
+            return true;
+        };
+
+        //used for deep linking to cards via location.hash
+        var handleDeepLink = function(title){
+            _deepLinkIndex = -1;
+            if(_interactivityManager.isInteractionLocked()){
+                console.log("CardsMenu.handleDeepLink(", title, ") skipped, no deeplinking during animation/interaction");
+                return;
+            }
+            for(var i=_nullStartItems; i<_data.length; i++){
+                if(_data[i] && _data[i].title.toLowerCase() === title){
+                    //console.log("CardsMenu.executeDeepLink()", title, i);
+                    if(scrollToIndex(i)){
+                        autoMatedScrollComplete = deepLinkScrollComplete;
+                    }else{
+                        deepLinkScrollComplete();
+                    }
+                    return;
+                }
+            }
+            console.log("CardsMenu.handleDeepLink() error : link not found : ", title);
+        };
+
+        var deepLinkScrollComplete = function(){
+            var deepLinkTitle = _data[_deepLinkIndex + _nullStartItems].title;
+            console.log("CardsMenu.deepLinkScrollComplete() _deepLinkIndex:", _deepLinkIndex, " , title : ", deepLinkTitle);
+            var i, data;
+            for(var i=0; i<_cards.length; i++){
+                data = _cards[i].getData();
+                if(data && data.title === deepLinkTitle){
+                    executeCardClick(_cards[i]);
+                    break;
+                }
+            }
+            _deepLinkIndex = -1;
         };
 
         //*************************
@@ -312,6 +374,9 @@
         var introComplete = function(){
             _interactivityManager.unlockInteraction();
             render();
+            if(readyCallback){
+                readyCallback();
+            }
         };
 
         //===============::ZOOM IN AND OUT::=========================
@@ -341,7 +406,7 @@
         var animateCardInComplete = function(){
             _selectedCard.render(_context, _data[_selectedDataIndex], false);
             if(_cardClickHandler){
-                _cardClickHandler(_selectedDataIndex- 4);//-4 because of null items
+                _cardClickHandler(_selectedDataIndex- _nullStartItems);
             }
         };
 
@@ -355,6 +420,9 @@
             _selectedCard = null;
             _interactivityManager.unlockInteraction();
             render();
+            if(readyCallback){
+                readyCallback();
+            }
         };
 
     };

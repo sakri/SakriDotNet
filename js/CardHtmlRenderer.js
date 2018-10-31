@@ -28,6 +28,10 @@
             return _card && _card.style.display !== "none";
         };
 
+        this.matchesHash = function(title){
+            return _data.title === title;
+        };
+
         this.close = function(){
             if(_story){
                 _story.scrollTop = 0;
@@ -112,7 +116,7 @@
             _story.onscroll = function(){
                 if(!_data.storyReadComplete && _story.scrollTop / (_story.scrollHeight - _story.clientHeight) > .95){
                     _data.storyReadComplete = true;
-                    GoogleAnalyticsService.tagStoryReadCompleteHandler(data);
+                    GoogleAnalyticsService.tagStoryReadCompleteHandler(_data);
                     AppData.storeInteraction();
                 }
             };
