@@ -58,7 +58,7 @@
         };
 
         this.circlesIntroComplete = function(){
-            return !_animations.pixelGuy.isAnimating() && _animations.title && !_animations.title.isAnimating() && _circles.introComplete();
+            return _circles.introComplete();
         };
 
         this.render = function(normal){
