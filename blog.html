@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--
+
+    please read the comment at the top of index.html (the javascript and css in this file are identical)
+
+    -->
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-393774-1"></script>
+    <script>
+        var _scriptStart = new Date().getTime();
+        if(location.href.indexOf("localhost") == -1){
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-393774-1');
+        };
+    </script>
+
+    <!-- site metadata -->
+    <meta name="Resource-type" content="Document"/>
+    <meta name="author" content="Sakri Rosenstrom" />
+    <meta name="description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games" />
+    <meta name="keywords" content="Sakri, Rosenstrom, 54kr1, html5, html5 Canvas, canvas, javascript, js, css, css3, svg, angular, polymer, front end, frontend, developer, freelance, creative, creative coder, coder, programmer, brussels, belgium, workshops" />
+    <!--<meta name="viewport" content="minimum-scale=1.0, maximum-scale=1, user-scalable=0" />-->
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1.0, maximum-scale=1, user-scalable=0" />
+
+    <title>Sakri Rosensenstrom Blog : Front End Developer and Creative Coder, Brussels Belgium</title>
+
+    <!-- Open Graph data -->
+    <meta property="og:site_name" content="Sakri Rosenstrom - Frontend Developer and Creative Coder, Brussels"/>
+    <meta property="og:title" content="Sakri Rosenstrom - Frontend Developer Brussels" />
+    <meta property="og:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games"/>
+    <meta property="og:image" content="https://www.sakri.net/assets/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.sakri.net/blog.html" />
+
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakri Rosenstrom - Frontend Developer Brussels">
+    <meta name="twitter:description" content="Sakri Rosenstrom is a Brussels based freelance front end developer with 20 years experience crafting UIs, interaction, components, architectures, visualizations and effects for websites, applications and games">
+    <meta name="twitter:url" content="https://www.sakri.net/blog.html">
+    <meta name="twitter:image" content="https://www.sakri.net/assets/thumbnail.png">
+
+    <!-- Icons -->
+    <link href="https://www.sakri.net/assets/thumbnail.png" type="image/png" rel="image_src">
+    <link href="https://www.sakri.net" rel="canonical">
+
+    <!-- Social -->
+    <meta name="p:domain_verify" content="0748e1babd732d1cd5cf7b2a03ad766b"/><!-- Pinterest -->
+
+    <link rel="apple-touch-icon" href="https://www.sakri.net/assets/icons/touch-icon-iphone.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://www.sakri.net/assets/icons/touch-icon-ipad.png" type="image/png" sizes="76x76">
+    <link rel="apple-touch-icon" href="https://www.sakri.net/assets/icons/touch-icon-iphone-retina.png" type="image/png" sizes="120x120">
+    <link rel="apple-touch-icon" href="https://www.sakri.net/assets/icons/touch-icon-ipad-retina.png" type="image/png" sizes="152x152">
+
+    <link rel="icon" href="https://www.sakri.net/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="https://www.sakri.net/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="https://www.sakri.net/assets/icons/favicon-96x96.png" type="image/png" sizes="96x96">
+
+    <!-- for grunt script to work, CSS, Javascript and init declarations/comments must remain in this order -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/sakriDotNet.css" />
+
+    <!-- javascript sources -->
+    <script src="./js/utils.js"></script>
+    <script src="./js/layout/SakriDotNetTangleUIRects.js"></script>
+    <script src="./js/layout/SakriDotNetTangleUITransitions.js"></script>
+    <script src="./js/TangleUI/TangleUI.js"></script>
+    <script src="./js/TangleUI/Transition.js"></script>
+    <script src="./js/TangleUI/Animation.js"></script>
+    <script src="./js/layout/AppLayout.js"></script>
+    <script src="./js/service/GoogleAnalytics.js"></script>
+    <script src="./js/service/HomeSectionsDataParser.js"></script>
+    <script src="./js/data.js"></script>
+    <script src="./js/sprites.js"></script>
+    <script src="./js/widget/LoaderCircles.js"></script>
+    <script src="./js/SakriDotNetLoader.js"></script>
+    <script src="./js/CanvasInteractionManager.js"></script>
+    <script src="./js/DragManager.js"></script>
+    <script src="./js/widget/TabButton.js"></script>
+    <script src="./js/CardCanvasRenderer.js"></script>
+    <script src="./js/CardHtmlRenderer.js"></script>
+    <script src="./js/CardsMenu.js"></script>
+    <script src="./js/Card.js"></script>
+    <script src="./js/SakriDotNetHomeApp.js"></script>
+
+
+    <!-- init -->
+    <script>
+
+        function waitForIt(){
+            if(document.body){
+                if(AppConfig.checkNoJs()){
+                    return;
+                }
+                document.body.style.overflow = "hidden";
+                return new SakriDotNetHomeApp("blog", "index.html").init();
+            }
+            requestAnimationFrame(waitForIt);
+        }
+
+        waitForIt();
+
+    </script>
+
+</head>
+<body>
+
+    <section>
+        <div class="sectionContent">
+            <h1>Search Engine Optimization 2018 round 1</h1>
+            <img src="./assets/blog/seo_frontend_portfolio_round1.png" alt="Search Engine Optimiwation 2018 round 1 preview" />
+            <p>While looking around at other front end developer portfolios for inspiration, I ran into a good post by
+                Rafael Caferati (link below).  My interest in SEO runs nowhere as deep as his, Anyone in this business
+                should be aware of the basics. In the 2000s I ran a "flash blog" on this domain which was generating
+                around 500 visits a day at its peak.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>My Blogging days went down the drain with the demise of Flash, and my google ranking plummeted along with it.
+                Googling "sakri" would lead a user to my website around page 6. To rectify this grave injustice I:</p>
+            <ul>
+                <li>bought an ssl certificate, now all my pages use https</li>
+                <li>made sure all my social media profiles link to sakri.net</li>
+                <li>used vanillaJS with minimal external libraries etc. minified and entirely embedded in the app.html
+                    files to reduce server calls and shorten loads as much as possible. The apps are under 100kb each, (with
+                    a few images).</li>
+                <li>copied the metadata structure from some highly visible sites and adjusted to my own</li>
+                <li>registered a local business through google. It's a bit weird to have my home address visible to anyone,
+                    but I'm renting at the moment anyway.</li>
+                <li>This is the big one : Even though my "cards menu apps" contain all their text content in the apps
+                    html file, my build script also outputs html files for every card.  For example :
+                    <a href="https://www.sakri.net/portfolio/sakri_dot_net.html" target="_blank">portfolio/sakri_dot_net.html</a>;
+                    This file contains all the metadata, a generated nav with links to all the portfolio pages and apps and some other
+                    template content.
+                </li>
+                <li>made sure I had sitemaps containing all these html files, with robots.txt pointing to them</li>
+                <li>...and a few other minor efforts not worth the mention.</li>
+            </ul>
+            <p>All this took some effort, but it has started to pay off : </p>
+            <ul>
+                <li><a href="https://www.google.com/search?q=sakri" target="_blank">google.com/search?q=sakri</a> : first page!</li>
+                <li><a href="https://www.google.com/search?q=sakri" target="_blank">google.com/search?q=sakri</a> : first page!</li>
+                <li><a href="https://www.google.com/search?q=sakri" target="_blank">google.com/search?q=sakri</a> : first page!</li>
+            </ul>
+            <p>The current goal is to reclaim my throne for "sakri" from the <a href="https://en.wikipedia.org/wiki/Sakri" target="_blank">wikipedia article (Sakri : a census town in the Dhule District of India)</a>,
+                and actually increase visibility to the point where I will no longer have to search for projects (yes, a man can dream ;) )</p>
+            <p>As promised here's the article that sparked this : </p>
+            <a href="https://caferati.me/labs/seo-part-one-google-search-for-full-stack-developer-portfolio">Rafael Caferatis on SEO</a>
+            <p>Discuss this article on Reddit (I'll get notified) : </p>
+            <a href="https://www.reddit.com/r/sakri/" alt="discuss this post on reddit">reddit.com/r/sakri/</a>
+        </div>
+    </section>
+
+    <section>
+        <div class="sectionContent">
+            <h1>Fluffy Morphing Cloud on Codepen</h1>
+            <img src="./assets/blog/fluffyMorphingCloud.png" alt="fluffy morphing cloud pen preview" />
+            <p>I've had this idea kicking around for a while, and wanted to generate some fluffy clouds for a game I'm planning
+                to make. The idea is to crete two random "cloud" shapes, then morph between them to simulate a "cartoonish"
+                fluffy cloud with the illusion of "real" cloud behaviour.
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>The cloud shapes are generated by plotting points along an egg shape, using a random radius.
+                This results in random enough shapes, without having to worry about intersecting lines. To somewhat flatten my clouds,
+                I used an egg shape instead of a plain circle. </p>
+            <p>Here's a pen explaining the shape generation:</p>
+            <a href="https://codepen.io/sakri/pen/eQOVLe/" target="_blank" alt="Random cloud shape generator on Codepen">
+                <p>Random cloud shape generator on Codepen</p>
+                <img src="./assets/blog/randomCloudCircle.png"  alt="random circular shape preview" />
+                <img src="./assets/blog/randomCloudEgg.png"  alt="random egg shape preview" />
+            </a>
+            <p>The "fluff" are just circles placed along a grid over the cloud shape. Cells which are inside the cloud shapes
+                path are stored.  The final animation creates two such grids, and interpolates between the two. When the morph is
+                compplete, a new "target" cloud is generated.</p>
+            <p>check it out (don't hesitate to click the like button ;) )</p>
+            <a href="https://codepen.io/sakri/pen/KGJoJW" target="_blank" alt="morphing fluffy cloud on codepen">Fluffy Morphing CLoud on Codepen</a>
+            <p>Discuss this article on Reddit (I'll get notified) : </p>
+            <a href="https://www.reddit.com/r/sakri/" alt="discuss this post on reddit">reddit.com/r/sakri/</a>
+        </div>
+    </section>
+
+    <section>
+        <div class="sectionContent">
+            <h1>Sakri.net Stats Module!</h1>
+            <img src="./assets/blog/statsModuleCelebrate.png" alt="stats module celebration preview" />
+            <p>The "core concept" of this website is : "show the world examples of what I'm good at, and like to do (and
+                maybe land some similar projects)".  I enjoy making custom data visualizations, so I needed an excuse
+                to include some. The spur of the moment solution was an app showing useless information about a visitors
+                "visit stats".
+            </p>
+        </div>
+        <div class="sectionExtendedContent">
+            <img src="./assets/blog/statsModule.png" alt="stats module celebration preview" />
+            <p>This evolved into a tongue in cheek effort to persuade increased interaction with the site.
+                The data viz widgets are all built from scratch with Html5 Canvas, are very lightweight and performant.
+                A pie chart shows 'cards visit' data, a line chart shows 'clicks history' and a list of progress bars
+                shows 'badges' or 'achievements' : upon reaching 100% the user is treated to a 'pixel confetti' animation.
+            </p>For such a small project, I chose to go with Vue.js</p>
+            </p>Visit the standalone version here (with 'cheat buttons') : </p>
+            <a href="https://www.sakri.net/statsModule.html">Stats Module Standalone</a>
+            </p>Visit my 'home app' for the full experience ;)</p>
+            <a href="https://www.sakri.net">Sakri.net home page</a>
+            </p>See the source code on github :</p>
+            <a href="https://github.com/sakri/SakriDotNet">github.com/sakri/SakriDotNet</a>
+            <p>Discuss this article on Reddit (I'll get notified) : </p>
+            <a href="https://www.reddit.com/r/sakri/" alt="discuss this post on reddit">reddit.com/r/sakri/</a>
+        </div>
+    </section>
+
+    <section>
+        <div class="sectionContent">
+            <h1>Sakri.net 2018 is live!</h1>
+            <img src="./assets/blog/sakriDotNetIsLive.png" alt="sakri dot net is live" />
+            <p>Sakri.net was registered sometime in the early 00's.  This must be version 45.</p>
+        </div>
+        <div class="sectionExtendedContent">
+            <p>Sakri.net was registered sometime in the early 00's.  This must be version 45.</p>
+        </div>
+    </section>
+
+</body>
+</html>

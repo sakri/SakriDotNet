@@ -116,7 +116,7 @@
         var keyPressCardsMenu = function (keyCode) {
             switch (keyCode) {
                 case 13://enter
-                    _menu.enterPressHandler();
+                    _menu.openCardAtCurrentScrollPosition();
                     break;
                 case 38:
                 case 39:

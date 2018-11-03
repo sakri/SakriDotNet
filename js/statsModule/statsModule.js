@@ -246,17 +246,17 @@ var initApp = function(standalone, closeModuleCallback){
             },
             tagCelebrate : function(){
                 if (gtag) {
-                    gtag('event', 'celebrateStatsModule', {'event_category' : "statsModuleComplete"});
+                    gtag('event', 'celebrate', {'event_category' : "statsModule"});
                 }
             },
             tagShare : function(){
                 if (gtag) {
-                    gtag('event', 'shareStatsModule', {'event_category' : "statsModuleShare"});
+                    gtag('event', 'share', {'event_category' : "statsModule"});
                 }
             },
             tagShareQuote : function(){
                 if (gtag) {
-                    gtag('event', 'shareNextQuote', {'event_category' : "shareNextQuote"});
+                    gtag('event', 'shareNextQuote', {'event_category' : "statsModule"});
                 }
             },
 

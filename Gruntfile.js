@@ -77,6 +77,16 @@ npm install grunt-contrib-uglify --save-dev
 npm install libxmljs --save-dev
      */
 
+    //================ UTIL FUNCTIONS (TODO: move to GruntUtils.js or so) ====================
+
+    //only works when one tag is present in html file (I know, should parse xml and query, todo)
+    //expects a string like : body, nav, footer....
+    var extractTagAndContentsFromHtml = function(html, tag){
+        var extracted = html.split("<" + tag)[1];
+        extracted = html.split("</" + tag + ">")[0];
+        return "<" + tag + extracted + "</" + tag + ">";
+    };
+
     //================ SITE SPECIFIC CUSTOM TASKS ==========================
 
     var prepareRelease = function(){
@@ -84,6 +94,7 @@ npm install libxmljs --save-dev
             grunt.file.delete("./release");
         }
         grunt.file.mkdir("./release");
+        grunt.file.mkdir("./release/blog");
         grunt.file.mkdir("./release/faq");
         grunt.file.mkdir("./release/portfolio");
         grunt.file.copy("./css/", "./release/css/");
@@ -142,66 +153,108 @@ npm install libxmljs --save-dev
     grunt.registerTask('embedMinifiedCss', 'Inserts or replaces minified css in a file', embedMinifiedCss);
 
 
-
-    var getHtmlPathsFromSiteMap = function(xmlString, excludedFiles, prependPath){
+    //prependPath is "faq/" or "blog/" etc.
+    //returns {fileName : prependPath + somePage.html, pubDate: 2018-10-31}
+    var getFilesFromSiteMap = function(xmlString, excludedFiles, prependPath){
         prependPath = prependPath || "";
-        var paths = [];
-        var urls = xmlString.split("<url>"), i, url;
-        //grunt.log.writeln("getHtmlPathsFromSiteMap() urls.length : " + urls.length);
+        var files = [];
+        var urls = xmlString.split("<url>"),
+            i, fileName, pubDate;
+        grunt.log.writeln("getFilesFromSiteMap() urls.length : " + urls.length);
         for(i=1; i<urls.length; i++){
-            url = urls[i].split("<loc>")[1];
-            url = url.split("</loc>")[0];
-            url = url.split("/");
-            url = url[url.length - 1];
-            if(!excludedFiles || excludedFiles.indexOf(url)==-1){
-                paths.push(prependPath + url);
+            fileName = urls[i].split("<loc>")[1];
+            fileName = fileName.split("</loc>")[0];
+            fileName = fileName.split("/");
+            fileName = fileName[fileName.length - 1];
+            pubDate = urls[i].split("<lastmod>")[1].split("</lastmod>")[0];
+            if(!excludedFiles || excludedFiles.indexOf(fileName) == -1){
+                files.push({fileName : prependPath + fileName, pubDate : pubDate});
             }
         }
-        return paths;
+        return files;
     };
 
-    var createNavigationString = function(path, urls){
-        var nav = '\n\t<nav>';
-        nav += '\n\t\t<a href="https://www.sakri.net/index.html">home</a>';
+    var createNavigationString = function(files){
+        var nav = '\t\t<a href="https://www.sakri.net/index.html">home</a>';
         nav += '\n\t\t<a href="https://www.sakri.net/portfolio.html">portfolio</a>';
         nav += '\n\t\t<a href="https://www.sakri.net/faq.html">faq</a>';
-        var i, link;
-        for(i=0; i<urls.length; i++){
-            link = urls[i].split(".")[0];
-            if(link.indexOf("_") > -1){
-                link = link.split("_").join(" ");
+        var i, file, linkTitle;
+        for(i=0; i < files.length; i++){
+            file = files[i];
+            linkTitle = file.fileName.split(".")[0];
+            if(linkTitle.indexOf("_") > -1){
+                linkTitle = linkTitle.split("_").join(" ");
             }
-            nav += '\n\t\t<a href="' + path + urls[i] + '">' + link + '</a>';
+            nav += '\n\t\t<a href="https://www.sakri.net/' + file.fileName + '">' + linkTitle + '</a>';
         }
-        nav += '\n\t</nav>\n';
         return nav;
     };
 
-    var getGeneratedFilesHead = function(headTemplatePath){
-        var head = grunt.file.read(headTemplatePath);
-        head = head.split("<head>")[1];
-        return head.split("</head>")[0];
+    var getGeneratedFilesHeaderString = function(title, pubDate, lastUpdate){
+        var header = "<h1>" + title + "</h1>\n\t\t<p>Posted by: Sakri Rosenstrom</p>";
+        header += '\n\t\t<p>Last updated on <time datetime="' + pubDate + '">' + pubDate + '</time></p>';
+        return header;
     };
 
-    var setGeneratedFileMetaData = function(file, templateString){
-        var title = file.split("<title>")[1].split("</title>")[0];
-        templateString = templateString.split("<title></title>").join("<title>" + title + "</title>");
-        return file.split("<head>")[0] + templateString + file.split("</head>")[1];
+    //very clunky, must match createGeneratedFileFromTemplate to the dot
+    var getGeneratedFilesTemplateObject = function(){
+        var file = grunt.file.read("./templates/pagesTemplate.html");
+        var template = {
+            slots : ["pageTitle", "pageOgTitle", "pageOgUrl", "pageTwitterTitle", "pageTwitterUrl", "pageHeader", "pageNav", "pageContent"],
+            parts:[]
+        };
+
+        var slots = template.slots.slice(), parts;//copy
+        while(slots.length){
+            parts = file.split("{" + slots.pop() + "}");
+            template.parts.unshift(parts[1]);
+            file = parts[0];
+        }
+        template.parts.unshift(file);
+
+        return template;
+    };
+
+    var getGeneratedPageTemplateData = function(file, template, nav){
+        var sourceFile = grunt.file.read("./" + file.fileName);
+        var title = sourceFile.split("<title>")[1].split("</title>")[0];
+        var url = "https://www.sakri.net/" + file.fileName;
+        return {
+            "pageTitle" : title,
+            "pageOgTitle" : title,
+            "pageOgUrl" : url,
+            "pageTwitterTitle" : title,
+            "pageTwitterUrl" : url,
+            "pageHeader" : getGeneratedFilesHeaderString(title, file.pubDate),
+            "pageNav" : nav,
+            "pageContent" : sourceFile.split("<body>")[1].split("</body>")[0]
+        };
+    };
+
+    //TODO: add description metadata, find a real template solution
+    var createGeneratedFileFromTemplate = function(file, template, nav){
+        var data = getGeneratedPageTemplateData(file, template, nav);
+        var output = template.parts[0];
+        for(var i=0; i<template.slots.length; i++){
+            output += (data[template.slots[i]] + template.parts[i + 1]);
+        }
+        return output;
     };
 
     var generateFilesFromSitemap = function(path, excludedFiles){
+
+        //read and copy sitemap to release folder
         grunt.log.writeln("generateFilesFromSitemap() path: " + path );
         var siteMap = grunt.file.read("./" + path + "sitemap.xml");
         grunt.file.write("./release/" + path + "sitemap.xml", siteMap);
-        var urls = getHtmlPathsFromSiteMap(siteMap, excludedFiles);
-        var nav = createNavigationString("./", urls);
-        var metadata = getGeneratedFilesHead("./assets/metadata.html");
-        var i, file;
-        for(var i=0; i<urls.length; i++){
-            file = grunt.file.read("./" + path + urls[i]);
-            file = file.split("<body>").join("<body>" + nav);
-            file = setGeneratedFileMetaData(file, metadata);
-            grunt.file.write("./release/" + path + urls[i], file);
+        var files = getFilesFromSiteMap(siteMap, excludedFiles, path);
+        var nav = createNavigationString(files);
+        var template= getGeneratedFilesTemplateObject();
+        var i, file, html;
+        for(i=0; i<files.length; i++){
+            file = files[i];
+            html = createGeneratedFileFromTemplate(file, template, nav);
+            grunt.file.write("./release/" + file.fileName, html);
         }
     };
 
@@ -211,7 +264,8 @@ npm install libxmljs --save-dev
     var generateHtmlFiles = function(){
         var sitemapIndex = grunt.file.read("./sitemap_index.xml");
         grunt.file.write("./release/sitemap_index.xml", sitemapIndex);
-        generateFilesFromSitemap("", ["faq.html", "index.html", "portfolio.html"]);
+        generateFilesFromSitemap("", ["faq.html", "index.html", "portfolio.html", "blog.html"]);
+        generateFilesFromSitemap("blog/");
         generateFilesFromSitemap("faq/");
         generateFilesFromSitemap("portfolio/");
     };
@@ -220,7 +274,10 @@ npm install libxmljs --save-dev
 
 
 
-    var getBodyAnchorNameFromFile = function(fileName){
+
+
+    var getSectionHashFromFileName = function(fileName){
+        grunt.log.writeln("getSectionHashFromFileName() " + fileName);
         if(fileName.indexOf("/index.html") > -1){
             return fileName.split("/")[0];
         }
@@ -231,11 +288,11 @@ npm install libxmljs --save-dev
     };
 
     var updateAppContents = function(appFileName, files, title, siteLinks){
-        grunt.log.writeln("updateAppContents() file: " + appFileName );
+        grunt.log.writeln("updateAppContents() file: " + appFileName + ", files.length : " + files.length);
         var appFile = grunt.file.read("./release/" + appFileName);
-        var i, filePath, fileContents, bodyAnchor,
+        var i, filePath, fileContents, hash,
             bodyContent = "\n\t<h1>" + title + "</h1>\n",
-            nav = "\n\t<nav>", siteLink;
+            nav = "\n\t<nav>", siteLink, file;
         if(siteLinks){
             for(i=0; i<siteLinks.length; i++){
                 siteLink = siteLinks[i];
@@ -243,11 +300,11 @@ npm install libxmljs --save-dev
             }
         }
         for(i=0; i<files.length; i++){
-            filePath = files[i];
-            bodyAnchor = getBodyAnchorNameFromFile(filePath);
-            nav += '\n\t\t<a href="#' + bodyAnchor + '">' + bodyAnchor.split("_").join(" ") + '</a>';
-            bodyContent += '\n\t<section id="' + bodyAnchor + '">\n';
-            fileContents = grunt.file.read(filePath);
+            file = files[i];
+            hash = getSectionHashFromFileName(file.fileName);
+            nav += '\n\t\t<a href="#' + hash + '">' + hash.split("_").join(" ") + '</a>';
+            bodyContent += '\n\t<section id="' + hash + '">\n';
+            fileContents = grunt.file.read("./" + file.fileName);
             bodyContent += fileContents.split("<body>")[1].split("</body>")[0];
             bodyContent += '\n\t</section>\n';
         }
@@ -260,15 +317,25 @@ npm install libxmljs --save-dev
 
     //needs to be done for home files, faq and portfolio
     var updateAppsContents = function(){
-        var files = ["about.html", "services.html", "portfolio/index.html", "contact.html", "faq/index.html", "workshops.html"]
+        //home
+        var files = [{fileName : "about.html"}, {fileName : "services.html"}, {fileName : "portfolio/index.html"}, {fileName : "contact.html"}, {fileName : "blog/index.html"}, {fileName : "faq/index.html"}, {fileName : "workshops.html"}]
         updateAppContents("index.html", files, "Sakri Rosenstrom");
         updateAppContents("indexWithSource.html", files, "Sakri Rosenstrom");
-        files = getHtmlPathsFromSiteMap(grunt.file.read("./faq/sitemap.xml"), null, "faq/");
+
+        //blog
+        files = getFilesFromSiteMap(grunt.file.read("./blog/sitemap.xml"), null, "blog/");
         files.shift();//remove index (could be better)
-        updateAppContents("faq.html", files, "Frequently Asked Questions", [{title:"home", link:"index.html"}, {title:"portfolio", link:"portfolio.html"}]);
-        files = getHtmlPathsFromSiteMap(grunt.file.read("./portfolio/sitemap.xml"), null, "portfolio/");
+        updateAppContents("blog.html", files, "Blog", [{title:"home", link:"index.html"}, {title:"portfolio", link:"portfolio.html"}, {title:"faq", link:"faq.html"}]);
+
+        //faq
+        files = getFilesFromSiteMap(grunt.file.read("./faq/sitemap.xml"), null, "faq/");
         files.shift();//remove index (could be better)
-        updateAppContents("portfolio.html", files, "Portfolio", [{title:"home", link:"index.html"}, {title:"faq", link:"faq.html"}]);
+        updateAppContents("faq.html", files, "Frequently Asked Questions", [{title:"home", link:"index.html"}, {title:"portfolio", link:"portfolio.html"}, {title:"blog", link:"blog.html"}]);
+
+        //portfolio
+        files = getFilesFromSiteMap(grunt.file.read("./portfolio/sitemap.xml"), null, "portfolio/");
+        files.shift();//remove index (could be better)
+        updateAppContents("portfolio.html", files, "Portfolio", [{title:"home", link:"index.html"}, {title:"faq", link:"faq.html"}, {title:"blog", link:"blog.html"}]);
     };
 
     grunt.registerTask('updateAppsContents', 'update apps contents static html content files', updateAppsContents);
@@ -283,11 +350,13 @@ npm install libxmljs --save-dev
         'cssmin',
 
         'embedMinifiedScript:./index.html:./release/js/SakriDotNet.min.js:./release/index.html',
+        'embedMinifiedScript:./blog.html:./release/js/SakriDotNet.min.js:./release/blog.html',
         'embedMinifiedScript:./faq.html:./release/js/SakriDotNet.min.js:./release/faq.html',
         'embedMinifiedScript:./portfolio.html:./release/js/SakriDotNet.min.js:./release/portfolio.html',
         'embedMinifiedScript:./statsModule.html:./release/js/StatsModule.min.js:./release/statsModule.html',
 
         'embedMinifiedCss:./release/index.html:./release/css/sakriDotNet.min.css',
+        'embedMinifiedCss:./release/blog.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/faq.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/portfolio.html:./release/css/sakriDotNet.min.css',
         'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css',

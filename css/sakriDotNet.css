@@ -42,6 +42,11 @@ section{
     color: #FBD000;/* selected link */
 }
 
+sectionExtendedContent img{
+    width: 100%;
+    object-fit: contain;
+}
+
 /* CARDS MENU */
 
 .cardElement{

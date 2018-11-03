@@ -88,7 +88,9 @@
             case "folio":
                 label = "portfolio";
                 break;
-        }
+            case "blog":
+                label = "blog";
+                break;        }
         return label;
     };
 

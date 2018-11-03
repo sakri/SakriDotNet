@@ -66,7 +66,7 @@
             animateSelectedCardOut();
         };
 
-        this.enterPressHandler = function(){
+        this.openCardAtCurrentScrollPosition = function(){
             if(!_interactivityManager.isInteractionLocked()){
                 executeCardClick(_cards[_cards.length - 2]);//TODO: has to check if has enough cards for following calculation!
             }
@@ -84,6 +84,7 @@
             _canvas.style.display = value ? "block" : "none";
         };
 
+        //TODO: Review implementation
         this.processDeepLinkFromTitle = function(title){
             handleDeepLink(title);
         };
