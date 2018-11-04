@@ -257,6 +257,7 @@
             }
             _loader.render(completed / _images.length);
             if(completed >= _images.length && _loader.circlesIntroComplete() ){
+                console.log("images load complete, loaded : ", completed, " / ",  _images.length);
                 _loader.playExitAnimation(completeCallBack);
                 return;
             }

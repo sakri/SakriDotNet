@@ -1,6 +1,6 @@
 /**
  * Created by Sakri Rosenstrom on 01-10-18
- * Dependencies : utils.js
+ * Dependencies : MathUtil, Rectangle
  *
  *
  * =====================================================

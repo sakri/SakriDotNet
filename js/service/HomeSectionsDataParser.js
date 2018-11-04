@@ -20,8 +20,8 @@
             data.themeColor = AppConfig.colorPalette[i % AppConfig.colorPalette.length];
             data.title = node.querySelector("h1").innerHTML.toLowerCase();
             data.contentLayout = new CardContentLayout(
-                data.image ? data.image.width : AppLayout.thumbDefaultBounds.width,
-                data.image ? data.image.height : AppLayout.thumbDefaultBounds.height
+                data.image ? data.image.width : AppLayout.cardImageDefaultBounds.width,
+                data.image ? data.image.height : AppLayout.cardImageDefaultBounds.height
             );
             data.headline = node.querySelector("p").innerHTML;
             story = section.querySelector(".sectionExtendedContent");
