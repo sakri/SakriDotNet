@@ -64,8 +64,16 @@
                 Math.ceil(data.contentLayout.thumbBounds.height * AppLayout.cardBounds.width)
             );
             console.log("createCardThumbnailImage()", data.image.width, data.image.height, _renderCanvas.width, _renderCanvas.height);
-            _renderContext.drawImage(data.image, 0, 0, _renderCanvas.width, _renderCanvas.height);
-            data.thumbnailImage = createImageFromRenderCanvas(data.thumbnailImage);
+            try{
+                _renderContext.drawImage(data.image, 0, 0, _renderCanvas.width, _renderCanvas.height);
+                data.thumbnailImage = createImageFromRenderCanvas(data.thumbnailImage);
+            }catch(error){
+                console.log("Error creating card image, generate missing image.")
+                data.image = null;
+                data.thumbnailImage = null;
+                this.createCardThumbnailImageFromTitle(data);
+            }
+
         };
 
         this.createCardThumbnailImageFromTitle = function(data){

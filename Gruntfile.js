@@ -305,7 +305,12 @@ npm install libxmljs --save-dev
             nav += '\n\t\t<a href="#' + hash + '">' + hash.split("_").join(" ") + '</a>';
             bodyContent += '\n\t<section id="' + hash + '">\n';
             fileContents = grunt.file.read("./" + file.fileName);
-            bodyContent += fileContents.split("<body>")[1].split("</body>")[0];
+            //
+            fileContents = fileContents.split("<body>")[1].split("</body>")[0];
+            fileContents = fileContents.split('<img src="https://www.sakri.net/').join('<img src="./');
+
+            bodyContent += fileContents;
+
             bodyContent += '\n\t</section>\n';
         }
         nav += "\n\t</nav>\n";

@@ -17,10 +17,12 @@
 
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script>
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-0047234248896096",
-            enable_page_level_ads: true
-        });
+        if(location.href.indexOf("localhost") === -1) {
+            (adsbygoogle = window.adsbygoogle || []).push({
+                google_ad_client: "ca-pub-0047234248896096",
+                enable_page_level_ads: true
+            });
+        }
     </script>
 
     <!-- site metadata -->
