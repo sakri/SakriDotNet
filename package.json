@@ -8,6 +8,8 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^3.0.0",
-    "grunt-contrib-uglify": "^3.4.0"
+    "grunt-contrib-uglify": "^3.4.0",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
   }
 }

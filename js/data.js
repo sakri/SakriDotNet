@@ -254,7 +254,7 @@
         var stat, statInt, i;
         for(i=0; i<4; i++) {
             stat = parseInt(parts[i]);
-            if (isNaN(stat) || stat > 128) {
+            if (isNaN(stat) || stat > 255) {
                 console.log("AppData.updateFromVisitStatsUrlParam() Invalid param, invalid stat[" + i + "] : ", stat);
                 return;
             }

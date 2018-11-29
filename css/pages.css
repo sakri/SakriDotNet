@@ -3,14 +3,6 @@ html, body{
     padding: 0px;
     font-family: Helvetica,Arial,sans-serif;
     background-color: #ededed;
-    font-size: 1.5em;
-}
-
-#header{
-    word-break: break-all;
-}
-
-#main{
     margin: 2% 2% 2% 2%;  /*top right bottom left */
     word-break: break-all;
 }

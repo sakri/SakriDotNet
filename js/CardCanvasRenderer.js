@@ -61,19 +61,21 @@
             }
             updateRenderCanvas(
                 Math.ceil(data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width),
-                Math.ceil(data.contentLayout.thumbBounds.height * AppLayout.cardBounds.width)
+                Math.ceil(data.contentLayout.thumbBounds.height * AppLayout.cardBounds.height)
             );
-            console.log("createCardThumbnailImage()", data.image.width, data.image.height, _renderCanvas.width, _renderCanvas.height);
+            var percent = Math.min(
+                 data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width / data.image.width,
+                 data.contentLayout.thumbBounds.height * AppLayout.cardBounds.height / data.image.height
+            );
             try{
-                _renderContext.drawImage(data.image, 0, 0, _renderCanvas.width, _renderCanvas.height);
+                _renderContext.putImageData(CanvasMultiPassResize.getImageData(data.image, percent, 2), 0, 0);
                 data.thumbnailImage = createImageFromRenderCanvas(data.thumbnailImage);
             }catch(error){
-                console.log("Error creating card image, generate missing image.")
+                console.log("Error creating card image, generate missing image.");
                 data.image = null;
                 data.thumbnailImage = null;
                 this.createCardThumbnailImageFromTitle(data);
             }
-
         };
 
         this.createCardThumbnailImageFromTitle = function(data){
@@ -141,6 +143,7 @@
             _renderContext.textAlign = "left";
 
             var titleBounds = new Rectangle(0, 0, _renderCanvas.width, _renderCanvas.height);
+            //var title = data.title.length
             data.titleFontSize = setContextAutoFitSingleLineFont(_renderContext, titleBounds, data.title, getTitleCanvasFontString, data.titleFontSize );
             _renderContext.fillText(data.title, 0, Math.round(_renderCanvas.height / 2));
         };

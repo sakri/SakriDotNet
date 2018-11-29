@@ -141,7 +141,6 @@
 
         //console.log("CardContentLayout constructor() : ", imageOriginalWidth, imageOriginalHeight);
 
-        //TODO: rename thumbBounds to thumbBounds
         this.thumbBounds = new Rectangle();
         this.storyBounds = new Rectangle();
 
@@ -149,7 +148,7 @@
 
             //bounds are first calculated to full screen, then stored as normals pertaining to width and height:
             //new Rect(10,10,90,90) app is 100by100 => rect(.1, .1, .9, .9)
-            this.thumbBounds.update(0,0,imageOriginalWidth, imageOriginalHeight);
+            this.thumbBounds.update(0, 0, imageOriginalWidth, imageOriginalHeight);
             RectangleUtil.scaleRectDownTo(AppLayout.cardImageDefaultBounds, this.thumbBounds);
 
             this.storyBounds.updateToRect(AppLayout.storyDefaultBounds);

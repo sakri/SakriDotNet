@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Canvas image resize test</title>
+
+    <style>
+
+        html, body{
+            margin: 0px;
+            padding: 0px;
+            font-family: Helvetica,Arial,sans-serif;
+        }
+
+        canvas{
+            display:inline;
+        }
+
+    </style>
+
+    <script src="./js/util/MathUtil.js"></script>
+    <script src="./js/util/CanvasMultiPassResize.js"></script>
+
+    <script>
+
+        var _singlePassContext, _doublePassContext, _imgLoader, _output;
+
+        function init(){
+            _imgLoader = document.getElementById('imgLoader');
+            _singlePassContext = document.getElementById('singlePass').getContext('2d');
+            _doublePassContext = document.getElementById('doublePass').getContext('2d');
+            var shrinkBy = .5;
+            _singlePassContext.canvas.width = _doublePassContext.canvas.width = _imgLoader.width * shrinkBy;
+            _singlePassContext.canvas.height = _doublePassContext.canvas.height = _imgLoader.height * shrinkBy;
+            _singlePassContext.putImageData(CanvasMultiPassResize.getImageData(_imgLoader, .4), 0, 0);
+            _doublePassContext.putImageData(CanvasMultiPassResize.getImageData(_imgLoader, .4, 2), 0, 0);
+        };
+
+    </script>
+
+</head>
+<body>
+
+    <image src="./assets/sectionImages/medium/services.png" onload="init()" id="imgLoader"></image>
+    <!--<image src="./assets/sectionImages/profile.jpg" onload="init()" id="imgLoader"></image>-->
+    <canvas id="singlePass"></canvas>
+    <canvas id="doublePass"></canvas>
+
+</body>
+</html>

@@ -367,6 +367,7 @@ npm install libxmljs --save-dev
         'embedMinifiedCss:./release/statsModule.html:./release/css/statsModule.min.css',
 
         'copyToRelease:./index.html:./release/indexWithSource.html',
+        'copyToRelease:./404.html:./release/404.html',
         'copyToRelease:./css/sakriDotNet.css:./release/css/sakriDotNet.css',
         'copyToRelease:./css/statsModule.css:./release/css/statsModule.css',
 
