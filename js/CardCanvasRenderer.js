@@ -60,15 +60,14 @@
                 return;
             }
             updateRenderCanvas(
-                Math.ceil(data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width),
-                Math.ceil(data.contentLayout.thumbBounds.height * AppLayout.cardBounds.height)
+                data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width,
+                data.contentLayout.thumbBounds.height * AppLayout.cardBounds.height
             );
-            var percent = Math.min(
-                 data.contentLayout.thumbBounds.width * AppLayout.cardBounds.width / data.image.width,
-                 data.contentLayout.thumbBounds.height * AppLayout.cardBounds.height / data.image.height
-            );
+            var percent = Math.min(_renderCanvas.width / data.image.width, _renderCanvas.height / data.image.height);
+
             try{
-                _renderContext.putImageData(CanvasMultiPassResize.getImageData(data.image, percent, 2), 0, 0);
+                var imgData = CanvasMultiPassResize.getImageData(data.image, percent, 2);
+                _renderContext.putImageData(imgData, 0, 0);
                 data.thumbnailImage = createImageFromRenderCanvas(data.thumbnailImage);
             }catch(error){
                 console.log("Error creating card image, generate missing image.");

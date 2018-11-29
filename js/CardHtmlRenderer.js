@@ -55,10 +55,10 @@
                 return;
             }
             element.style.visibility = "visible";
-            element.style.left = Math.round(AppLayout.cardBounds.x + bounds.x * AppLayout.cardBounds.width) + "px";
-            element.style.top = Math.round(AppLayout.cardBounds.y + bounds.y * AppLayout.cardBounds.height) + "px";
-            element.style.width = Math.round(bounds.width * AppLayout.cardBounds.width) + "px";
-            element.style.height = Math.round(bounds.height * AppLayout.cardBounds.height) + "px";
+            element.style.left = (AppLayout.cardBounds.x + bounds.x * AppLayout.cardBounds.width) + "px";
+            element.style.top = (AppLayout.cardBounds.y + bounds.y * AppLayout.cardBounds.height) + "px";
+            element.style.width = bounds.width * AppLayout.cardBounds.width + "px";
+            element.style.height = bounds.height * AppLayout.cardBounds.height + "px";
         };
 
         var updateCardLayout = function(){
@@ -107,7 +107,7 @@
 
             //IMAGE
             _thumbImage = new Image();
-            _thumbImage.classList.add("cardElement", "cardImage");
+            _thumbImage.classList.add("cardElement");
             _card.appendChild(_thumbImage);
 
             //STORY

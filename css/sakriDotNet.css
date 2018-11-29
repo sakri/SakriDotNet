@@ -71,10 +71,6 @@ sectionExtendedContent img{
     margin-bottom: 5%;
 }
 
-.cardImage{
-
-}
-
 .cardStory{
     /*overflow: hidden;*/
     overflow-y: auto;

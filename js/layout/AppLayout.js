@@ -29,7 +29,7 @@
         this.headerBounds.updateToRect(this.cardBounds);
         this.headerBounds.height = Math.round(Math.min(this.cardBounds.width, this.cardBounds.height) * .1);
 
-        this.cardImageDefaultBounds.x = margin * 2;
+        this.cardImageDefaultBounds.x = margin;
         this.cardImageDefaultBounds.y = this.headerBounds.bottom() + margin;
         //console.log("CardContentLayout updateLayout() img.x, y : ", this.thumbBounds.x, this.thumbBounds.y);
         if(this.bounds.isLandscape()){
@@ -44,7 +44,7 @@
             this.storyDefaultBounds.y = this.cardImageDefaultBounds.bottom() + margin;
             this.storyDefaultBounds.height = this.cardBounds.bottom() - this.storyDefaultBounds.y - margin;
         }
-        this.storyDefaultBounds.width -= this.cardBounds.x;
+        //this.storyDefaultBounds.width -= this.cardBounds.x;
         //REMOVE
         CardMenuLayout.updateLayout(width, height);//Update to TangleUI
     };
@@ -141,36 +141,39 @@
 
         //console.log("CardContentLayout constructor() : ", imageOriginalWidth, imageOriginalHeight);
 
-        this.thumbBounds = new Rectangle();
+        this.thumbBounds = new Rectangle();//normals relative to card dimensions
         this.storyBounds = new Rectangle();
 
         this.updateLayout = function(){
 
-            //bounds are first calculated to full screen, then stored as normals pertaining to width and height:
+            //bounds are first calculated to full screen, then stored as normals pertaining to card width and height:
             //new Rect(10,10,90,90) app is 100by100 => rect(.1, .1, .9, .9)
             this.thumbBounds.update(0, 0, imageOriginalWidth, imageOriginalHeight);
             RectangleUtil.scaleRectDownTo(AppLayout.cardImageDefaultBounds, this.thumbBounds);
 
             this.storyBounds.updateToRect(AppLayout.storyDefaultBounds);
 
+            this.thumbBounds.y = AppLayout.cardImageDefaultBounds.y;
             if(AppLayout.bounds.isPortrait()){
-                RectangleUtil.align(AppLayout.cardImageDefaultBounds, this.thumbBounds, "center", "middle");
+                this.thumbBounds.x = AppLayout.cardBounds.width * .5 - this.thumbBounds.width * .5;
+                this.storyBounds.x = AppLayout.cardBounds.width * .5 - this.storyBounds.width * .5;
                 this.storyBounds.y = this.thumbBounds.bottom() + AppLayout.cardBounds.x;
-                this.storyBounds.height = AppLayout.cardBounds.bottom() - this.storyBounds.y - AppLayout.cardBounds.x;
+                this.storyBounds.height = AppLayout.cardBounds.bottom() - this.storyBounds.y - AppLayout.cardImageDefaultBounds.x;
             }else{
-                RectangleUtil.align(AppLayout.cardImageDefaultBounds, this.thumbBounds, "center", "top");
+                this.thumbBounds.x = AppLayout.cardBounds.width * .25 - this.thumbBounds.width * .5;
             }
+            this.storyBounds.width -= AppLayout.cardImageDefaultBounds.x;
 
             //convert to normals
-            this.thumbBounds.x /= AppLayout.bounds.width;
-            this.thumbBounds.y /= AppLayout.bounds.height;
-            this.thumbBounds.width /= AppLayout.bounds.width;
-            this.thumbBounds.height /= AppLayout.bounds.height;
+            this.thumbBounds.x /= AppLayout.cardBounds.width;
+            this.thumbBounds.y /= AppLayout.cardBounds.height;
+            this.thumbBounds.width /= AppLayout.cardBounds.width;
+            this.thumbBounds.height /= AppLayout.cardBounds.height;
 
-            this.storyBounds.x /= AppLayout.bounds.width;
-            this.storyBounds.y /= AppLayout.bounds.height;
-            this.storyBounds.width /= AppLayout.bounds.width;
-            this.storyBounds.height /= AppLayout.bounds.height;
+            this.storyBounds.x /= AppLayout.cardBounds.width;
+            this.storyBounds.y /= AppLayout.cardBounds.height;
+            this.storyBounds.width /= AppLayout.cardBounds.width;
+            this.storyBounds.height /= AppLayout.cardBounds.height;
 
         };
 

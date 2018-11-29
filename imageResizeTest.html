@@ -23,28 +23,46 @@
 
     <script>
 
-        var _singlePassContext, _doublePassContext, _imgLoader, _output;
-
         function init(){
-            _imgLoader = document.getElementById('imgLoader');
-            _singlePassContext = document.getElementById('singlePass').getContext('2d');
-            _doublePassContext = document.getElementById('doublePass').getContext('2d');
+            //compareMultiPass();
+            checkScalingBug();
+        }
+
+        function compareMultiPass(){
+            var imgLoader = document.getElementById('imgLoader');
+            var singlePassContext = document.getElementById('singlePass').getContext('2d');
+            var doublePassContext = document.getElementById('doublePass').getContext('2d');
             var shrinkBy = .5;
-            _singlePassContext.canvas.width = _doublePassContext.canvas.width = _imgLoader.width * shrinkBy;
-            _singlePassContext.canvas.height = _doublePassContext.canvas.height = _imgLoader.height * shrinkBy;
-            _singlePassContext.putImageData(CanvasMultiPassResize.getImageData(_imgLoader, .4), 0, 0);
-            _doublePassContext.putImageData(CanvasMultiPassResize.getImageData(_imgLoader, .4, 2), 0, 0);
-        };
+            singlePassContext.canvas.width = doublePassContext.canvas.width = imgLoader.width * shrinkBy;
+            singlePassContext.canvas.height = doublePassContext.canvas.height = imgLoader.height * shrinkBy;
+            singlePassContext.putImageData(CanvasMultiPassResize.getImageData(imgLoader, .4), 0, 0);
+            doublePassContext.putImageData(CanvasMultiPassResize.getImageData(imgLoader, .4, 2), 0, 0);
+        }
+
+        function checkScalingBug(){
+            var imgLoader = document.getElementById('imgLoader');
+            var context = document.getElementById('singlePass').getContext('2d');
+            var shrinkBy = .5;
+            //imgLoader.style.position = context.canvas.style.position = 'absolute';
+            var imgWidth = imgLoader.width;
+            var imgHeight = imgLoader.height;
+            context.canvas.width =  imgWidth * shrinkBy;
+            context.canvas.height = imgHeight * shrinkBy;
+            context.putImageData(CanvasMultiPassResize.getImageData(imgLoader, shrinkBy), 0, 0);
+            context.fillStyle = 'rgba(255, 0, 0, .3)';
+            context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+            imgLoader.style.width = (imgWidth * shrinkBy) + "px";
+            imgLoader.style.height = (imgHeight * shrinkBy) + "px";
+        }
 
     </script>
 
 </head>
 <body>
 
-    <image src="./assets/sectionImages/medium/services.png" onload="init()" id="imgLoader"></image>
-    <!--<image src="./assets/sectionImages/profile.jpg" onload="init()" id="imgLoader"></image>-->
+    <!--<image src="./assets/sectionImages/medium/services.png" onload="init()" id="imgLoader"></image>-->
+    <image src="./assets/sectionImages/profile.jpg" onload="init()" id="imgLoader"></image>
     <canvas id="singlePass"></canvas>
-    <canvas id="doublePass"></canvas>
 
 </body>
 </html>
