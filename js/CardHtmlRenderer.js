@@ -65,7 +65,7 @@
             showCardElement(_thumbImage, _data.thumbnailImage, _data.contentLayout.thumbBounds);
             showCardElement(_story, _data.headline, _data.contentLayout.storyBounds);
             _story.style.fontSize = _data.textFontSize + "px";
-            _story.style.width = Math.round(_data.contentLayout.storyBounds.width * AppLayout.cardBounds.width + AppLayout.cardBounds.x) + "px";
+            _story.style.width = Math.round(_data.contentLayout.storyBounds.width * AppLayout.cardBounds.width + AppLayout.cardImageDefaultBounds.x) + "px";
             _story.style.marginRight = AppLayout.cardBounds.x + "px";
             _story.style.marginBottom = AppLayout.headerBounds.height;
 

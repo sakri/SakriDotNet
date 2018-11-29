@@ -36,7 +36,7 @@
             this.cardImageDefaultBounds.width = Math.round(this.cardBounds.width * .5 - margin * 2);
             this.cardImageDefaultBounds.height = Math.round(this.cardBounds.height * .7);
             this.storyDefaultBounds.updateToRect(this.cardImageDefaultBounds);
-            this.storyDefaultBounds.x = this.cardBounds.right() - this.storyDefaultBounds.width - margin;
+            this.storyDefaultBounds.x = this.cardBounds.width * .5 + margin;
         }else{
             this.cardImageDefaultBounds.width = this.cardBounds.width - margin * 2;
             this.cardImageDefaultBounds.height = Math.round(this.cardBounds.height * .3);
