@@ -18,10 +18,18 @@
             _story.innerHTML = "<p class=\"cardStoryFirstParagraph\">" + _data.headline + "</p>" +  (_data.story || "");
             _story.style.fontSize = _data.textFontSize + "px";
             _story.style.lineHeight = _data.textLineHeight + "px";
-            _story.scrollTop = 0;
+            _story.style.visibility = 'hidden';
+
             _link.innerHTML = _data.link ? _data.link.innerHTML : "";
             _card.style.display = "initial";
-            setTimeout(checkStoryReadComplete, 500);//TODO: use requestAnimationFrame instead?
+            requestAnimationFrame(this.checkScroller.bind(this));
+        };
+
+        this.checkScroller = function(){
+            var storyHeight = _data.contentLayout.storyBounds.height * AppLayout.cardBounds.height;
+            _story.style.paddingRight = (_story.scrollHeight >  storyHeight ? AppLayout.cardBounds.x : 0) + "px";
+            _story.style.visibility = 'visible';
+            checkStoryReadComplete();
         };
 
         this.isOpen = function(){
@@ -65,9 +73,7 @@
             showCardElement(_thumbImage, _data.thumbnailImage, _data.contentLayout.thumbBounds);
             showCardElement(_story, _data.headline, _data.contentLayout.storyBounds);
             _story.style.fontSize = _data.textFontSize + "px";
-            _story.style.width = Math.round(_data.contentLayout.storyBounds.width * AppLayout.cardBounds.width + AppLayout.cardImageDefaultBounds.x) + "px";
-            _story.style.marginRight = AppLayout.cardBounds.x + "px";
-            _story.style.marginBottom = AppLayout.headerBounds.height;
+            _story.style.width = (_data.contentLayout.storyBounds.width * AppLayout.cardBounds.width) + "px";
 
             if(_data.link && _data.link.innerHTML){
                 _link.style.height = AppLayout.headerBounds.height + "px";
@@ -121,6 +127,7 @@
                 }
             };
             _card.appendChild(_story);
+
 
             //LINK
             _link = document.createElement("button");

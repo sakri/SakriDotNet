@@ -5,6 +5,7 @@ html, body{
     background-color: #ededed;
     margin: 2% 2% 2% 2%;  /*top right bottom left */
     word-break: break-all;
+    color:#262626;
 }
 
 .sectionContent img{

@@ -42,7 +42,7 @@
             this.cardImageDefaultBounds.height = Math.round(this.cardBounds.height * .3);
             this.storyDefaultBounds.updateToRect(this.cardImageDefaultBounds);
             this.storyDefaultBounds.y = this.cardImageDefaultBounds.bottom() + margin;
-            this.storyDefaultBounds.height = this.cardBounds.bottom() - this.storyDefaultBounds.y - margin;
+            this.storyDefaultBounds.height = this.cardBounds.height - this.storyDefaultBounds.y - margin;
         }
         //this.storyDefaultBounds.width -= this.cardBounds.x;
         //REMOVE
@@ -158,7 +158,7 @@
                 this.thumbBounds.x = AppLayout.cardBounds.width * .5 - this.thumbBounds.width * .5;
                 this.storyBounds.x = AppLayout.cardBounds.width * .5 - this.storyBounds.width * .5;
                 this.storyBounds.y = this.thumbBounds.bottom() + AppLayout.cardBounds.x;
-                this.storyBounds.height = AppLayout.cardBounds.bottom() - this.storyBounds.y - AppLayout.cardImageDefaultBounds.x;
+                this.storyBounds.height = AppLayout.cardBounds.height - this.storyBounds.y - AppLayout.cardImageDefaultBounds.x;
             }else{
                 this.thumbBounds.x = AppLayout.cardBounds.width * .25 - this.thumbBounds.width * .5;
             }

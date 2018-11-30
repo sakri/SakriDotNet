@@ -98,18 +98,13 @@
     <!-- init -->
     <script>
 
-        function waitForIt(){
-            if(document.body){
-                if(AppConfig.checkNoJs()){
-                    return;
-                }
-                document.body.style.overflow = "hidden";
-                return new SakriDotNetHomeApp("folio", "index.html").init();
+        (function waitForIt(){
+            if(document.body && window.Promise && !AppConfig.checkNoJs()){
+                document.body.style.overflow = 'hidden';
+                return new SakriDotNetHomeApp('folio', 'index.html').init();
             }
             requestAnimationFrame(waitForIt);
-        }
-
-        waitForIt();
+        }());
 
     </script>
 

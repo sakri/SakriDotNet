@@ -6,7 +6,7 @@
 (function() {
 
     window.AppConfig = {};
-    AppConfig.appBgColor = "#ededed";
+    AppConfig.appBgColor = "#f3f3f3";
     AppConfig.cardBgColor = "#ffffff";
     AppConfig.colorPalette = ["#049CD8", "#FBD000", "#E52521", "#43B047"];
     AppConfig.getRandomPaletteColor = function(){

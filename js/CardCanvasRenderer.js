@@ -36,7 +36,7 @@
         //Private variables
         var _renderCanvas, _renderContext,
             _titleFontColor = "#444444",
-            _textFontColor = "#000000";
+            _textFontColor = "#262626";
 
         //Public API
 
