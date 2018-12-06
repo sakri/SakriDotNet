@@ -154,4 +154,11 @@
         RectangleUtil.scaleRectTo(staticRect, rectToScale);
     };
 
+    RectangleUtil.positionFromNormalRect = function(rect, normalRect, staticRect){
+        rect.x = staticRect.x + normalRect.x * staticRect.width;
+        rect.y = staticRect.y + normalRect.y * staticRect.height;
+        rect.width = normalRect.width * staticRect.width;
+        rect.height = normalRect.height * staticRect.height;
+    };
+
 }(window));

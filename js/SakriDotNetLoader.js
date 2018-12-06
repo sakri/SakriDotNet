@@ -52,9 +52,7 @@
         };
 
         this.updateCircles = function(colors, numCircles){
-            if(_circles){
-                _circles.updateCircles(colors, numCircles, _circlesBounds, _circlesEmitter);
-            }
+            _circles.updateCircles(colors, numCircles, _circlesBounds, _circlesEmitter);
         };
 
         this.circlesIntroComplete = function(){
@@ -256,7 +254,7 @@
                 completed += (_images[i].complete ? 1 : 0);
             }
             _loader.render(completed / _images.length);
-            if(completed >= _images.length && _loader.circlesIntroComplete() ){
+            if(_images.length && completed >= _images.length && _loader.circlesIntroComplete() ){
                 console.log("images load complete, loaded : ", completed, " / ",  _images.length);
                 _loader.playExitAnimation(completeCallBack);
                 return;

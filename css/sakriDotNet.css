@@ -48,6 +48,10 @@ sectionExtendedContent img{
     object-fit: contain;
 }
 
+.sectionExtraImages{
+    display: none;
+}
+
 /* CARDS MENU */
 
 .cardElement{

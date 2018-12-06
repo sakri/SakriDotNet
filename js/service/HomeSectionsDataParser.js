@@ -7,12 +7,12 @@
     //loops through "section" tags on a page, stores content as data objects and clears dom
     HomeSectionsDataParser.parseSectionsData = function () {
         var sectionNodes = document.body.querySelectorAll("section, article"),
-            dataList = [], data, section, node, i, story, originalImage;
+            dataList = [], data, section, node, i, story, originalImage, extraImages;
         for (i = 0; i < sectionNodes.length; i++) {
             section = sectionNodes[i];
             node = section.querySelector(".sectionContent");
             originalImage = node.querySelector("img");
-            data = {};
+            data = new CardData();
             if (originalImage) {
                 data.image = new Image();
                 data.image.src = originalImage.src;
@@ -29,6 +29,7 @@
             data.link = node.querySelector("a");
             data.visited = false;
             data.storyReadComplete = false;
+            data.extraImages = getExtraImagesFromSection(section);
             dataList[i] = data;
         }
         document.body.innerHTML = "";
@@ -36,5 +37,16 @@
     };
     //private properties and methods
 
+    var getExtraImagesFromSection = function(section){
+        var extraImages = section.querySelector(".sectionExtraImages");
+        if(!extraImages){
+            return null;
+        }
+        extraImages = extraImages.getElementsByTagName("a");
+        extraImages = Array.from({length: extraImages.length}, function(empty, i){
+            return extraImages[i].getAttribute("href");
+        });
+        return extraImages;
+    }
 
 }());

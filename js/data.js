@@ -51,13 +51,14 @@
 
     window.CardData = function(){
 
-        this.image = "";
+        this.image = "";//card thumbnail
         this.themeColor = "#CCCCCC";
         this.title = "";
         this.contentLayout = undefined;//new CardContentLayout(origWidth, origHeight)
         this.headline = "";
         this.story = "";
-        this.link = "";
+        this.link = "";//action link (used to open other apps : portfolio, faq, blog)
+        this.extraImages = undefined;//card image rotation
 
         //Card state related, maybe move
         this.visited = false;

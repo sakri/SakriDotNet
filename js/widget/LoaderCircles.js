@@ -17,13 +17,12 @@
                 return;
             }
 
-            _circles = [];
             var circleXIncrement = bounds.width / numCircles;
             _radius = Math.min(Math.round(circleXIncrement * .3), bounds.height);
             _lineWidth = _radius * .3;
             _emitter = emitter;
-            for(var i=0; i < numCircles; i++){
-                _circles[i] = {
+            _circles = Array.from({length: numCircles}, function(empty, i){
+                return {
                     currentX : emitter.x,
                     currentY : emitter.y,
                     endX : Math.round(bounds.x + circleXIncrement * i + circleXIncrement * .5),
@@ -31,7 +30,7 @@
                     color : colors[i % colors.length],
                     animNormal : 0
                 };
-            }
+            });
         };
 
         this.renderLoading = function(normal, context){
@@ -61,7 +60,7 @@
                     i * circleScaleDurationNormalSpacer,
                     i * circleScaleDurationNormalSpacer + circleSpacing * 2
                 );
-                radius = _radius + Math.sin(radiusNormal * Math.PI) * (_radius * .4);//ok.. whatever?
+                radius = _radius + Math.sin(radiusNormal * Math.PI) * (_radius * .4);
 
                 context.beginPath();
                 if(i === renderCount - 1){
@@ -75,7 +74,7 @@
                 context.stroke();
             }
             _fakeProgressNormal += .01;
-            _fakeProgressNormal = (_fakeProgressNormal < 1) ? _fakeProgressNormal : 0;
+            _fakeProgressNormal = _fakeProgressNormal > 1 ? 0 : _fakeProgressNormal;
         };
 
         this.introComplete = function(){
@@ -83,22 +82,19 @@
         };
 
         this.prepareExit = function(endX, endY){
-            var i, circle;
-            for(i = 0; i<_circles.length; i++){
-                circle = _circles[i];
+            _circles.forEach(function(circle){
                 circle.startX = circle.endX;
                 circle.startY = circle.endY;
                 circle.endX = endX;
                 circle.endY = endY;
-            }
+            });
         };
 
         this.renderLoaderCirclesCompleteTransition = function(normal, context){
             var i, circle, smoothStepIncrement = (1 / _circles.length), animNormal;
             context.strokeStyle = "#222222";
             context.lineWidth = _lineWidth;
-            for(i=0; i<_circles.length; i++){
-                circle = _circles[i];
+            _circles.forEach(function(circle, i){
                 animNormal = MathUtil.smoothstep(normal, smoothStepIncrement * i, 1);
                 circle.currentX = MathUtil.interpolate(normal, circle.startX, circle.endX);
                 circle.currentY = MathUtil.interpolate(animNormal, circle.startY, circle.endY);
@@ -108,7 +104,7 @@
                 context.closePath();
                 context.fill();
                 context.stroke();
-            }
+            });
         };
 
     };

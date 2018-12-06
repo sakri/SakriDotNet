@@ -14,10 +14,6 @@
 
     Sakri.ImageLoader = function() {
 
-        //DEBUGGING  TODO: REMVOVE
-        var _ajaxStartTime = -1;
-        var _imageStartTime = -1;
-
         //private properties
         var _request = new XMLHttpRequest();
         var _progressNormal = 0;
@@ -29,7 +25,6 @@
 
         //should have some failsafe checking if image has been fully loaded?
         this.getImage = function(){
-            //return image.cloneNode(true);
             return _image;
         };
 
@@ -44,7 +39,6 @@
 
             _request.onload = function( e ) {
                 _progressNormal = 1;
-                console.log("ImageLoader.onload ajax call took : " + (performance.now() - _ajaxStartTime));
                 _loadImageFromCache(url, completeCallback, errorCallback);
             };
 
@@ -63,7 +57,6 @@
                 }
             };
 
-            ajaxStartTime = performance.now();
             _request.open( 'GET', url , true );
             _request.responseType = 'arraybuffer';
             _request.send();
@@ -71,10 +64,8 @@
         };
 
         this.loadImageFromCache = function(url, completeCallback, errorCallback){
-            _imageStartTime = performance.now();
             _image.src = url;
             _image.onload = function(){
-                console.log("ImageLoader.onload image cache call took : " + (performance.now() - _imageStartTime));
                 this.onload = function(){};
                 if(completeCallback){
                     completeCallback();

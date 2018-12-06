@@ -6,6 +6,7 @@
 
 (function() {
 
+    //TODO: readyCallback currently used to check hash (url) rename, unclear
     window.CardsMenu = function(parent, zIndex, scrollCallback, cardClickCallback, readyCallback){
 
         var _canvas,
@@ -407,7 +408,7 @@
         var animateCardInComplete = function(){
             _selectedCard.render(_context, _data[_selectedDataIndex], false);
             if(_cardClickHandler){
-                _cardClickHandler(_selectedDataIndex- _nullStartItems);
+                _cardClickHandler(_selectedDataIndex - _nullStartItems);
             }
         };
 

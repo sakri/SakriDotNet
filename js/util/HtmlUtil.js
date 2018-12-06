@@ -19,4 +19,16 @@
         return measuredWidth;
     };
 
+    HtmlUtil.showElement = function(element, bounds, display){
+        if(!bounds || display === "none"){
+            element.style.display = "none";//used to toggle visibility. TangleUI managed items use display:block, so no issue
+            return;
+        }
+        element.style.display = display || "block";
+        element.style.left = Math.round(bounds.x) + "px";
+        element.style.top = Math.round(bounds.y) + "px";
+        element.style.width = Math.round(bounds.width) + "px";
+        element.style.height = Math.round(bounds.height) + "px";
+    };
+
 }());

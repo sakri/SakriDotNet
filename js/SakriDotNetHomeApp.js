@@ -5,6 +5,11 @@
         //Public API
 
         this.init = function () {
+            if (location.hash) {
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                }, 1);
+            }
             GoogleAnalyticsService.appName = appName;//@appName is currently only used for analytics
             TangleUI.setLayoutDefinitions(SakriDotNetLayout);
             TransitionStore.setTransitionDefinitions(SakriDotNetTransitions);
@@ -53,13 +58,12 @@
 
         //move to _cardCanvasRenderer
         var renderCardsCanvasAssets = function () {
-            var i, cardData, showReadMore, lastIndex = AppData.cards.length - 1;
-            for (i = 0; i < AppData.cards.length; i++){
-                cardData = AppData.cards[i];
+            var showReadMore, lastIndex = AppData.cards.length - 1;
+            AppData.cards.forEach(function(cardData, i){
                 cardData.contentLayout.updateLayout();
                 showReadMore = i === lastIndex;//only card on top needs this (never visible for others)
                 _cardCanvasRenderer.createCardCanvasAssets(cardData, showReadMore);
-            }
+            });
             _menu.setData(AppData.cards);
         };
 

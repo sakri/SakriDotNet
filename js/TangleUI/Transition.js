@@ -59,7 +59,7 @@
         return "translate(" + rect.x + "px, " + rect.y + "px)";
     };
 
-    //TODO: move, is useful without Transitions.
+    //TODO: move, is useful without Transitions. Duplicated in HtmlUtil. remove!
     TransitionCSSUtil.showElement = function(element, bounds){
         if(!bounds){
             element.style.display = "none";//used to toggle visibility. TangleUI managed items use display:block, so no issue

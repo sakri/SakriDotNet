@@ -20,8 +20,10 @@
             _story.style.lineHeight = _data.textLineHeight + "px";
             _story.style.visibility = 'hidden';
 
+            //TODO: this causes a flicker but I can't seem to get the correct scrollHeight info in this frame
             _link.innerHTML = _data.link ? _data.link.innerHTML : "";
             _card.style.display = "initial";
+            checkExtraImages();
             requestAnimationFrame(this.checkScroller.bind(this));
         };
 
@@ -47,31 +49,24 @@
             if(_card){
                 _card.style.display = "none";
             }
+            if(_imagesCarousel){
+                _imagesCarousel.stop();
+            }
         };
 
 
         //Private properties and methods
 
-        var _data, _card, _thumbImage, _story, _link, _linkCanvas;
+        var _data, _card, _thumbImage, _story, _link, _linkCanvas, _imagesCarousel,
+            _imageBounds = new Rectangle(), _storyBounds = new Rectangle();
 
         //--------- Layout ---------------
 
-        //TODO: use TransitionCSSUtil.showCardElement
-        var showCardElement = function(element, value, bounds){
-            if(!value){
-                element.style.visibility = "hidden";
-                return;
-            }
-            element.style.visibility = "visible";
-            element.style.left = (AppLayout.cardBounds.x + bounds.x * AppLayout.cardBounds.width) + "px";
-            element.style.top = (AppLayout.cardBounds.y + bounds.y * AppLayout.cardBounds.height) + "px";
-            element.style.width = bounds.width * AppLayout.cardBounds.width + "px";
-            element.style.height = bounds.height * AppLayout.cardBounds.height + "px";
-        };
-
         var updateCardLayout = function(){
-            showCardElement(_thumbImage, _data.thumbnailImage, _data.contentLayout.thumbBounds);
-            showCardElement(_story, _data.headline, _data.contentLayout.storyBounds);
+            RectangleUtil.positionFromNormalRect(_imageBounds, _data.contentLayout.thumbBounds, AppLayout.cardBounds);
+            RectangleUtil.positionFromNormalRect(_storyBounds, _data.contentLayout.storyBounds, AppLayout.cardBounds);
+            HtmlUtil.showElement(_thumbImage, _imageBounds);
+            HtmlUtil.showElement(_story, _storyBounds);
             _story.style.fontSize = _data.textFontSize + "px";
             _story.style.width = (_data.contentLayout.storyBounds.width * AppLayout.cardBounds.width) + "px";
 
@@ -97,6 +92,14 @@
         //TODO: needs to be renamed to reflect link opens instance of SakriDotNetHomeApp
         var cardActionLinkClick = function(){
             window.location.href = _data.link.getAttribute("href")+"?" + AppData.getVisitStatsUrlParam();
+        };
+
+        var checkExtraImages = function(){
+            if(_data.extraImages && _data.extraImages.length){
+                _imagesCarousel = _imagesCarousel || new CardImageCarousel();
+                _imagesCarousel.load(_data.extraImages,_card, 100, _imageBounds, _thumbImage);
+                _thumbImage.style.display = "none";
+            }
         };
 
 
